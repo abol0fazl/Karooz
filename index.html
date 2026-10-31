@@ -856,7 +856,7 @@
   .project-percent-label{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px; }
   .project-percent-track{ height:8px; background:var(--bg-card); border-radius:999px; overflow:hidden; }
   .project-percent-fill{ height:100%; background:var(--red); border-radius:999px; }
-  .report-stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:20px 0; }
+  .report-stats-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:20px 0; }
   @media (max-width:640px){ .report-stats-grid{grid-template-columns:repeat(2,1fr);} }
 
   @media print{
@@ -876,6 +876,107 @@
     .header{ flex-direction: column-reverse; }
     .stamp{ align-self: flex-end; }
     .month-nav{ flex-wrap: wrap; }
+  }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+
+  /* ================= Minimal 3D layer (visual only — nothing structural changed) ================= */
+  :root{
+    --hl: rgba(255,255,255,0.08);
+    --lo: rgba(0,0,0,0.30);
+    --lift-1: inset 0 1px 0 var(--hl), inset 0 -1px 0 var(--lo), 0 1px 2px rgba(0,0,0,.28), 0 8px 16px -6px rgba(0,0,0,.38);
+    --lift-2: inset 0 1px 0 var(--hl), inset 0 -1px 0 var(--lo), 0 2px 4px rgba(0,0,0,.30), 0 16px 28px -10px rgba(0,0,0,.55);
+    --sink: inset 0 2px 5px rgba(0,0,0,.35), inset 0 -1px 0 var(--hl);
+  }
+  html[data-mode="light"]{
+    --hl: rgba(255,255,255,0.95);
+    --lo: rgba(120,80,70,0.14);
+    --lift-1: inset 0 1px 0 var(--hl), inset 0 -1px 0 var(--lo), 0 1px 2px rgba(90,60,50,.14), 0 8px 16px -6px rgba(90,60,50,.20);
+    --lift-2: inset 0 1px 0 var(--hl), inset 0 -1px 0 var(--lo), 0 2px 4px rgba(90,60,50,.16), 0 16px 28px -10px rgba(90,60,50,.30);
+    --sink: inset 0 2px 4px rgba(90,60,50,.18), inset 0 -1px 0 rgba(255,255,255,.9);
+  }
+
+  .card, .quote-card, .project-card, .task, .day-box, .project-stat-box{ box-shadow: var(--lift-1); }
+  .modal-panel, .settings-drawer{ box-shadow: var(--lift-2); }
+  .task, .project-card{ transition: transform .15s ease, box-shadow .15s ease, background .15s, border-color .15s; }
+  .task:hover{ transform: translateY(-1px); box-shadow: var(--lift-2); }
+  .day-box:hover, .project-card:hover{ box-shadow: var(--lift-2); }
+
+  .btn{
+    background-image: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,.18) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.25), inset 0 -2px 0 rgba(0,0,0,.25), 0 2px 3px rgba(0,0,0,.35), 0 6px 12px -4px var(--red-glow);
+    transition: background-color .15s, transform .1s, box-shadow .15s, border-color .15s, color .15s;
+  }
+  .btn:hover{
+    background-image: linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,.18) 100%);
+    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -2px 0 rgba(0,0,0,.25), 0 3px 5px rgba(0,0,0,.4), 0 10px 18px -4px var(--red-glow);
+  }
+  .btn:active{ transform: translateY(1px) scale(.985); box-shadow: inset 0 2px 6px rgba(0,0,0,.45); }
+  .btn.secondary, .btn.secondary:hover{
+    background-image: linear-gradient(180deg, var(--hl), transparent 65%);
+    box-shadow: var(--lift-1);
+  }
+  .btn.secondary:hover{ transform: translateY(-1px); box-shadow: var(--lift-2); }
+  .btn.secondary:active{ transform: translateY(1px) scale(.985); box-shadow: var(--sink); }
+  .btn:disabled, .btn:disabled:hover, .btn:disabled:active{
+    opacity: .5; cursor: not-allowed; transform: none; filter: grayscale(.5);
+    box-shadow: var(--sink); background-image: none;
+  }
+
+  .tab-btn{ background-image: linear-gradient(180deg, var(--hl), transparent 70%); box-shadow: var(--lift-1); }
+  .tab-btn:hover{ transform: translateY(-1px); }
+  .tab-btn.active{ box-shadow: var(--sink), 0 0 0 1px var(--red-glow); transform: none; }
+
+  .chip, .cat-chip, .day-tag-chip, .status-pill{ box-shadow: inset 0 1px 0 var(--hl), 0 2px 4px rgba(0,0,0,.22); }
+  .chip.active, .cat-chip.active, .day-tag-chip.selected, .status-pill.selected{ box-shadow: var(--sink); }
+
+  input[type="text"], select, textarea, .note-textarea{ box-shadow: var(--sink); }
+  .checkbox{ box-shadow: var(--sink); }
+  .task.done .checkbox{ box-shadow: 0 0 8px var(--green-dim), inset 0 1px 0 var(--hl); }
+  .icon-btn:hover{ box-shadow: var(--lift-1); }
+  .project-percent-track{ box-shadow: var(--sink); }
+
+  /* ---------- Friday (holiday) & leave boxes in the monthly report ---------- */
+  .day-box .dlabel{
+    display:inline-block; margin-top:6px; font-size:10px; font-weight:700;
+    padding:2px 9px; border-radius:999px;
+  }
+  .day-box.friday{
+    cursor: default;
+    background: linear-gradient(160deg, var(--red-dim), var(--bg-card-glass) 130%);
+    border-color: var(--red);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 22px var(--red-glow), 0 6px 14px -6px var(--red-glow);
+  }
+  .day-box.friday:hover{
+    transform: none; border-color: var(--red);
+    background: linear-gradient(160deg, var(--red-dim), var(--bg-card-glass) 130%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 22px var(--red-glow), 0 6px 14px -6px var(--red-glow);
+  }
+  .day-box.friday .dnum{ color: var(--red-bright); }
+  .day-box.friday .dweekday{ color: var(--red-bright); opacity: .85; }
+  .day-box.friday .dlabel{ background: var(--red); color: #fff; }
+
+  .day-box.leave{
+    border: 2px dashed var(--gold);
+    border-radius: 22px 8px 22px 8px;
+    background: linear-gradient(160deg, var(--gold-dim), var(--bg-card-glass) 130%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 20px rgba(201,154,82,.15), var(--lift-1);
+  }
+  .day-box.leave:hover{ border-color: var(--gold); background: linear-gradient(160deg, var(--gold-dim), var(--bg-card-hover) 130%); }
+  .day-box.leave .dnum{ color: var(--gold); }
+  .day-box.leave .dlabel{ background: var(--gold); color: #1a1208; }
+
+  /* ---------- Leave button (daily tab) ---------- */
+  #leaveBtn{ color: var(--gold); border-color: var(--gold); }
+  #leaveBtn:hover{ color: var(--gold); border-color: var(--gold); }
+  #leaveBtn:disabled{ color: var(--text-dim); border-color: var(--border); }
+  #leaveBtn.on:disabled{
+    opacity: .95; filter: none; color: var(--gold); border-color: var(--gold);
+    background-color: var(--gold-dim);
+  }
+
+  @media print{
+    #reportExportArea, #reportExportArea *{ box-shadow: none !important; }
   }
 </style>
 </head>
@@ -975,6 +1076,8 @@
     <div class="card" style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
       <button class="btn" id="endOfDayBtn" type="button" style="padding:12px 32px; font-size:15px;">🌙 پایان روز</button>
       <button class="btn secondary" id="dailyReportBtn" type="button" style="padding:12px 32px; font-size:15px;">📋 خروجی گزارش روزانه</button>
+      <button class="btn secondary" id="leaveBtn" type="button" style="padding:12px 32px; font-size:15px;">🏖️ مرخصی</button>
+      <button class="btn secondary" id="overtimeBtn" type="button" style="padding:12px 32px; font-size:15px;">⏱️ اضافه‌کاری</button>
     </div>
 
   </div><!-- /#dailyView -->
@@ -1182,6 +1285,20 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="overtimeModalOverlay">
+  <div class="modal-panel" id="overtimeModalPanel" style="max-width:420px; text-align:center;">
+    <div class="modal-header">
+      <div class="modal-title" id="overtimeModalTitle">اضافه‌کاری</div>
+      <button class="modal-close" id="overtimeModalClose" type="button">✕</button>
+    </div>
+    <div style="font-size:13px; color:var(--text-dim); margin-bottom:14px;">تا چه ساعتی در این روز اضافه‌کاری بودی؟ (فقط برای همین روز ثبت می‌شود)</div>
+    <div class="day-tag-picker" id="overtimeHourPicker" style="justify-content:center;"></div>
+    <div id="overtimeSummary" style="margin:16px 0 4px; font-size:13px; color:var(--gold); font-weight:600;"></div>
+    <button class="btn submit-btn" id="overtimeSaveBtn" type="button" style="margin-top:12px;">ثبت اضافه‌کاری</button>
+    <button class="btn secondary" id="overtimeClearBtn" type="button" style="display:none; margin:8px auto 0; width:100%;">حذف اضافه‌کاری این روز</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="projectModalOverlay">
   <div class="modal-panel wide" id="projectModalPanel">
     <div class="modal-header">
@@ -1239,6 +1356,7 @@
 
     <div class="section-label">توصیف این روز</div>
     <div class="day-tag-picker" id="dayTagPicker"></div>
+    <div id="eodOvertimeBadge"></div>
 
     <div class="section-label" style="margin-top:20px;">✅ کارهای انجام‌شده</div>
     <div id="eodTaskList"></div>
@@ -1271,7 +1389,9 @@
     projectMeta: 'karooz.projectMeta.v1',
     theme: 'karooz.theme.v1',
     notes: 'karooz.notes.v1',
-    reportSettings: 'karooz.reportSettings.v1'
+    reportSettings: 'karooz.reportSettings.v1',
+    overtime: 'karooz.overtime.v1',
+    leaves: 'karooz.leaves.v1'
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
 
@@ -1528,6 +1648,18 @@
   let projectMeta = load(KEYS.projectMeta, {});
   let notes = load(KEYS.notes, {});
   let reportSettings = load(KEYS.reportSettings, { name: '', department: '' });
+  let leaves = load(KEYS.leaves, {});   // { 'y-m': 'y-m-d' } — one leave day per Jalali month
+  let overtime = load(KEYS.overtime, {});   // { 'y-m-d': endHour (17..21) } — overtime applies to that single day only
+  const OT_BASE = 16;
+  function otLabel(end){ return `اضافه‌کاری تا ساعت ${toFa(end)} (${toFa(end - OT_BASE)} ساعت)`; }
+  function monthOvertime(y, m){
+    let hours = 0, days = 0;
+    Object.keys(overtime).forEach(k => {
+      const p = k.split('-').map(Number);
+      if(p[0] === y && p[1] === m && overtime[k] > OT_BASE){ hours += overtime[k] - OT_BASE; days++; }
+    });
+    return { hours, days };
+  }
   let theme;
   {
     const savedThemeRaw = load(KEYS.theme, null);
@@ -1675,7 +1807,9 @@
     const parts = jalaliPartsFor(viewedDate());
     const isToday = dayOffset === 0;
     document.getElementById('dayNavTitle').textContent = isToday ? 'امروز' : parts.weekday;
-    document.getElementById('dayNavSub').textContent = `${toFa(parts.day)} ${parts.month} ${toFa(parts.year)}`;
+    const vy = viewedYMD();
+    const isLeaveDay = leaves[vy.y + '-' + vy.m] === viewedDayKey();
+    document.getElementById('dayNavSub').textContent = `${toFa(parts.day)} ${parts.month} ${toFa(parts.year)}` + (isLeaveDay ? ' · 🏖️ مرخصی' : '') + (overtime[viewedDayKey()] ? ' · اضافه‌کاری تا ' + toFa(overtime[viewedDayKey()]) : '');
     document.getElementById('jumpTodayBtn').style.display = isToday ? 'none' : 'inline-block';
   }
 
@@ -1903,9 +2037,10 @@
   }
 
   /* ---------------- Hourly performance chart ---------------- */
-  function buildHourlyChartSVG(doneTasks, widthPx, heightPx){
+  function buildHourlyChartSVG(doneTasks, widthPx, heightPx, endHour){
     widthPx = widthPx || 540; heightPx = heightPx || 170;
-    const hours = [8,9,10,11,12,13,14,15,16];
+    const hours = [];
+    for(let h = 8; h <= Math.max(16, endHour || 16); h++) hours.push(h);
     const counts = hours.map(() => 0);
     doneTasks.forEach(t => {
       if(!t.completedAt) return;
@@ -2020,6 +2155,12 @@
     const key = viewedDayKey();
     const entry = notes[key];
     renderDayTagPicker(entry ? entry.dayTag : null);
+    const otEl = document.getElementById('eodOvertimeBadge'); otEl.innerHTML = '';
+    if(overtime[key]){
+      const b = document.createElement('div'); b.className = 'day-tag-chip selected';
+      b.style.cssText = 'display:inline-block; margin-top:10px; cursor:default;';
+      b.textContent = otLabel(overtime[key]); otEl.appendChild(b);
+    }
 
     const listEl = document.getElementById('eodTaskList');
     listEl.innerHTML = '';
@@ -2037,7 +2178,7 @@
       });
     }
 
-    document.getElementById('eodChart').innerHTML = buildHourlyChartSVG(doneToday, 560, 170);
+    document.getElementById('eodChart').innerHTML = buildHourlyChartSVG(doneToday, 560, 170, overtime[key] || 0);
     document.getElementById('eodModalOverlay').classList.add('open');
   }
   function closeEndOfDayModal(){ document.getElementById('eodModalOverlay').classList.remove('open'); }
@@ -2411,25 +2552,44 @@
     const totalOpen = tasks.filter(t => t.status !== 'done' && !t.inWorkspace).length;
     document.getElementById('monthSummary').innerHTML =
       `<div><b>${toFa(totalCompleted)}</b> کار در این ماه تکمیل شده</div>` +
-      `<div><b>${toFa(totalOpen)}</b> کار هنوز باز است (کل)</div>`;
+      `<div><b>${toFa(totalOpen)}</b> کار هنوز باز است (کل)</div>` +
+      (leaves[reportView.y + '-' + reportView.m] ? `<div>🏖️ مرخصی این ماه: روز <b>${toFa(leaves[reportView.y + '-' + reportView.m].split('-')[2])}</b></div>` : '') +
+      (monthOvertime(reportView.y, reportView.m).days ? `<div><b>${toFa(monthOvertime(reportView.y, reportView.m).hours)}</b> ساعت اضافه‌کاری (${toFa(monthOvertime(reportView.y, reportView.m).days)} روز)</div>` : '');
 
     const grid = document.getElementById('monthlyReportBody');
     grid.innerHTML = '';
-    const allDays = new Set([...Object.keys(monthTasksByDay).map(Number), ...Object.keys(monthNotesByDay).map(Number)]);
 
-    if(allDays.size === 0){
+    // Fridays (holiday), the month's leave day, and overtime days
+    const daysInMonth = getDaysInJalaliMonth(reportView.y, reportView.m);
+    const firstDate = findGregorianForJalali(reportView.y, reportView.m, 1);
+    const dateOfDay = (d) => { const dt = new Date(firstDate.getTime()); dt.setDate(dt.getDate() + d - 1); return dt; };
+    const fridays = new Set();
+    for(let d = 1; d <= daysInMonth; d++){ if(dateOfDay(d).getDay() === 5) fridays.add(d); }
+    const leaveKey = leaves[reportView.y + '-' + reportView.m] || null;
+    const leaveDay = leaveKey ? parseInt(leaveKey.split('-')[2], 10) : null;
+
+    const monthOtByDay = {};
+    Object.keys(overtime).forEach(k => {
+      const p = k.split('-').map(Number);
+      if(p[0] === reportView.y && p[1] === reportView.m && overtime[k] > OT_BASE) monthOtByDay[p[2]] = overtime[k];
+    });
+    const activeDays = new Set([...Object.keys(monthTasksByDay).map(Number), ...Object.keys(monthNotesByDay).map(Number), ...Object.keys(monthOtByDay).map(Number)]);
+    if(leaveDay) activeDays.add(leaveDay);
+    const allDays = new Set([...activeDays, ...fridays]);
+
+    if(activeDays.size === 0){
       grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="glyph">🗓️</div><p>در این ماه هنوز کاری تکمیل یا یادداشتی ثبت نشده.</p></div>`;
-      return;
     }
 
     [...allDays].sort((a,b) => a-b).forEach(d => {
+      const isFriday = fridays.has(d);
+      const isLeave = !isFriday && leaveDay === d;
       const dayTasks = monthTasksByDay[d] || [];
       const noteObj = monthNotesByDay[d] || null;
-      const ts = dayTasks.length ? dayTasks[0].completedAt : (noteObj ? noteObj.updatedAt : Date.now());
-      const weekday = jalaliPartsFor(new Date(ts)).weekday || '';
+      const weekday = jalaliPartsFor(dateOfDay(d)).weekday || '';
 
       const box = document.createElement('div');
-      box.className = 'day-box';
+      box.className = 'day-box' + (isFriday ? ' friday' : '') + (isLeave ? ' leave' : '');
       if(noteObj){
         const dot = document.createElement('div'); dot.className = 'dnote-dot';
         box.appendChild(dot);
@@ -2441,7 +2601,21 @@
         const dcount = document.createElement('div'); dcount.className = 'dcount'; dcount.textContent = `${toFa(dayTasks.length)} کار`;
         box.appendChild(dcount);
       }
-      box.addEventListener('click', () => openDayModal(d, dayTasks, noteObj));
+      if(monthOtByDay[d]){
+        const dot = document.createElement('div'); dot.className = 'dcount'; dot.style.color = 'var(--gold)';
+        dot.textContent = `اضافه‌کاری ${toFa(monthOtByDay[d] - OT_BASE)} ساعت`;
+        box.appendChild(dot);
+      }
+      if(isFriday || isLeave){
+        const lbl = document.createElement('div'); lbl.className = 'dlabel';
+        lbl.textContent = isFriday ? 'تعطیل' : '🏖️ مرخصی';
+        box.appendChild(lbl);
+      }
+      if(isFriday){
+        box.setAttribute('aria-disabled', 'true');
+      }else{
+        box.addEventListener('click', () => openDayModal(d, dayTasks, noteObj));
+      }
       grid.appendChild(box);
     });
   }
@@ -2498,6 +2672,8 @@
     statsEl.appendChild(statBox('پروژه‌های فعال این ماه', toFa(distinctProjects)));
     statsEl.appendChild(statBox('میانگین امتیاز', avgRating ? ('★ ' + toFa(avgRating.toFixed(1))) : '—'));
     statsEl.appendChild(statBox('پرکارترین روز', busiestDay ? (toFa(busiestDay[0]) + ' ام (' + toFa(busiestDay[1]) + ' کار)') : '—'));
+    const otM = monthOvertime(exportReportView.y, exportReportView.m);
+    statsEl.appendChild(statBox('اضافه‌کاری این ماه', otM.days ? (toFa(otM.hours) + ' ساعت (' + toFa(otM.days) + ' روز)') : '—'));
 
     const donutEl = document.getElementById('reportDonut');
     donutEl.innerHTML = '';
@@ -2510,13 +2686,21 @@
   }
 
   function openDayModal(d, dayTasks, noteObj){
-    const ts = dayTasks.length ? dayTasks[0].completedAt : (noteObj ? noteObj.updatedAt : Date.now());
-    const parts = jalaliPartsFor(new Date(ts));
+    const parts = jalaliPartsFor(findGregorianForJalali(reportView.y, reportView.m, d));
+    const otEnd = overtime[dayKeyOf(reportView.y, reportView.m, d)] || 0;
     document.getElementById('dayModalTitle').textContent =
       `${parts.weekday}، ${toFa(d)} ${PERSIAN_MONTHS[reportView.m - 1]} ${toFa(reportView.y)}`;
 
     const body = document.getElementById('dayModalBody');
     body.innerHTML = '';
+
+    if(leaves[reportView.y + '-' + reportView.m] === dayKeyOf(reportView.y, reportView.m, d)){
+      const leaveBadge = document.createElement('div');
+      leaveBadge.className = 'day-tag-chip selected';
+      leaveBadge.style.cssText = 'display:inline-block; margin:0 0 14px 8px; cursor:default;';
+      leaveBadge.textContent = '🏖️ مرخصی';
+      body.appendChild(leaveBadge);
+    }
 
     if(noteObj && noteObj.dayTag){
       const tagBadge = document.createElement('div');
@@ -2524,6 +2708,14 @@
       tagBadge.style.cssText = 'display:inline-block; margin-bottom:14px; cursor:default;';
       tagBadge.textContent = noteObj.dayTag;
       body.appendChild(tagBadge);
+    }
+
+    if(otEnd > OT_BASE){
+      const otBadge = document.createElement('div');
+      otBadge.className = 'day-tag-chip selected';
+      otBadge.style.cssText = 'display:inline-block; margin:0 0 14px 8px; cursor:default;';
+      otBadge.textContent = otLabel(otEnd);
+      body.appendChild(otBadge);
     }
 
     if(noteObj && noteObj.text && noteObj.text.trim()){
@@ -2570,7 +2762,7 @@
       chartLabel.textContent = '📈 عملکرد بر اساس ساعت';
       body.appendChild(chartLabel);
       const chartWrap = document.createElement('div');
-      chartWrap.innerHTML = buildHourlyChartSVG(dayTasks, 660, 160);
+      chartWrap.innerHTML = buildHourlyChartSVG(dayTasks, 660, 160, otEnd);
       body.appendChild(chartWrap);
     }
     document.getElementById('dayModalOverlay').classList.add('open');
@@ -2648,7 +2840,31 @@
     }
   }
 
+  function renderLeaveBtn(){
+    const btn = document.getElementById('leaveBtn');
+    if(!btn) return;
+    const ymd = viewedYMD();
+    const used = leaves[ymd.y + '-' + ymd.m] || null;
+    btn.classList.remove('on');
+    btn.disabled = false;
+    btn.title = 'ثبت مرخصی (فقط یک‌بار در ماه)';
+    btn.textContent = '🏖️ مرخصی';
+    if(used === viewedDayKey()){
+      btn.disabled = true; btn.classList.add('on');
+      btn.textContent = '🏖️ مرخصی ثبت شد';
+      btn.title = 'این روز مرخصی است';
+    }else if(used){
+      btn.disabled = true;
+      btn.textContent = '🏖️ مرخصی این ماه مصرف شده';
+      btn.title = 'مرخصی این ماه روز ' + toFa(used.split('-')[2]) + ' استفاده شده';
+    }else if(viewedDate().getDay() === 5){
+      btn.disabled = true;
+      btn.title = 'جمعه تعطیل است';
+    }
+  }
+
   function refreshDailyView(){
+    renderLeaveBtn();
     renderDayNav();
     loadViewedNote();
     renderFilterChips();
@@ -2789,6 +3005,42 @@
     refreshDailyView();
   });
 
+  let pendingOvertime = 0;
+  function renderOvertimePicker(){
+    const el = document.getElementById('overtimeHourPicker'); el.innerHTML = '';
+    [17,18,19,20,21].forEach(h => {
+      const chip = document.createElement('div');
+      chip.className = 'day-tag-chip' + (pendingOvertime === h ? ' selected' : '');
+      chip.textContent = 'تا ساعت ' + toFa(h);
+      chip.addEventListener('click', () => { pendingOvertime = (pendingOvertime === h) ? 0 : h; renderOvertimePicker(); });
+      el.appendChild(chip);
+    });
+    document.getElementById('overtimeSummary').textContent = pendingOvertime ? otLabel(pendingOvertime) : 'ساعتی انتخاب نشده.';
+    document.getElementById('overtimeSaveBtn').disabled = !pendingOvertime;
+  }
+  function openOvertimeModal(){
+    const key = viewedDayKey();
+    pendingOvertime = overtime[key] || 0;
+    const parts = jalaliPartsFor(viewedDate());
+    document.getElementById('overtimeModalTitle').textContent = `اضافه‌کاری — ${parts.weekday} ${toFa(parts.day)} ${parts.month}`;
+    document.getElementById('overtimeClearBtn').style.display = overtime[key] ? 'block' : 'none';
+    renderOvertimePicker();
+    document.getElementById('overtimeModalOverlay').classList.add('open');
+  }
+  function closeOvertimeModal(){ document.getElementById('overtimeModalOverlay').classList.remove('open'); }
+  document.getElementById('overtimeBtn').addEventListener('click', openOvertimeModal);
+  document.getElementById('overtimeModalClose').addEventListener('click', closeOvertimeModal);
+  document.getElementById('overtimeModalOverlay').addEventListener('click', (e) => { if(e.target.id === 'overtimeModalOverlay') closeOvertimeModal(); });
+  document.getElementById('overtimeSaveBtn').addEventListener('click', () => {
+    if(!pendingOvertime) return;
+    overtime[viewedDayKey()] = pendingOvertime;
+    save(KEYS.overtime, overtime); closeOvertimeModal(); renderAll();
+  });
+  document.getElementById('overtimeClearBtn').addEventListener('click', () => {
+    delete overtime[viewedDayKey()];
+    save(KEYS.overtime, overtime); closeOvertimeModal(); renderAll();
+  });
+
   document.getElementById('endOfDayBtn').addEventListener('click', openEndOfDayModal);
   document.getElementById('eodModalClose').addEventListener('click', closeEndOfDayModal);
   document.getElementById('eodModalOverlay').addEventListener('click', (e) => {
@@ -2810,6 +3062,18 @@
     }).catch(() => {
       alert('کپی خودکار انجام نشد؛ متن را به‌صورت دستی انتخاب و کپی کن.');
     });
+  });
+
+  document.getElementById('leaveBtn').addEventListener('click', () => {
+    const ymd = viewedYMD();
+    const mk = ymd.y + '-' + ymd.m;
+    if(leaves[mk]) return;
+    if(viewedDate().getDay() === 5) return;
+    if(!confirm('مرخصی این ماه روی ' + toFa(viewedJalaliDisplay()) + ' ثبت شود؟\nفقط یک‌بار در ماه قابل استفاده است و بعد از ثبت قابل تغییر نیست.')) return;
+    leaves[mk] = viewedDayKey();
+    save(KEYS.leaves, leaves);
+    renderDayNav();
+    renderLeaveBtn();
   });
 
   document.getElementById('prevMonthBtn').addEventListener('click', () => {
@@ -2996,7 +3260,7 @@
   });
 
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, exportedAt: new Date().toISOString() };
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -3022,6 +3286,8 @@
         if(data.categoryColors && typeof data.categoryColors === 'object') categoryColors = data.categoryColors;
         if(data.projectMeta && typeof data.projectMeta === 'object') projectMeta = data.projectMeta;
         if(data.notes && typeof data.notes === 'object') notes = data.notes;
+        if(data.overtime && typeof data.overtime === 'object') overtime = data.overtime;
+        if(data.leaves && typeof data.leaves === 'object') leaves = data.leaves;
         if(data.theme && typeof data.theme === 'object'){
           if(data.theme.dark && data.theme.light){
             theme = {
@@ -3048,6 +3314,8 @@
         save(KEYS.categoryColors, categoryColors);
         save(KEYS.projectMeta, projectMeta);
         save(KEYS.notes, notes);
+        save(KEYS.overtime, overtime);
+        save(KEYS.leaves, leaves);
         save(KEYS.theme, theme);
         applyTheme();
         syncThemeInputs();
