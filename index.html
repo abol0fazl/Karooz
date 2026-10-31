@@ -1,0 +1,3094 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کاروز — مدیریت کارهای روزانه</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --bg: #15111a;
+    --bg-elevated: #1c1621;
+    --bg-card: #211a27;
+    --bg-card-hover: #271f2e;
+    --border: #362c3e;
+    --border-soft: #2a222f;
+    --text: #f1ecee;
+    --text-dim: #a698a9;
+    --text-faint: #71647377;
+    --red: #d6394e;
+    --red-bright: #ef4d63;
+    --red-dim: #4a2029;
+    --red-glow: rgba(214,57,78,0.25);
+    --gold: #c99a52;
+    --gold-dim: #4a3a20;
+    --green: #6f9c76;
+    --green-dim: #223326;
+    --radius: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background-color: var(--bg);
+    background-repeat: no-repeat;
+    color: var(--text);
+    font-family: 'Vazirmatn', Tahoma, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    transition: background-color .3s ease, color .3s ease;
+  }
+  input[type="range"]{ accent-color: var(--red); cursor:pointer; }
+
+  ::selection{ background: var(--red-dim); color: var(--text); }
+
+  ::-webkit-scrollbar{ width: 10px; height:10px; }
+  ::-webkit-scrollbar-track{ background: transparent; }
+  ::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover{ background: var(--red-dim); }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 28px 20px 90px;
+  }
+
+  /* ---------- Header ---------- */
+  .header{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .brand h1{
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+    color: #f1ecee;
+  }
+  .brand h1 span{ color: #ef4d63; }
+  .brand p{
+    margin:0;
+    color: var(--text-dim);
+    font-size: 13.5px;
+  }
+
+  /* ---------- Stamp / today card (signature element — fixed, not themeable, always real "now") ---------- */
+  .stamp{
+    position: relative;
+    width: 138px;
+    min-width: 138px;
+    padding: 14px 8px 12px;
+    text-align:center;
+    background: linear-gradient(160deg, #4a2029, #2c1620 70%);
+    border: 1.5px dashed #79394688;
+    border-radius: 12px;
+    transform: rotate(-2.5deg);
+    box-shadow: var(--shadow);
+  }
+  .stamp::before, .stamp::after{
+    content:"";
+    position:absolute;
+    width: 16px; height:16px;
+    background: var(--bg);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .stamp::before{ right: -9px; }
+  .stamp::after{ left: -9px; }
+  .stamp .weekday{
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #c99a52;
+    margin-bottom: 2px;
+  }
+  .stamp .day{
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1;
+    color: #f1ecee;
+    margin: 4px 0 2px;
+  }
+  .stamp .month{
+    font-size: 12.5px;
+    color: #a698a9;
+    font-weight: 500;
+  }
+  .stamp .tag{
+    margin-top: 8px;
+    font-size: 10px;
+    color: #71647377;
+    letter-spacing: 1px;
+    border-top: 1px dashed #79394688;
+    padding-top: 6px;
+  }
+
+  /* ---------- Motivational quote ---------- */
+  .quote-card{
+    background: linear-gradient(135deg, var(--bg-elevated-glass), var(--bg-card-glass));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 20px 26px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow:hidden;
+  }
+  .quote-mark{
+    position:absolute; top:-18px; right:14px;
+    font-size:84px; color: var(--red-dim); opacity:0.55; font-family: Georgia, 'Times New Roman', serif; line-height:1;
+    pointer-events:none; user-select:none;
+  }
+  .quote-text{
+    font-size:14.5px; line-height:2; color:var(--text); position:relative; z-index:1;
+    font-weight:500; max-width: 92%;
+  }
+  .quote-author{
+    margin-top:10px; font-size:12px; color:var(--gold); font-weight:700; position:relative; z-index:1;
+  }
+
+  /* ---------- Cards / sections ---------- */
+  .card{
+    background: var(--bg-elevated-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .tab-btn{
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .tab-btn:hover{ color: var(--text); border-color: var(--border); }
+  .tab-btn.active{
+    background: var(--red-dim);
+    border-color: var(--red);
+    color: var(--text);
+  }
+
+  /* ---------- Day navigation ---------- */
+  .day-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    gap: 10px;
+  }
+  .day-nav-label{ text-align:center; }
+  .day-nav-title{ font-size:15px; font-weight:700; }
+  .day-nav-sub{ font-size:11.5px; color:var(--text-dim); margin-top:2px; }
+  .jump-today-btn{
+    display:none;
+    margin: 8px auto 0;
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight:600;
+    padding: 4px 13px;
+    border-radius: 999px;
+    cursor:pointer;
+  }
+  .jump-today-btn:hover{ background: var(--red); }
+
+  /* ---------- Compose card (add task + daily note) ---------- */
+  .compose-card{
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 22px;
+  }
+  @media (max-width: 700px){
+    .compose-card{ grid-template-columns: 1fr; }
+    .compose-col + .compose-col{
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-soft);
+    }
+  }
+  .compose-col{ min-width:0; }
+  .compose-col-title{
+    font-size:12.5px; font-weight:700; color:var(--gold); margin-bottom:10px;
+  }
+
+  /* ---------- Add task form ---------- */
+  .add-form{ display:flex; flex-direction:column; gap:10px; }
+  .add-form .title-row input[type="text"]{
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 14px 16px;
+  }
+  .add-form textarea.desc-input{
+    width:100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    outline:none;
+    resize: vertical;
+    min-height: 46px;
+    line-height:1.6;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .add-form textarea.desc-input:focus{ border-color: var(--red); box-shadow: 0 0 0 3px var(--red-glow); }
+  .add-form .meta-row{ display:flex; flex-wrap:wrap; gap:10px; }
+  .add-form .meta-row select{ flex: 1 1 120px; }
+  .add-form .submit-btn{ width:100%; }
+  .field-mini-label{ font-size:11px; color:var(--text-faint); margin-bottom:2px; }
+
+  input[type="text"], select{
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type="text"]:focus, select:focus{
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px var(--red-glow);
+  }
+  select{
+    min-width: 120px;
+    cursor: pointer;
+  }
+  .btn{
+    background: var(--red);
+    color: #fff;
+    border: none;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .btn:hover{ background: var(--red-bright); }
+  .btn:active{ transform: scale(0.97); }
+  .btn.secondary{
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .btn.secondary:hover{ border-color: var(--red); color: var(--text); }
+  .btn.small{ padding: 6px 12px; font-size: 12.5px; }
+
+  /* ---------- Category picker (multi-select chips) ---------- */
+  .category-picker{ display:flex; flex-wrap:wrap; gap:7px; }
+  .cat-chip{
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12.5px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    cursor:pointer;
+    transition: all .12s;
+  }
+  .cat-chip:hover{ border-color: var(--gold); color: var(--text); }
+  .cat-chip.active{ font-weight:700; }
+
+  /* ---------- Settings sections (used inside the drawer) ---------- */
+  .settings-col h3{
+    font-size: 12.5px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .settings-add{ display:flex; gap:6px; margin-bottom: 8px; align-items:center; }
+  .settings-add input[type="text"]{ flex:1; }
+  .settings-add input[type="color"]{
+    width:38px; height:38px; padding:3px; border-radius:var(--radius-sm);
+    border:1px solid var(--border); background:var(--bg-card); cursor:pointer;
+  }
+  .tag-list{ display:flex; flex-wrap:wrap; gap:6px; }
+  .tag-pill{
+    display:flex; align-items:center; gap:7px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .tag-pill input[type="color"]{
+    width:16px; height:16px; padding:0; border:none; border-radius:4px; cursor:pointer; background:none;
+  }
+  .tag-pill button{
+    background:none; border:none; color: var(--text-faint);
+    cursor:pointer; font-size: 13px; line-height:1; padding:0;
+  }
+  .tag-pill button:hover{ color: var(--red-bright); }
+
+  /* ---------- Daily note ---------- */
+  .note-textarea{
+    width:100%;
+    min-height: 160px;
+    height:100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    outline:none;
+    resize: vertical;
+    line-height: 1.7;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .note-textarea:focus{ border-color: var(--red); box-shadow: 0 0 0 3px var(--red-glow); }
+
+  /* ---------- Filters ---------- */
+  .filters{
+    display:flex;
+    flex-wrap: wrap;
+    align-items:center;
+    gap: 8px;
+  }
+  .filters .search{
+    flex: 1 1 160px;
+  }
+  .chip{
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor:pointer;
+    white-space: nowrap;
+    transition: all .12s;
+  }
+  .chip:hover{ border-color: var(--red); color: var(--text); }
+  .chip.active{
+    background: var(--red-dim);
+    border-color: var(--red);
+    color: var(--text);
+  }
+  .chip-group{ display:flex; gap:6px; flex-wrap:wrap; }
+  .filters-divider{
+    width:1px; height: 20px; background: var(--border); margin: 0 4px;
+  }
+
+  /* ---------- Task list ---------- */
+  .task-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .task{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    background: var(--bg-elevated-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    transition: background .12s, border-color .12s;
+  }
+  .task:hover{ background: var(--bg-card-glass); border-color: var(--border); }
+
+  @keyframes taskCompletePulse{
+    0%{ transform:scale(1); }
+    35%{ transform:scale(1.015); background: var(--green-dim); border-color:var(--green); }
+    100%{ transform:scale(1); }
+  }
+  .task-complete-pulse{ animation: taskCompletePulse .32s ease; }
+
+  .checkbox{
+    width: 20px; height:20px;
+    min-width: 20px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: all .12s;
+  }
+  .checkbox svg{ width:12px; height:12px; opacity:0; transition: opacity .12s; }
+  .task.done .checkbox{ background: var(--green-dim); border-color: var(--green); }
+  .task.done .checkbox svg{ opacity:1; }
+
+  .task-main{ flex: 1; min-width:0; }
+  .task-title{
+    font-size: 13.5px;
+    font-weight: 400;
+    margin-bottom: 4px;
+    word-break: break-word;
+  }
+  .task.done .task-title{
+    color: var(--text-faint);
+    text-decoration: line-through;
+  }
+  .task-desc{
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+  .task-tags{ display:flex; flex-wrap:wrap; gap:6px; }
+  .mini-tag{
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .mini-tag.status{
+    border: none;
+    font-weight: 600;
+  }
+  .mini-tag.status.todo{ background: var(--bg-card); color: var(--text-dim); border:1px solid var(--border); }
+  .mini-tag.status.doing{ background: var(--gold-dim); color: var(--gold); }
+  .mini-tag.status.done{ background: var(--green-dim); color: var(--green); }
+
+  .task-actions{ display:flex; gap:4px; }
+  .icon-btn{
+    background:none; border:none; cursor:pointer;
+    color: var(--text-faint);
+    padding: 6px; border-radius: 8px;
+    display:flex; align-items:center; justify-content:center;
+    transition: all .12s;
+  }
+  .icon-btn:hover{ background: var(--bg-card); color: var(--text); }
+  .icon-btn.danger:hover{ color: var(--red-bright); }
+  .icon-btn.move{ color: var(--gold); }
+  .icon-btn.move:hover{ background: var(--gold-dim); color: var(--gold); }
+  .icon-btn svg{ width:16px; height:16px; }
+
+  /* ---------- Edit row ---------- */
+  .edit-row{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    background: var(--bg-card-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--red-dim);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .edit-row input[type="text"]{ flex: 1 1 200px; }
+  .edit-row textarea{
+    flex: 1 1 100%;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    outline:none;
+    resize: vertical;
+    min-height: 42px;
+  }
+  .edit-row .category-picker{ flex: 1 1 100%; }
+
+  .empty-state{
+    text-align:center;
+    padding: 50px 20px;
+    color: var(--text-faint);
+  }
+  .empty-state .glyph{ font-size: 34px; margin-bottom: 10px; opacity:.6; }
+  .empty-state p{ margin: 4px 0; font-size: 13.5px; }
+
+  /* ---------- Footer ---------- */
+  .footer{
+    text-align:center;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-soft);
+    color: var(--text-dim);
+    font-size: 12.5px;
+  }
+
+  /* ---------- Settings FAB + glass drawer ---------- */
+  .settings-fab{
+    position:fixed; bottom:22px; left:22px; z-index:1200;
+    width:52px; height:52px; border-radius:50%;
+    background: var(--red);
+    color:#fff; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  .settings-fab svg{ width:22px; height:22px; position:relative; z-index:1; }
+  .settings-fab::after{
+    content:"";
+    position:absolute; inset:-6px;
+    border-radius:50%;
+    border: 2px solid var(--red);
+    opacity:0.6;
+    animation: fabRing 2.4s ease-out infinite;
+  }
+  @keyframes fabRing{
+    0%{ transform:scale(0.82); opacity:0.55; }
+    100%{ transform:scale(1.45); opacity:0; }
+  }
+  .settings-drawer-overlay{
+    position:fixed; inset:0; z-index:1300;
+    background: rgba(8,6,10,0.45);
+    opacity:0; pointer-events:none;
+    transition: opacity .25s ease;
+  }
+  .settings-drawer-overlay.open{ opacity:1; pointer-events:auto; }
+  .settings-drawer{
+    position:fixed; top:0; bottom:0; left:0;
+    width: min(430px, 92vw);
+    background: var(--bg-elevated-glass);
+    backdrop-filter: blur(calc(var(--glass-blur) + 8px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 8px));
+    border-right: 1px solid var(--border);
+    padding: 24px 20px 40px;
+    overflow-y:auto;
+    transform: translateX(-100%);
+    transition: transform .3s ease;
+  }
+  .settings-drawer-overlay.open .settings-drawer{ transform: translateX(0); }
+  .settings-drawer-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+  .settings-drawer-title{ font-size:16px; font-weight:800; }
+  .settings-drawer-section{ margin-bottom:28px; }
+  .settings-drawer-section:last-child{ margin-bottom:0; }
+  .settings-drawer-section-title{ font-size:12.5px; font-weight:700; color:var(--gold); margin-bottom:12px; }
+  .settings-drawer .backup-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .settings-drawer .backup-actions button{
+    background:none; border:1px solid var(--border); color: var(--text-dim);
+    font-family:inherit; font-size:12px; padding:6px 12px; border-radius: 999px; cursor:pointer;
+  }
+  .settings-drawer .backup-actions button:hover{ border-color: var(--red); color: var(--text); }
+
+  /* ---------- Dark/Light mode toggle ---------- */
+  .mode-toggle-wrap{ display:flex; justify-content:center; }
+  .mode-toggle{
+    position:relative; width:76px; height:36px; border-radius:999px;
+    background: var(--bg-card); border:1px solid var(--border);
+    cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    padding:0 9px; direction:ltr;
+  }
+  .mode-toggle-icon{ font-size:14px; line-height:1; position:relative; z-index:1; opacity:.55; transition:opacity .3s; }
+  .mode-toggle-knob{
+    position:absolute; top:3px; left:3px; width:28px; height:28px; border-radius:50%;
+    background: var(--red); box-shadow:0 2px 6px rgba(0,0,0,.35);
+    transition: transform .3s ease, background .3s ease;
+  }
+  html[data-mode="light"] .mode-toggle-knob{ transform: translateX(38px); background: var(--gold); }
+  html[data-mode="light"] .mode-toggle-icon.sun{ opacity:1; }
+  html[data-mode="dark"] .mode-toggle-icon.moon{ opacity:1; }
+
+  .glass-blur-row{ display:flex; align-items:center; gap:10px; }
+  .glass-blur-row input[type="range"]{ flex:1; }
+  .glass-blur-value{ font-size:11.5px; color:var(--text-dim); min-width:34px; text-align:left; }
+
+  /* ---------- Color customization ---------- */
+  .color-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .color-field{ display:flex; flex-direction:column; gap:6px; }
+  .color-field label{ font-size:11.5px; color:var(--text-dim); }
+  .color-field input[type="color"]{
+    width:100%; height:32px;
+    border:1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    padding:3px;
+    cursor:pointer;
+  }
+  .color-actions{
+    grid-column: 1 / -1;
+    display:flex; gap:10px; margin-top:4px;
+  }
+
+  /* ---------- Monthly report ---------- */
+  .month-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 16px;
+    gap: 10px;
+  }
+  .month-nav .month-label{ font-size:16px; font-weight:700; }
+  .month-summary{
+    display:flex; gap:22px; flex-wrap:wrap;
+    margin-bottom: 20px;
+    font-size:13px; color:var(--text-dim);
+  }
+  .month-summary b{ color:var(--text); font-size:16px; }
+  .day-box-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+    gap: 10px;
+  }
+  .day-box{
+    background: var(--bg-card-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    text-align:center;
+    cursor:pointer;
+    transition: all .15s;
+    position:relative;
+  }
+  .day-box:hover{ border-color: var(--red); background: var(--bg-card-hover); transform: translateY(-2px); }
+  .day-box .dnum{ font-size:20px; font-weight:800; color:var(--text); }
+  .day-box .dweekday{ font-size:10.5px; color:var(--text-dim); margin-top:2px; }
+  .day-box .dcount{ font-size:10.5px; color:var(--green); margin-top:6px; font-weight:600; }
+  .day-box .dnote-dot{
+    position:absolute; top:8px; left:8px;
+    width:6px;height:6px;border-radius:50%;
+    background: var(--gold);
+  }
+
+  /* ---------- Day detail / rating / project / end-of-day modals ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    display:flex; align-items:center; justify-content:center;
+    z-index: 1000;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity .25s ease;
+    padding: 20px;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-panel{
+    background: var(--bg-elevated-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    max-width: 620px;
+    width:100%;
+    max-height: 80vh;
+    overflow-y:auto;
+    padding: 22px;
+    transform: scale(0.94) translateY(10px);
+    transition: transform .25s ease;
+    box-shadow: var(--shadow);
+  }
+  .modal-panel.wide{ max-width: 760px; }
+  .modal-overlay.open .modal-panel{ transform: scale(1) translateY(0); }
+  .modal-header{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom: 14px;
+  }
+  .modal-title{ font-size:16px; font-weight:700; }
+  .modal-close{
+    background:none;border:none;color:var(--text-faint);cursor:pointer;
+    font-size:18px; line-height:1; padding:4px;
+  }
+  .modal-close:hover{ color: var(--text); }
+  .modal-note-label{ font-size:11px; color:var(--gold); font-weight:700; margin-bottom:6px; }
+  .modal-note{
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+    line-height:1.8;
+  }
+  .modal-task-item{
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .modal-task-item:last-child{ border-bottom:none; }
+  .modal-task-title{ font-size:14px; font-weight:500; margin-bottom:4px; }
+  .modal-task-desc{ font-size:12.5px; color:var(--text-dim); margin-bottom:6px; line-height:1.6; }
+
+  .section-label{ font-size:11px; color:var(--gold); font-weight:700; margin-bottom:10px; }
+
+  /* ---------- Completion rating ---------- */
+  .rating-line{ display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+  .rating-stars-mini{ color: var(--gold); font-size:12px; letter-spacing:1px; }
+  .rating-note-mini{ font-size:11.5px; color:var(--text-faint); font-style:italic; }
+  .rating-modal-stars{ display:flex; gap:8px; justify-content:center; margin: 6px 0 18px; }
+  .star-input{
+    font-size:38px; line-height:1; color: var(--border);
+    cursor:pointer; transition: color .12s, transform .12s; user-select:none;
+  }
+  .star-input:hover{ transform: scale(1.12); }
+  .star-input.filled{ color: var(--gold); }
+
+  /* ---------- Projects tab ---------- */
+  .project-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .project-card{
+    background: var(--bg-elevated-glass);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor:pointer;
+    transition: all .15s;
+  }
+  .project-card:hover{ border-color: var(--red); background: var(--bg-card-hover); transform: translateY(-2px); }
+  .project-card-head{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .project-logo{
+    width:44px; height:44px; border-radius:12px; overflow:hidden;
+    background: var(--bg-card); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+    color: var(--gold);
+  }
+  .project-logo svg{ width:22px; height:22px; }
+  .project-logo img{ width:100%; height:100%; object-fit:cover; }
+  .project-title-wrap{ flex:1; min-width:0; }
+  .project-title{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:7px; }
+  .project-title span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .project-status-dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+  .project-stat-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .project-stat-box{
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 9px 6px;
+    text-align:center;
+  }
+  .project-stat-label{ font-size:9.5px; color:var(--text-faint); margin-bottom:5px; }
+  .project-stat-value{ font-size:12px; font-weight:700; color:var(--text); word-break:break-word; }
+  @media (max-width:640px){
+    .project-stat-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---------- Project detail modal ---------- */
+  .project-logo-lg{
+    width:56px; height:56px; border-radius:14px; overflow:hidden;
+    background: var(--bg-card); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; color:var(--gold); flex:0 0 auto;
+  }
+  .project-logo-lg svg{ width:28px; height:28px; }
+  .project-logo-lg img{ width:100%; height:100%; object-fit:cover; }
+  .logo-upload-label{
+    font-size:11px; color:var(--gold); cursor:pointer; text-decoration:underline; margin-top:4px; display:inline-block;
+  }
+  .status-pills{ display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .status-pill{
+    background: var(--bg-card); border:1px solid var(--border); color:var(--text-dim);
+    font-family:inherit; font-size:12.5px; font-weight:600; padding:7px 16px; border-radius:999px; cursor:pointer;
+    transition: all .12s;
+  }
+  .status-pill[data-status="active"].selected{ background: var(--green-dim); border-color: var(--green); color: var(--text); }
+  .status-pill[data-status="developing"].selected{ background: var(--gold-dim); border-color: var(--gold); color: var(--text); }
+  .status-pill[data-status="not_started"].selected{ background: var(--border-soft); border-color: var(--border); color: var(--text); }
+  .project-dates-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:12px;
+  }
+  @media (max-width:560px){ .project-dates-grid{ grid-template-columns:1fr; } }
+  .date-select-row{ display:flex; gap:6px; }
+  .date-select-row select{ flex:1; min-width:0; padding:8px 6px; }
+  .date-select-row input[type="number"]{
+    width:72px; background: var(--bg-card); border:1px solid var(--border); color:var(--text);
+    font-family:inherit; font-size:13px; padding:8px 6px; border-radius:var(--radius-sm); outline:none;
+  }
+  .project-date-display{ font-size:11px; color:var(--gold); margin-top:8px; font-weight:600; min-height:14px; }
+
+  /* ---------- End of day modal ---------- */
+  .day-tag-picker{ display:flex; flex-wrap:wrap; gap:8px; }
+  .day-tag-chip{
+    background: var(--bg-card); border:1px solid var(--border); color:var(--text-dim);
+    font-family:inherit; font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:999px; cursor:pointer;
+    transition: all .12s;
+  }
+  .day-tag-chip.selected{ background: var(--red-dim); border-color: var(--red); color:var(--text); }
+  .eod-task-item{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:8px 0; border-bottom:1px solid var(--border-soft); font-size:13px;
+  }
+  .eod-task-item:last-child{ border-bottom:none; }
+  .eod-task-time{ font-size:11.5px; color:var(--gold); font-weight:700; white-space:nowrap; }
+  .hourly-chart-path{
+    fill:none; stroke: var(--red); stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray: 1400; stroke-dashoffset: 1400;
+    animation: drawLine 1.1s ease forwards;
+  }
+  @keyframes drawLine{ to{ stroke-dashoffset:0; } }
+
+  /* ---------- Monthly export report ---------- */
+  .report-header{ text-align:center; margin-bottom:24px; padding-bottom:18px; border-bottom:2px solid var(--border); }
+  .report-header h2{ font-size:19px; font-weight:800; margin:0 0 6px; }
+  .report-header .report-sub{ font-size:13px; color:var(--gold); font-weight:600; }
+  .project-percent-row{ margin-bottom:14px; }
+  .project-percent-label{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px; }
+  .project-percent-track{ height:8px; background:var(--bg-card); border-radius:999px; overflow:hidden; }
+  .project-percent-fill{ height:100%; background:var(--red); border-radius:999px; }
+  .report-stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:20px 0; }
+  @media (max-width:640px){ .report-stats-grid{grid-template-columns:repeat(2,1fr);} }
+
+  @media print{
+    body *{ visibility:hidden; }
+    #reportExportArea, #reportExportArea *{
+      visibility:visible;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    }
+    #reportExportArea{
+      position:absolute; top:0; left:0; width:100%;
+      background:var(--bg) !important;
+    }
+    .settings-fab, .settings-drawer-overlay{ display:none !important; }
+  }
+
+  @media (max-width: 560px){
+    .header{ flex-direction: column-reverse; }
+    .stamp{ align-self: flex-end; }
+    .month-nav{ flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand">
+      <h1>کار<span>وز</span></h1>
+      <p>مدیریت مینیمال کارهای روزانه — پروژه‌ها، دسته‌بندی‌ها و وضعیت‌ها</p>
+    </div>
+    <div class="stamp" id="stampCard">
+      <div class="weekday" id="stampWeekday">—</div>
+      <div class="day" id="stampDay">--</div>
+      <div class="month" id="stampMonth">—</div>
+      <div class="tag">امروز</div>
+    </div>
+  </div>
+
+  <div class="quote-card">
+    <div class="quote-mark">"</div>
+    <div class="quote-text" id="quoteText">—</div>
+    <div class="quote-author" id="quoteAuthor">—</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabDaily" type="button">امروز</button>
+    <button class="tab-btn" id="tabWorkspace" type="button">اتاق کار</button>
+    <button class="tab-btn" id="tabProjects" type="button">پروژه‌های من</button>
+    <button class="tab-btn" id="tabMonthly" type="button">گزارش ماهانه</button>
+    <button class="tab-btn" id="tabExport" type="button">خروجی ماهانه</button>
+  </div>
+
+  <!-- ================= DAILY VIEW ================= -->
+  <div id="dailyView">
+
+    <div class="card">
+      <div class="day-nav">
+        <button class="btn secondary small" id="prevDayBtn" type="button">‹ روز قبل</button>
+        <div class="day-nav-label">
+          <div class="day-nav-title" id="dayNavTitle">امروز</div>
+          <div class="day-nav-sub" id="dayNavSub">—</div>
+          <button class="jump-today-btn" id="jumpTodayBtn" type="button">بازگشت به امروز</button>
+        </div>
+        <button class="btn secondary small" id="nextDayBtn" type="button">روز بعد ›</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="filters">
+        <input type="text" class="search" id="searchInput" placeholder="جستجو در کارها…">
+        <div class="filters-divider"></div>
+        <div class="chip-group" id="statusFilterGroup"></div>
+        <div class="filters-divider"></div>
+        <div class="chip-group" id="projectFilterGroup"></div>
+        <div class="chip-group" id="categoryFilterGroup"></div>
+      </div>
+    </div>
+
+    <div class="task-list" id="taskList"></div>
+
+    <div class="card">
+      <div class="section-label">📊 ترکیب کارهای این روز</div>
+      <div id="dailyDonut"></div>
+    </div>
+
+    <div class="card compose-card">
+      <div class="compose-col">
+        <div class="compose-col-title">➕ کار جدید</div>
+        <form class="add-form" id="addForm">
+          <div class="title-row">
+            <input type="text" id="titleInput" placeholder="عنوان کار جدید را بنویسید…" autocomplete="off" required>
+          </div>
+          <textarea class="desc-input" id="descInput" placeholder="توضیحات کوتاه (اختیاری)…" rows="2"></textarea>
+          <div class="meta-row">
+            <select id="projectSelect"></select>
+            <select id="statusSelect">
+              <option value="todo">برای انجام</option>
+              <option value="doing">در حال انجام</option>
+              <option value="done">انجام شد</option>
+            </select>
+          </div>
+          <div>
+            <div class="field-mini-label">دسته‌بندی‌ها (چند مورد قابل انتخاب)</div>
+            <div class="category-picker" id="addCategoryPickerHost"></div>
+          </div>
+          <button type="submit" class="btn submit-btn">افزودن</button>
+        </form>
+      </div>
+      <div class="compose-col">
+        <div class="compose-col-title">📝 یادداشت این روز</div>
+        <textarea class="note-textarea" id="dailyNoteInput" placeholder="یادداشت‌های این روز را اینجا بنویس…"></textarea>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn" id="endOfDayBtn" type="button" style="padding:12px 32px; font-size:15px;">🌙 پایان روز</button>
+      <button class="btn secondary" id="dailyReportBtn" type="button" style="padding:12px 32px; font-size:15px;">📋 خروجی گزارش روزانه</button>
+    </div>
+
+  </div><!-- /#dailyView -->
+
+  <!-- ================= WORKSPACE VIEW ================= -->
+  <div id="workspaceView" style="display:none;">
+    <div class="card">
+      <form class="add-form" id="wsAddForm">
+        <div class="title-row">
+          <input type="text" id="wsTitleInput" placeholder="کاری که فعلاً برای روز خاصی نیست…" autocomplete="off" required>
+        </div>
+        <textarea class="desc-input" id="wsDescInput" placeholder="توضیحات کوتاه (اختیاری)…" rows="2"></textarea>
+        <div class="meta-row">
+          <select id="wsProjectSelect"></select>
+        </div>
+        <div>
+          <div class="field-mini-label">دسته‌بندی‌ها (چند مورد قابل انتخاب)</div>
+          <div class="category-picker" id="wsCategoryPickerHost"></div>
+        </div>
+        <button type="submit" class="btn submit-btn">افزودن به اتاق کار</button>
+      </form>
+    </div>
+    <div class="task-list" id="workspaceList"></div>
+  </div><!-- /#workspaceView -->
+
+  <!-- ================= PROJECTS VIEW ================= -->
+  <div id="projectsView" style="display:none;">
+    <div class="project-grid" id="projectGrid"></div>
+  </div><!-- /#projectsView -->
+
+  <!-- ================= MONTHLY REPORT VIEW ================= -->
+  <div id="monthlyView" style="display:none;">
+    <div class="card">
+      <div class="month-nav">
+        <button class="btn secondary small" id="prevMonthBtn" type="button">‹ ماه قبل</button>
+        <div class="month-label" id="monthLabel">—</div>
+        <button class="btn secondary small" id="nextMonthBtn" type="button">ماه بعد ›</button>
+      </div>
+      <div class="month-summary" id="monthSummary"></div>
+      <div class="day-box-grid" id="monthlyReportBody"></div>
+    </div>
+  </div><!-- /#monthlyView -->
+
+  <!-- ================= MONTHLY EXPORT VIEW ================= -->
+  <div id="exportView" style="display:none;">
+    <div class="card">
+      <div class="filters" style="margin-bottom:14px;">
+        <input type="text" id="reportPersonName" placeholder="نام شما" style="flex:1 1 160px;">
+        <input type="text" id="reportDepartment" placeholder="نام بخش/تیم" style="flex:1 1 160px;">
+      </div>
+      <div class="month-nav">
+        <button class="btn secondary small" id="prevExportMonthBtn" type="button">‹ ماه قبل</button>
+        <div class="month-label" id="exportMonthLabel">—</div>
+        <button class="btn secondary small" id="nextExportMonthBtn" type="button">ماه بعد ›</button>
+      </div>
+    </div>
+
+    <div class="card" id="reportExportArea">
+      <div class="report-header">
+        <h2 id="reportTitleLine1">—</h2>
+        <div class="report-sub" id="reportTitleLine2">—</div>
+      </div>
+
+      <div class="section-label">📁 سهم هر پروژه از این ماه</div>
+      <div id="reportProjectBars"></div>
+
+      <div class="report-stats-grid" id="reportStatsGrid"></div>
+
+      <div class="section-label" style="margin-top:20px;">📊 ترکیب کل دسته‌بندی‌های ماه</div>
+      <div id="reportDonut"></div>
+
+      <div class="section-label" style="margin-top:20px;">📈 روند روزانه‌ی این ماه</div>
+      <div id="reportDailyChart"></div>
+    </div>
+
+    <div class="card" style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn" id="downloadReportImageBtn" type="button">📷 دانلود به‌صورت تصویر</button>
+      <button class="btn secondary" id="printReportBtn" type="button">🖨️ چاپ / ذخیره PDF</button>
+    </div>
+  </div><!-- /#exportView -->
+
+  <div class="footer">
+    <div id="statsLine">۰ کار</div>
+  </div>
+
+</div>
+
+<!-- ================= SETTINGS FAB + DRAWER ================= -->
+<button class="settings-fab" id="settingsFab" type="button" title="تنظیمات">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+</button>
+
+<div class="settings-drawer-overlay" id="settingsDrawerOverlay">
+  <div class="settings-drawer">
+    <div class="settings-drawer-header">
+      <div class="settings-drawer-title">⚙️ تنظیمات</div>
+      <button class="modal-close" id="settingsDrawerClose" type="button">✕</button>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">حالت نمایش</div>
+      <div class="mode-toggle-wrap">
+        <button class="mode-toggle" id="modeToggleBtn" type="button" title="تغییر حالت روز/شب">
+          <span class="mode-toggle-icon sun">☀️</span>
+          <span class="mode-toggle-knob"></span>
+          <span class="mode-toggle-icon moon">🌙</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">میزان جلوه‌ی شیشه‌ای (بلور)</div>
+      <div class="glass-blur-row">
+        <input type="range" id="glassBlurSlider" min="0" max="30" step="1">
+        <span class="glass-blur-value" id="glassBlurValue">۱۴px</span>
+      </div>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">تصویر پس‌زمینه</div>
+      <div class="backup-actions">
+        <button id="bgImageBtn" type="button">🖼️ انتخاب تصویر</button>
+        <button id="removeBgImageBtn" type="button">حذف پس‌زمینه</button>
+      </div>
+      <input type="file" id="bgImageInput" accept="image/*" style="display:none;">
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">مدیریت پروژه‌ها</div>
+      <div class="settings-col">
+        <div class="settings-add">
+          <input type="text" id="newProjectInput" placeholder="مثلاً: وبسایت شرکت الف">
+          <button class="btn small" id="addProjectBtn" type="button">افزودن</button>
+        </div>
+        <div class="tag-list" id="projectTagList"></div>
+      </div>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">مدیریت دسته‌بندی‌ها</div>
+      <div class="settings-col">
+        <div class="settings-add">
+          <input type="text" id="newCategoryInput" placeholder="مثلاً: طراحی، توسعه، جلسه">
+          <input type="color" id="newCategoryColor" value="#c99a52" title="رنگ دسته‌بندی">
+          <button class="btn small" id="addCategoryBtn" type="button">افزودن</button>
+        </div>
+        <div class="tag-list" id="categoryTagList"></div>
+      </div>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">🎨 شخصی‌سازی رنگ</div>
+      <div class="color-grid">
+        <div class="color-field"><label>پس‌زمینه</label><input type="color" id="themeBg"></div>
+        <div class="color-field"><label>پس‌زمینه بلوک‌ها</label><input type="color" id="themeBgElevated"></div>
+        <div class="color-field"><label>پس‌زمینه کارت‌ها</label><input type="color" id="themeBgCard"></div>
+        <div class="color-field"><label>خط دورها</label><input type="color" id="themeBorder"></div>
+        <div class="color-field"><label>متن اصلی</label><input type="color" id="themeText"></div>
+        <div class="color-field"><label>متن کم‌رنگ</label><input type="color" id="themeTextDim"></div>
+        <div class="color-field"><label>رنگ اصلی (قرمز)</label><input type="color" id="themeRed"></div>
+        <div class="color-field"><label>رنگ فرعی (طلایی)</label><input type="color" id="themeGold"></div>
+        <div class="color-field"><label>رنگ انجام‌شده (سبز)</label><input type="color" id="themeGreen"></div>
+        <div class="color-actions">
+          <button class="btn secondary small" id="resetThemeBtn" type="button">بازگشت به پیش‌فرض</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">پشتیبان‌گیری</div>
+      <div class="backup-actions">
+        <button id="exportBtn" type="button">خروجی پشتیبان (JSON)</button>
+        <button id="importBtn" type="button">بازیابی از فایل</button>
+        <input type="file" id="importFile" accept="application/json" style="display:none">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dayModalOverlay">
+  <div class="modal-panel wide" id="dayModalPanel">
+    <div class="modal-header">
+      <div class="modal-title" id="dayModalTitle">—</div>
+      <button class="modal-close" id="dayModalClose" type="button">✕</button>
+    </div>
+    <div id="dayModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ratingModalOverlay">
+  <div class="modal-panel" id="ratingModalPanel" style="max-width:360px; text-align:center;">
+    <div class="modal-header">
+      <div class="modal-title" id="ratingModalTitle">امتیاز به این کار</div>
+      <button class="modal-close" id="ratingModalClose" type="button">✕</button>
+    </div>
+    <div class="rating-modal-stars" id="ratingStars">
+      <span class="star-input" data-value="5">★</span>
+      <span class="star-input" data-value="4">★</span>
+      <span class="star-input" data-value="3">★</span>
+      <span class="star-input" data-value="2">★</span>
+      <span class="star-input" data-value="1">★</span>
+    </div>
+    <textarea class="note-textarea" id="ratingNoteInput" placeholder="توضیح کوتاه درباره‌ی این کار (اختیاری)…" style="min-height:70px;"></textarea>
+    <button class="btn submit-btn" id="ratingSaveBtn" type="button" style="margin-top:14px;">ثبت</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="projectModalOverlay">
+  <div class="modal-panel wide" id="projectModalPanel">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="project-logo-lg" id="projectModalLogo"></div>
+        <div>
+          <div class="modal-title" id="projectModalTitle">—</div>
+          <label class="logo-upload-label" for="projectLogoInput">تغییر لوگو</label>
+          <input type="file" id="projectLogoInput" accept="image/*" style="display:none;">
+        </div>
+      </div>
+      <button class="modal-close" id="projectModalClose" type="button">✕</button>
+    </div>
+
+    <div class="section-label">وضعیت پروژه</div>
+    <div class="status-pills" id="projectStatusPills">
+      <button class="status-pill" data-status="not_started" type="button">شروع نشده</button>
+      <button class="status-pill" data-status="developing" type="button">در حال توسعه</button>
+      <button class="status-pill" data-status="active" type="button">فعال</button>
+    </div>
+
+    <div class="project-dates-grid">
+      <div class="project-date-field">
+        <div class="section-label">تاریخ شروع</div>
+        <div class="date-select-row">
+          <select id="startDay"></select>
+          <select id="startMonth"></select>
+          <input type="number" id="startYear" placeholder="سال" min="1300" max="1500">
+        </div>
+        <div class="project-date-display" id="startDateLabel"></div>
+      </div>
+      <div class="project-date-field">
+        <div class="section-label">تاریخ تکمیل</div>
+        <div class="date-select-row">
+          <select id="endDay"></select>
+          <select id="endMonth"></select>
+          <input type="number" id="endYear" placeholder="سال" min="1300" max="1500">
+        </div>
+        <div class="project-date-display" id="endDateLabel"></div>
+      </div>
+    </div>
+    <button class="btn secondary small" id="saveProjectDatesBtn" type="button">ثبت تاریخ‌ها</button>
+
+    <div class="section-label" style="margin-top:22px;">📊 ترکیب کل کارهای این پروژه</div>
+    <div id="projectDonut"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="eodModalOverlay">
+  <div class="modal-panel wide" id="eodModalPanel">
+    <div class="modal-header">
+      <div class="modal-title" id="eodModalTitle">گزارش پایان روز</div>
+      <button class="modal-close" id="eodModalClose" type="button">✕</button>
+    </div>
+
+    <div class="section-label">توصیف این روز</div>
+    <div class="day-tag-picker" id="dayTagPicker"></div>
+
+    <div class="section-label" style="margin-top:20px;">✅ کارهای انجام‌شده</div>
+    <div id="eodTaskList"></div>
+
+    <div class="section-label" style="margin-top:20px;">📈 عملکرد بر اساس ساعت</div>
+    <div id="eodChart"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dailyReportModalOverlay">
+  <div class="modal-panel" id="dailyReportModalPanel">
+    <div class="modal-header">
+      <div class="modal-title">📋 خروجی گزارش روزانه</div>
+      <button class="modal-close" id="dailyReportModalClose" type="button">✕</button>
+    </div>
+    <div class="modal-note" id="dailyReportText"></div>
+    <button class="btn submit-btn" id="copyDailyReportBtn" type="button">📋 کپی متن گزارش</button>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  /* ---------------- Storage ---------------- */
+  const KEYS = {
+    tasks: 'karooz.tasks.v3',
+    projects: 'karooz.projects.v1',
+    categories: 'karooz.categories.v1',
+    categoryColors: 'karooz.categoryColors.v1',
+    projectMeta: 'karooz.projectMeta.v1',
+    theme: 'karooz.theme.v1',
+    notes: 'karooz.notes.v1',
+    reportSettings: 'karooz.reportSettings.v1'
+  };
+  const OLD_TASKS_KEY = 'karooz.tasks.v2';
+
+  function load(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      if(!raw) return fallback;
+      return JSON.parse(raw);
+    }catch(e){ return fallback; }
+  }
+  function save(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }
+    catch(e){ console.error('ذخیره‌سازی ناموفق بود', e); }
+  }
+
+  function uid(){
+    return 't' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  /* ---- color math for theme customization ---- */
+  function hexToRgb(hex){
+    hex = hex.replace('#','');
+    if(hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+    const num = parseInt(hex, 16);
+    return { r: (num>>16)&255, g: (num>>8)&255, b: num&255 };
+  }
+  function rgbToHex(r,g,b){
+    return '#' + [r,g,b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,'0')).join('');
+  }
+  function rgbToHsl(r,g,b){
+    r/=255; g/=255; b/=255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2;
+    if(max === min){ h = s = 0; }
+    else{
+      const d = max - min;
+      s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+      switch(max){
+        case r: h = (g-b)/d + (g<b?6:0); break;
+        case g: h = (b-r)/d + 2; break;
+        default: h = (r-g)/d + 4;
+      }
+      h /= 6;
+    }
+    return { h: h*360, s: s*100, l: l*100 };
+  }
+  function hslToRgb(h,s,l){
+    h/=360; s/=100; l/=100;
+    let r,g,b;
+    if(s === 0){ r = g = b = l; }
+    else{
+      const hue2rgb = (p,q,t) => {
+        if(t<0) t+=1; if(t>1) t-=1;
+        if(t<1/6) return p+(q-p)*6*t;
+        if(t<1/2) return q;
+        if(t<2/3) return p+(q-p)*(2/3-t)*6;
+        return p;
+      };
+      const q = l<0.5 ? l*(1+s) : l+s-l*s;
+      const p = 2*l-q;
+      r = hue2rgb(p,q,h+1/3);
+      g = hue2rgb(p,q,h);
+      b = hue2rgb(p,q,h-1/3);
+    }
+    return { r: r*255, g: g*255, b: b*255 };
+  }
+  function shade(hex, lDelta){
+    const {r,g,b} = hexToRgb(hex);
+    const hsl = rgbToHsl(r,g,b);
+    hsl.l = Math.max(0, Math.min(100, hsl.l + lDelta));
+    const rgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+    return rgbToHex(rgb.r, rgb.g, rgb.b);
+  }
+  function colorAlpha(hex, a){
+    const {r,g,b} = hexToRgb(hex);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function applyTheme(){
+    const t = theme[theme.mode];
+    const isLight = theme.mode === 'light';
+    const root = document.documentElement.style;
+    document.documentElement.dataset.mode = theme.mode;
+    root.setProperty('--bg', t.bg);
+    root.setProperty('--bg-elevated', t.bgElevated);
+    root.setProperty('--bg-card', t.bgCard);
+    root.setProperty('--bg-card-hover', shade(t.bgCard, isLight ? -5 : 5));
+    root.setProperty('--bg-elevated-glass', colorAlpha(t.bgElevated, 0.65));
+    root.setProperty('--bg-card-glass', colorAlpha(t.bgCard, 0.58));
+    root.setProperty('--border', t.border);
+    root.setProperty('--border-soft', colorAlpha(t.border, 0.6));
+    root.setProperty('--text', t.text);
+    root.setProperty('--text-dim', t.textDim);
+    root.setProperty('--text-faint', colorAlpha(t.textDim, 0.5));
+    root.setProperty('--red', t.red);
+    root.setProperty('--red-bright', shade(t.red, isLight ? -9 : 9));
+    root.setProperty('--red-dim', shade(t.red, isLight ? 32 : -32));
+    root.setProperty('--red-glow', colorAlpha(t.red, 0.25));
+    root.setProperty('--gold', t.gold);
+    root.setProperty('--gold-dim', shade(t.gold, isLight ? 35 : -35));
+    root.setProperty('--green', t.green);
+    root.setProperty('--green-dim', shade(t.green, isLight ? 35 : -35));
+    root.setProperty('--glass-blur', theme.glassBlur + 'px');
+    applyBodyBackground();
+  }
+
+  function applyBodyBackground(){
+    const t = theme[theme.mode];
+    if(theme.backgroundImage){
+      document.body.style.backgroundImage =
+        `linear-gradient(${colorAlpha(t.bg,0.72)}, ${colorAlpha(t.bg,0.72)}), url(${theme.backgroundImage})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center';
+      document.body.style.backgroundAttachment = 'fixed';
+    }else{
+      document.body.style.backgroundImage =
+        `radial-gradient(ellipse at 20% -10%, ${colorAlpha(t.red, 0.12)} 0%, transparent 55%)`;
+      document.body.style.backgroundSize = '';
+      document.body.style.backgroundPosition = '';
+      document.body.style.backgroundAttachment = '';
+    }
+  }
+
+  /* ---------------- Jalali date helpers ---------------- */
+  function jalaliPartsFor(date){
+    const fmt = new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-latn', {
+      year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+    });
+    const parts = fmt.formatToParts(date);
+    const map = {};
+    parts.forEach(p => map[p.type] = p.value);
+    return map;
+  }
+  function getJalaliYMD(date){
+    const fmt = new Intl.DateTimeFormat('fa-IR-u-ca-persian-nu-latn', {
+      year: 'numeric', month: 'numeric', day: 'numeric'
+    });
+    const parts = fmt.formatToParts(date);
+    const map = {};
+    parts.forEach(p => map[p.type] = p.value);
+    return { y: parseInt(map.year,10), m: parseInt(map.month,10), d: parseInt(map.day,10) };
+  }
+  function dayKeyOf(y,m,d){ return `${y}-${m}-${d}`; }
+  function todayDayKey(){
+    const ymd = getJalaliYMD(new Date());
+    return dayKeyOf(ymd.y, ymd.m, ymd.d);
+  }
+  function todayStamp(){
+    const map = jalaliPartsFor(new Date());
+    return { weekday: map.weekday||'', day: map.day||'', month: map.month||'', year: map.year||'' };
+  }
+  function findGregorianForJalali(targetY, targetM, targetD){
+    const todayYMD = getJalaliYMD(new Date());
+    const approxDays = (targetY - todayYMD.y)*365.25 + (targetM - todayYMD.m)*30.44 + (targetD - todayYMD.d);
+    let guess = new Date(Date.now() + Math.round(approxDays)*86400000);
+    const targetSeq = targetY*372 + targetM*31 + targetD;
+    for(let i = 0; i < 60; i++){
+      const ymd = getJalaliYMD(guess);
+      if(ymd.y === targetY && ymd.m === targetM && ymd.d === targetD) return guess;
+      const seq = ymd.y*372 + ymd.m*31 + ymd.d;
+      guess = new Date(guess.getTime() + (targetSeq > seq ? 1 : -1) * 86400000);
+    }
+    return guess;
+  }
+  function getDaysInJalaliMonth(y, m){
+    const nextM = m === 12 ? 1 : m + 1;
+    const nextY = m === 12 ? y + 1 : y;
+    const firstThis = findGregorianForJalali(y, m, 1);
+    const firstNext = findGregorianForJalali(nextY, nextM, 1);
+    return Math.round((firstNext.getTime() - firstThis.getTime()) / 86400000);
+  }
+
+  const PERSIAN_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+  const STATUS_LABELS = { todo: 'برای انجام', doing: 'در حال انجام', done: 'انجام شد' };
+  const faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+  function toFa(n){ return String(n).replace(/[0-9]/g, d => faDigits[d]); }
+
+  function setTaskStatus(t, newStatus, ts){
+    ts = ts || Date.now();
+    if(newStatus === 'done' && t.status !== 'done'){ t.completedAt = ts; }
+    if(newStatus !== 'done'){ t.completedAt = null; }
+    t.status = newStatus;
+  }
+
+  /* ---------------- Motivational quotes ---------------- */
+  const MOTIVATIONAL_QUOTES = [
+    { text: 'کسی که هرگز اشتباه نکرده هرگز چیز جدیدی امتحان نکرده است.', author: 'آلبرت اینشتین' },
+    { text: 'من شکست نخورده‌ام؛ فقط ده‌هزار راهی را پیدا کرده‌ام که جواب نمی‌دهد.', author: 'توماس ادیسون' },
+    { text: 'قطره قطره جمع گردد، وانگهی دریا شود.', author: 'مولانا' },
+    { text: 'هر که را طاووس خواهد جور هندوستان کشد.', author: 'حافظ' },
+    { text: 'توانا بود هر که دانا بود.', author: 'فردوسی' },
+    { text: 'بهترین راه پیش‌بینی آینده، ساختن آن است.', author: 'ابراهیم لینکلن' },
+    { text: 'از کوزه همان برون تراود که در اوست.', author: 'سعدی' },
+    { text: 'دانستن، توانستن است.', author: 'ابن‌سینا' },
+    { text: 'زندگی یا یک ماجراجویی جسورانه است، یا هیچ.', author: 'هلن کلر' },
+    { text: 'کوه را ذره ذره باید برد.', author: 'مولانا' },
+    { text: 'هیچ بادی برای کشتی‌ای که مقصدش را نمی‌داند، مساعد نیست.', author: 'سنکا' },
+    { text: 'بزرگ‌ترین شکوه در زندگی، هرگز زمین نخوردن نیست؛ هر بار برخاستن است.', author: 'کنفوسیوس' },
+    { text: 'کسی که کوچک‌ترین کارها را به بهترین شکل انجام می‌دهد، به بزرگ‌ترین‌ها می‌رسد.', author: 'گاندی' },
+    { text: 'صبر تلخ است، اما میوه‌اش شیرین است.', author: 'ارسطو' },
+    { text: 'هر روز صبح، فرصتی تازه برای ساختن زندگی‌ای است که می‌خواهی.', author: 'ناشناس' },
+    { text: 'کار امروز را به فردا میفکن.', author: 'ضرب‌المثل ایرانی' },
+    { text: 'موفقیت، مجموع تلاش‌های کوچکی است که هر روز تکرار می‌شوند.', author: 'رابرت کولیر' },
+    { text: 'آنچه در ذهن بگنجد، در دست نیز میسر می‌شود.', author: 'حکیم عمر خیام' },
+    { text: 'راه رفتن هزار مایل، با یک قدم آغاز می‌شود.', author: 'لائوتزو' },
+    { text: 'اراده‌ی استوار، هر مانعی را کوچک می‌کند.', author: 'ناپلئون بناپارت' }
+  ];
+  function getDailyQuote(){
+    const ymd = getJalaliYMD(new Date());
+    const seed = ymd.y*372 + ymd.m*31 + ymd.d;
+    return MOTIVATIONAL_QUOTES[((seed % MOTIVATIONAL_QUOTES.length) + MOTIVATIONAL_QUOTES.length) % MOTIVATIONAL_QUOTES.length];
+  }
+  function renderQuoteCard(){
+    const q = getDailyQuote();
+    document.getElementById('quoteText').textContent = q.text;
+    document.getElementById('quoteAuthor').textContent = '— ' + q.author;
+  }
+
+  /* ---------------- State ---------------- */
+  const DEFAULT_THEME_DARK = {
+    bg: '#15111a', bgElevated: '#1c1621', bgCard: '#211a27', border: '#362c3e',
+    text: '#f1ecee', textDim: '#a698a9', red: '#d6394e', gold: '#c99a52', green: '#6f9c76'
+  };
+  const DEFAULT_THEME_LIGHT = {
+    bg: '#f3ece7', bgElevated: '#fffdfb', bgCard: '#ece2dc', border: '#ddccc4',
+    text: '#2b2024', textDim: '#7a6b64', red: '#c1364a', gold: '#a8763a', green: '#4a7d55'
+  };
+  const CATEGORY_PALETTE = ['#d6394e','#c99a52','#6f9c76','#5b8fc9','#a86fc9','#c96f9e','#4fb0a5','#c98a4f'];
+  const PROJECT_STATUS = {
+    not_started: { label: 'شروع نشده', color: 'var(--text-faint)' },
+    developing: { label: 'در حال توسعه', color: 'var(--gold)' },
+    active: { label: 'فعال', color: 'var(--green)' }
+  };
+
+  let tasks = load(KEYS.tasks, null);
+  if(tasks === null){
+    tasks = load(OLD_TASKS_KEY, []);
+  }
+  tasks.forEach(t => {
+    if(t.description === undefined) t.description = '';
+    if(t.inWorkspace === undefined) t.inWorkspace = false;
+    if(t.completedAt === undefined) t.completedAt = (t.status === 'done') ? (t.createdAt || Date.now()) : null;
+    if(t.dayKey === undefined) t.dayKey = t.inWorkspace ? null : todayDayKey();
+    if(t.rating === undefined) t.rating = null;
+    if(t.completionNote === undefined) t.completionNote = '';
+    if(t.categories === undefined){ t.categories = t.category ? [t.category] : []; }
+    if(t.category !== undefined) delete t.category;
+  });
+  save(KEYS.tasks, tasks);
+
+  let projects = load(KEYS.projects, []);
+  let categories = load(KEYS.categories, ['عمومی']);
+  let categoryColors = load(KEYS.categoryColors, {});
+  let projectMeta = load(KEYS.projectMeta, {});
+  let notes = load(KEYS.notes, {});
+  let reportSettings = load(KEYS.reportSettings, { name: '', department: '' });
+  let theme;
+  {
+    const savedThemeRaw = load(KEYS.theme, null);
+    if(savedThemeRaw && savedThemeRaw.dark && savedThemeRaw.light){
+      theme = {
+        mode: savedThemeRaw.mode || 'dark',
+        glassBlur: savedThemeRaw.glassBlur !== undefined ? savedThemeRaw.glassBlur : 14,
+        backgroundImage: savedThemeRaw.backgroundImage || null,
+        dark: Object.assign({}, DEFAULT_THEME_DARK, savedThemeRaw.dark),
+        light: Object.assign({}, DEFAULT_THEME_LIGHT, savedThemeRaw.light)
+      };
+    }else if(savedThemeRaw && savedThemeRaw.bg){
+      theme = {
+        mode: 'dark', glassBlur: 14, backgroundImage: null,
+        dark: Object.assign({}, DEFAULT_THEME_DARK, savedThemeRaw),
+        light: Object.assign({}, DEFAULT_THEME_LIGHT)
+      };
+    }else{
+      theme = {
+        mode: 'dark', glassBlur: 14, backgroundImage: null,
+        dark: Object.assign({}, DEFAULT_THEME_DARK),
+        light: Object.assign({}, DEFAULT_THEME_LIGHT)
+      };
+    }
+  }
+
+  let filters = { status: 'all', project: 'all', category: 'all', search: '' };
+  let editingId = null;
+  let reportView = null;
+  let exportReportView = null;
+  let lastKnownDayKey = null;
+  let noteSaveTimer = null;
+  let dayOffset = 0;
+  let ratingSelected = 0;
+  let currentRatingTask = null;
+  let currentRatingRefresh = null;
+  let currentProjectModalName = null;
+  let addFormCategories = [];
+  let wsFormCategories = [];
+  let addCategoryPickerEl = null;
+  let wsCategoryPickerEl = null;
+
+  /* ---------------- Viewed-day helpers (daily tab navigation) ---------------- */
+  function viewedDate(){ return new Date(Date.now() + dayOffset * 86400000); }
+  function viewedYMD(){ return getJalaliYMD(viewedDate()); }
+  function viewedDayKey(){ const y = viewedYMD(); return dayKeyOf(y.y, y.m, y.d); }
+  function viewedJalaliDisplay(){ const s = jalaliPartsFor(viewedDate()); return `${s.day} ${s.month} ${s.year}`; }
+
+  function getDailyTasks(){
+    const key = viewedDayKey();
+    return tasks.filter(t => !t.inWorkspace && t.dayKey === key);
+  }
+
+  function getCategoryColor(name){
+    if(!categoryColors[name]){
+      categoryColors[name] = CATEGORY_PALETTE[Object.keys(categoryColors).length % CATEGORY_PALETTE.length];
+      save(KEYS.categoryColors, categoryColors);
+    }
+    return categoryColors[name];
+  }
+  function categoryTagEl(name){
+    const el = document.createElement('span');
+    el.className = 'mini-tag';
+    el.textContent = name;
+    const color = getCategoryColor(name);
+    el.style.borderColor = colorAlpha(color, 0.45);
+    el.style.background = colorAlpha(color, 0.14);
+    el.style.color = color;
+    return el;
+  }
+  function buildCategoryPicker(selectedArr){
+    const wrap = document.createElement('div');
+    wrap.className = 'category-picker';
+    function render(){
+      wrap.innerHTML = '';
+      if(categories.length === 0){
+        const span = document.createElement('span');
+        span.style.cssText = 'color:var(--text-faint); font-size:12px;';
+        span.textContent = 'ابتدا از بخش تنظیمات یک دسته‌بندی اضافه کن';
+        wrap.appendChild(span);
+        return;
+      }
+      categories.forEach(name => {
+        const isSel = selectedArr.includes(name);
+        const chip = document.createElement('div');
+        chip.className = 'chip cat-chip' + (isSel ? ' active' : '');
+        chip.textContent = name;
+        if(isSel){
+          const color = getCategoryColor(name);
+          chip.style.background = colorAlpha(color, 0.18);
+          chip.style.borderColor = color;
+          chip.style.color = color;
+        }
+        chip.addEventListener('click', () => {
+          const idx = selectedArr.indexOf(name);
+          if(idx === -1) selectedArr.push(name); else selectedArr.splice(idx, 1);
+          render();
+        });
+        wrap.appendChild(chip);
+      });
+    }
+    render();
+    wrap.refreshOptions = render;
+    return wrap;
+  }
+
+  function getProjectMeta(name){
+    if(!projectMeta[name]){
+      projectMeta[name] = { status: 'not_started', startDate: null, endDate: null, logo: null };
+      save(KEYS.projectMeta, projectMeta);
+    }
+    return projectMeta[name];
+  }
+  function getProjectStats(name){
+    const done = tasks.filter(t => t.project === name && t.status === 'done');
+    const total = done.length;
+    const catCounts = {};
+    done.forEach(t => { (t.categories||[]).forEach(c => { catCounts[c] = (catCounts[c]||0) + 1; }); });
+    let busiest = null, busiestCount = 0;
+    Object.keys(catCounts).forEach(c => { if(catCounts[c] > busiestCount){ busiest = c; busiestCount = catCounts[c]; } });
+    const rated = done.filter(t => t.rating);
+    const avgRating = rated.length ? (rated.reduce((s,t) => s + t.rating, 0) / rated.length) : null;
+    const lastTs = done.length ? Math.max(...done.map(t => t.completedAt)) : null;
+    return { total, busiest, avgRating, lastTs, doneTasks: done };
+  }
+  function jalaliShortFromTs(ts){
+    const p = jalaliPartsFor(new Date(ts));
+    return `${toFa(p.day)} ${p.month}`;
+  }
+  function jalaliDateObjLabel(dateObj){
+    if(!dateObj) return null;
+    return `${toFa(dateObj.d)} ${PERSIAN_MONTHS[dateObj.m - 1]} ${toFa(dateObj.y)}`;
+  }
+
+  /* ---------------- Rendering: stamp (always the real current moment) ---------------- */
+  function renderStamp(){
+    const s = todayStamp();
+    document.getElementById('stampWeekday').textContent = s.weekday;
+    document.getElementById('stampDay').textContent = toFa(s.day);
+    document.getElementById('stampMonth').textContent = `${s.month} ${toFa(s.year)}`;
+  }
+
+  /* ---------------- Rendering: day navigation bar ---------------- */
+  function renderDayNav(){
+    const parts = jalaliPartsFor(viewedDate());
+    const isToday = dayOffset === 0;
+    document.getElementById('dayNavTitle').textContent = isToday ? 'امروز' : parts.weekday;
+    document.getElementById('dayNavSub').textContent = `${toFa(parts.day)} ${parts.month} ${toFa(parts.year)}`;
+    document.getElementById('jumpTodayBtn').style.display = isToday ? 'none' : 'inline-block';
+  }
+
+  /* ---------------- Rendering: selects, category pickers & settings ---------------- */
+  function fillSelect(select, items, placeholder){
+    const current = select.value;
+    select.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = ''; opt0.textContent = placeholder;
+    select.appendChild(opt0);
+    items.forEach(it => {
+      const opt = document.createElement('option');
+      opt.value = it; opt.textContent = it;
+      select.appendChild(opt);
+    });
+    if(items.includes(current)) select.value = current;
+  }
+  function renderProjectSelect(){
+    fillSelect(document.getElementById('projectSelect'), projects, '— بدون پروژه —');
+    fillSelect(document.getElementById('wsProjectSelect'), projects, '— بدون پروژه —');
+  }
+  function renderCategoryPickers(){
+    if(addCategoryPickerEl) addCategoryPickerEl.refreshOptions();
+    if(wsCategoryPickerEl) wsCategoryPickerEl.refreshOptions();
+  }
+
+  function renderProjectTagList(){
+    const el = document.getElementById('projectTagList');
+    el.innerHTML = '';
+    if(projects.length === 0){
+      const span = document.createElement('span');
+      span.style.cssText = 'color:var(--text-faint);font-size:12.5px;';
+      span.textContent = 'هنوز موردی اضافه نشده';
+      el.appendChild(span); return;
+    }
+    projects.forEach(name => {
+      const pill = document.createElement('div'); pill.className = 'tag-pill';
+      const label = document.createElement('span'); label.textContent = name;
+      const btn = document.createElement('button'); btn.textContent = '✕'; btn.title = 'حذف';
+      btn.addEventListener('click', () => {
+        projects = projects.filter(p => p !== name);
+        delete projectMeta[name];
+        save(KEYS.projects, projects);
+        save(KEYS.projectMeta, projectMeta);
+        renderAll();
+      });
+      pill.appendChild(label); pill.appendChild(btn);
+      el.appendChild(pill);
+    });
+  }
+
+  function renderCategoryTagList(){
+    const el = document.getElementById('categoryTagList');
+    el.innerHTML = '';
+    if(categories.length === 0){
+      const span = document.createElement('span');
+      span.style.cssText = 'color:var(--text-faint);font-size:12.5px;';
+      span.textContent = 'هنوز موردی اضافه نشده';
+      el.appendChild(span); return;
+    }
+    categories.forEach(name => {
+      const pill = document.createElement('div'); pill.className = 'tag-pill';
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.value = getCategoryColor(name);
+      colorInput.title = 'تغییر رنگ';
+      colorInput.addEventListener('input', (e) => {
+        categoryColors[name] = e.target.value;
+        save(KEYS.categoryColors, categoryColors);
+        renderTaskList(); renderWorkspaceList();
+      });
+      const label = document.createElement('span'); label.textContent = name;
+      const btn = document.createElement('button'); btn.textContent = '✕'; btn.title = 'حذف';
+      btn.addEventListener('click', () => {
+        categories = categories.filter(c => c !== name);
+        delete categoryColors[name];
+        save(KEYS.categories, categories);
+        save(KEYS.categoryColors, categoryColors);
+        renderAll();
+      });
+      pill.appendChild(colorInput); pill.appendChild(label); pill.appendChild(btn);
+      el.appendChild(pill);
+    });
+  }
+
+  /* ---------------- Rendering: filter chips ---------------- */
+  function renderFilterChips(){
+    const daily = getDailyTasks();
+
+    const statusGroup = document.getElementById('statusFilterGroup');
+    statusGroup.innerHTML = '';
+    [['all','همه'],['todo','برای انجام'],['doing','در حال انجام'],['done','انجام شد']].forEach(([key,label]) => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (filters.status === key ? ' active' : '');
+      chip.textContent = label;
+      chip.addEventListener('click', () => { filters.status = key; renderTaskList(); renderFilterChips(); });
+      statusGroup.appendChild(chip);
+    });
+
+    const projectGroup = document.getElementById('projectFilterGroup');
+    projectGroup.innerHTML = '';
+    const usedProjects = [...new Set(daily.map(t => t.project).filter(Boolean))];
+    if(usedProjects.length){
+      const allChip = document.createElement('div');
+      allChip.className = 'chip' + (filters.project === 'all' ? ' active' : '');
+      allChip.textContent = 'همه پروژه‌ها';
+      allChip.addEventListener('click', () => { filters.project = 'all'; renderTaskList(); renderFilterChips(); });
+      projectGroup.appendChild(allChip);
+      usedProjects.forEach(p => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (filters.project === p ? ' active' : '');
+        chip.textContent = p;
+        chip.addEventListener('click', () => { filters.project = (filters.project===p?'all':p); renderTaskList(); renderFilterChips(); });
+        projectGroup.appendChild(chip);
+      });
+    }
+
+    const categoryGroup = document.getElementById('categoryFilterGroup');
+    categoryGroup.innerHTML = '';
+    const usedCategories = [...new Set(daily.flatMap(t => t.categories || []))];
+    usedCategories.forEach(c => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (filters.category === c ? ' active' : '');
+      chip.textContent = c;
+      chip.addEventListener('click', () => { filters.category = (filters.category===c?'all':c); renderTaskList(); renderFilterChips(); });
+      categoryGroup.appendChild(chip);
+    });
+  }
+
+  /* ---------------- Rendering: daily task list ---------------- */
+  function matchesFilters(t){
+    if(filters.status !== 'all' && t.status !== filters.status) return false;
+    if(filters.project !== 'all' && t.project !== filters.project) return false;
+    if(filters.category !== 'all' && !(t.categories||[]).includes(filters.category)) return false;
+    if(filters.search && !t.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    return true;
+  }
+
+  function svgCheck(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+  }
+  function svgEdit(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>';
+  }
+  function svgTrash(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
+  }
+  function svgMoveToday(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg>';
+  }
+  function svgToWorkspace(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"></rect><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"></path><line x1="10" y1="12" x2="14" y2="12"></line></svg>';
+  }
+  function svgProjectDefault(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>';
+  }
+
+  /* ---------------- Category composition donut ---------------- */
+  function buildDonutSVG(taskList, sizePx){
+    sizePx = sizePx || 176;
+    const wrapper = document.createElement('div');
+
+    if(!taskList.length){
+      wrapper.className = 'empty-state';
+      wrapper.style.padding = '20px';
+      wrapper.innerHTML = '<p>کاری برای نمایش نیست.</p>';
+      return wrapper;
+    }
+
+    const counts = {};
+    taskList.forEach(t => {
+      const cats = (t.categories && t.categories.length) ? t.categories : ['__none__'];
+      cats.forEach(key => { counts[key] = (counts[key] || 0) + 1; });
+    });
+    const entries = Object.keys(counts).map(k => ({
+      name: k === '__none__' ? 'بدون دسته' : k,
+      count: counts[k],
+      color: k === '__none__' ? '#5c5364' : getCategoryColor(k)
+    })).sort((a,b) => b.count - a.count);
+
+    const tagTotal = entries.reduce((s,e) => s + e.count, 0);
+    const r = 68, stroke = 22, cx = 90, cy = 90;
+    const c = 2 * Math.PI * r;
+    let offset = 0;
+    let segments = '';
+    entries.forEach(e => {
+      const frac = e.count / tagTotal;
+      const len = frac * c;
+      const gap = Math.max(c - len, 0);
+      segments += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${e.color}" stroke-width="${stroke}" stroke-dasharray="${len} ${gap}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+      offset += len;
+    });
+
+    wrapper.className = 'donut-wrap';
+    wrapper.style.cssText = 'display:flex; align-items:center; gap:20px; flex-wrap:wrap;';
+    const chart = document.createElement('div');
+    chart.innerHTML = `<svg viewBox="0 0 180 180" width="${sizePx}" height="${sizePx}">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" style="stroke:var(--bg-card)" stroke-width="${stroke}"/>
+        ${segments}
+        <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="26" font-weight="800" style="fill:var(--text)" font-family="Vazirmatn, Tahoma, sans-serif">${toFa(taskList.length)}</text>
+        <text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="11" style="fill:var(--text-dim)" font-family="Vazirmatn, Tahoma, sans-serif">کار</text>
+      </svg>`;
+
+    const legend = document.createElement('div');
+    legend.style.cssText = 'flex:1; min-width:150px; display:flex; flex-direction:column; gap:8px;';
+    entries.forEach(e => {
+      const pct = Math.round((e.count / tagTotal) * 100);
+      const row = document.createElement('div'); row.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12.5px;';
+      const dot = document.createElement('span'); dot.style.cssText = 'width:10px;height:10px;border-radius:3px;flex:0 0 auto;'; dot.style.background = e.color;
+      const name = document.createElement('span'); name.style.cssText = 'flex:1; color:var(--text);'; name.textContent = e.name;
+      const pctEl = document.createElement('span'); pctEl.style.cssText = 'color:var(--text-dim); font-variant-numeric: tabular-nums;'; pctEl.textContent = `${toFa(pct)}٪ (${toFa(e.count)})`;
+      row.appendChild(dot); row.appendChild(name); row.appendChild(pctEl);
+      legend.appendChild(row);
+    });
+
+    wrapper.appendChild(chart);
+    wrapper.appendChild(legend);
+    return wrapper;
+  }
+
+  function renderDailyDonut(){
+    const el = document.getElementById('dailyDonut');
+    el.innerHTML = '';
+    el.appendChild(buildDonutSVG(getDailyTasks(), 176));
+  }
+
+  /* ---------------- Hourly performance chart ---------------- */
+  function buildHourlyChartSVG(doneTasks, widthPx, heightPx){
+    widthPx = widthPx || 540; heightPx = heightPx || 170;
+    const hours = [8,9,10,11,12,13,14,15,16];
+    const counts = hours.map(() => 0);
+    doneTasks.forEach(t => {
+      if(!t.completedAt) return;
+      const hr = new Date(t.completedAt).getHours();
+      const idx = hours.indexOf(hr);
+      if(idx !== -1) counts[idx]++;
+    });
+    const maxCount = Math.max(1, ...counts);
+    const padX = 24, padTop = 20, padBottom = 30;
+    const plotW = widthPx - padX*2, plotH = heightPx - padTop - padBottom;
+    const stepX = plotW / (hours.length - 1);
+    const points = hours.map((h,i) => ({
+      x: padX + i*stepX,
+      y: padTop + plotH - (counts[i]/maxCount)*plotH,
+      count: counts[i], hour: h
+    }));
+
+    let lineD = `M ${points[0].x} ${points[0].y}`;
+    points.slice(1).forEach((p,i) => {
+      const prev = points[i];
+      const midX = (prev.x+p.x)/2;
+      lineD += ` C ${midX} ${prev.y}, ${midX} ${p.y}, ${p.x} ${p.y}`;
+    });
+    const areaD = lineD + ` L ${points[points.length-1].x} ${padTop+plotH} L ${points[0].x} ${padTop+plotH} Z`;
+
+    const dots = points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" style="fill:var(--red)"/>`).join('');
+    const labels = points.map(p => `<text x="${p.x}" y="${heightPx-8}" text-anchor="middle" font-size="10" style="fill:var(--text-faint)" font-family="Vazirmatn, Tahoma, sans-serif">${toFa(p.hour)}</text>`).join('');
+    const countLabels = points.filter(p=>p.count>0).map(p => `<text x="${p.x}" y="${p.y-9}" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--text)" font-family="Vazirmatn, Tahoma, sans-serif">${toFa(p.count)}</text>`).join('');
+
+    return `<svg viewBox="0 0 ${widthPx} ${heightPx}" width="100%" height="${heightPx}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="hourlyAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style="stop-color:var(--red); stop-opacity:0.35"/>
+          <stop offset="100%" style="stop-color:var(--red); stop-opacity:0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#hourlyAreaGrad)" stroke="none"/>
+      <path class="hourly-chart-path" d="${lineD}"/>
+      ${dots}
+      ${countLabels}
+      ${labels}
+    </svg>`;
+  }
+
+  function buildMonthlyDailyLineChartSVG(counts, widthPx, heightPx){
+    widthPx = widthPx || 700; heightPx = heightPx || 180;
+    const n = counts.length;
+    const maxCount = Math.max(1, ...counts);
+    const padX = 22, padTop = 20, padBottom = 26;
+    const plotW = widthPx - padX*2, plotH = heightPx - padTop - padBottom;
+    const stepX = n > 1 ? plotW / (n - 1) : 0;
+    const points = counts.map((c,i) => ({
+      x: padX + i*stepX,
+      y: padTop + plotH - (c/maxCount)*plotH,
+      count: c, day: i + 1
+    }));
+    let lineD = `M ${points[0].x} ${points[0].y}`;
+    points.slice(1).forEach((p,i) => {
+      const prev = points[i];
+      const midX = (prev.x+p.x)/2;
+      lineD += ` C ${midX} ${prev.y}, ${midX} ${p.y}, ${p.x} ${p.y}`;
+    });
+    const areaD = lineD + ` L ${points[n-1].x} ${padTop+plotH} L ${points[0].x} ${padTop+plotH} Z`;
+    const dots = points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="2.6" style="fill:var(--red)"/>`).join('');
+    const showEvery = n > 20 ? 5 : (n > 10 ? 2 : 1);
+    const labels = points.filter(p => (p.day-1) % showEvery === 0 || p.day === n).map(p =>
+      `<text x="${p.x}" y="${heightPx-8}" text-anchor="middle" font-size="9" style="fill:var(--text-faint)" font-family="Vazirmatn, Tahoma, sans-serif">${toFa(p.day)}</text>`
+    ).join('');
+    return `<svg viewBox="0 0 ${widthPx} ${heightPx}" width="100%" height="${heightPx}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="monthlyAreaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style="stop-color:var(--red); stop-opacity:0.35"/>
+          <stop offset="100%" style="stop-color:var(--red); stop-opacity:0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaD}" fill="url(#monthlyAreaGrad)" stroke="none"/>
+      <path class="hourly-chart-path" d="${lineD}"/>
+      ${dots}
+      ${labels}
+    </svg>`;
+  }
+
+  function getDayTagOptions(){
+    const catTags = categories.map(c => c + '\u200cمحور');
+    return [...catTags, 'روز پرکار', 'روز آروم'];
+  }
+  function renderDayTagPicker(selectedTag){
+    const el = document.getElementById('dayTagPicker');
+    el.innerHTML = '';
+    getDayTagOptions().forEach(tag => {
+      const chip = document.createElement('div');
+      chip.className = 'day-tag-chip' + (tag === selectedTag ? ' selected' : '');
+      chip.textContent = tag;
+      chip.addEventListener('click', () => {
+        const key = viewedDayKey();
+        const entry = notes[key] || { text: '', updatedAt: viewedDate().getTime() };
+        entry.dayTag = (entry.dayTag === tag) ? null : tag;
+        entry.updatedAt = viewedDate().getTime();
+        notes[key] = entry;
+        save(KEYS.notes, notes);
+        renderDayTagPicker(entry.dayTag);
+      });
+      el.appendChild(chip);
+    });
+  }
+
+  function openEndOfDayModal(){
+    const doneToday = getDailyTasks().filter(t => t.status === 'done' && t.completedAt).sort((a,b) => a.completedAt - b.completedAt);
+    const parts = jalaliPartsFor(viewedDate());
+    document.getElementById('eodModalTitle').textContent = `گزارش پایان روز — ${parts.weekday} ${toFa(parts.day)} ${parts.month}`;
+
+    const key = viewedDayKey();
+    const entry = notes[key];
+    renderDayTagPicker(entry ? entry.dayTag : null);
+
+    const listEl = document.getElementById('eodTaskList');
+    listEl.innerHTML = '';
+    if(doneToday.length === 0){
+      listEl.innerHTML = '<div class="empty-state"><p>هنوز کاری در این روز تکمیل نشده.</p></div>';
+    }else{
+      doneToday.forEach(t => {
+        const row = document.createElement('div'); row.className = 'eod-task-item';
+        const title = document.createElement('span'); title.textContent = t.title;
+        const time = document.createElement('span'); time.className = 'eod-task-time';
+        const d = new Date(t.completedAt);
+        time.textContent = toFa(String(d.getHours()).padStart(2,'0')) + ':' + toFa(String(d.getMinutes()).padStart(2,'0'));
+        row.appendChild(title); row.appendChild(time);
+        listEl.appendChild(row);
+      });
+    }
+
+    document.getElementById('eodChart').innerHTML = buildHourlyChartSVG(doneToday, 560, 170);
+    document.getElementById('eodModalOverlay').classList.add('open');
+  }
+  function closeEndOfDayModal(){ document.getElementById('eodModalOverlay').classList.remove('open'); }
+
+  /* ---------------- Daily report export (for sending to a channel) ---------------- */
+  function jalaliSlashDate(y, m, d){
+    return `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+  }
+  function buildDailyReportText(){
+    const ymd = viewedYMD();
+    const dateLine = `گزارش کار ${jalaliSlashDate(ymd.y, ymd.m, ymd.d)}`;
+    const namePart = reportSettings.name || '';
+    const deptPart = reportSettings.department ? `بخش ${reportSettings.department}` : '';
+    const infoLine = [namePart, deptPart].filter(Boolean).join(' | ');
+
+    const doneToday = getDailyTasks().filter(t => t.status === 'done' && t.completedAt).sort((a,b) => a.completedAt - b.completedAt);
+    const lines = doneToday.map((t, i) => {
+      const text = (t.completionNote && t.completionNote.trim()) ? t.completionNote.trim() : t.title;
+      return `${i+1}_${text}`;
+    });
+
+    const headerLines = [dateLine];
+    if(infoLine) headerLines.push(infoLine);
+    if(lines.length === 0) lines.push('امروز کاری تکمیل نشده است.');
+    return [...headerLines, '', ...lines].join('\n');
+  }
+  function openDailyReportModal(){
+    document.getElementById('dailyReportText').textContent = buildDailyReportText();
+    document.getElementById('dailyReportModalOverlay').classList.add('open');
+  }
+  function closeDailyReportModal(){ document.getElementById('dailyReportModalOverlay').classList.remove('open'); }
+
+  /* ---------------- Rendering: projects tab ---------------- */
+  function statBox(label, value, color){
+    const box = document.createElement('div'); box.className = 'project-stat-box';
+    const l = document.createElement('div'); l.className = 'project-stat-label'; l.textContent = label;
+    const v = document.createElement('div'); v.className = 'project-stat-value'; v.textContent = value;
+    if(color) v.style.color = color;
+    box.appendChild(l); box.appendChild(v);
+    return box;
+  }
+
+  function renderProjectsGrid(){
+    const grid = document.getElementById('projectGrid');
+    grid.innerHTML = '';
+    if(projects.length === 0){
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="glyph">📁</div><p>هنوز پروژه‌ای اضافه نشده.</p><p>از بخش تنظیمات یکی اضافه کن.</p></div>`;
+      return;
+    }
+    projects.forEach(name => {
+      const meta = getProjectMeta(name);
+      const stats = getProjectStats(name);
+      const statusInfo = PROJECT_STATUS[meta.status] || PROJECT_STATUS.not_started;
+
+      const card = document.createElement('div'); card.className = 'project-card';
+      card.addEventListener('click', () => openProjectModal(name));
+
+      const head = document.createElement('div'); head.className = 'project-card-head';
+      const logo = document.createElement('div'); logo.className = 'project-logo';
+      logo.innerHTML = meta.logo ? `<img src="${meta.logo}">` : svgProjectDefault();
+      const titleWrap = document.createElement('div'); titleWrap.className = 'project-title-wrap';
+      const title = document.createElement('div'); title.className = 'project-title';
+      const dot = document.createElement('span'); dot.className = 'project-status-dot'; dot.style.background = statusInfo.color;
+      const nameSpan = document.createElement('span'); nameSpan.textContent = name;
+      title.appendChild(dot); title.appendChild(nameSpan);
+      titleWrap.appendChild(title);
+      head.appendChild(logo); head.appendChild(titleWrap);
+      card.appendChild(head);
+
+      const statGrid = document.createElement('div'); statGrid.className = 'project-stat-grid';
+      statGrid.appendChild(statBox('وضعیت', statusInfo.label, statusInfo.color));
+      statGrid.appendChild(statBox('پرکارترین دسته', stats.busiest || '—', stats.busiest ? getCategoryColor(stats.busiest) : null));
+      statGrid.appendChild(statBox('کل کارهای انجام‌شده', toFa(stats.total)));
+      statGrid.appendChild(statBox('میانگین امتیاز', stats.avgRating ? ('★ ' + toFa(stats.avgRating.toFixed(1))) : '—'));
+      statGrid.appendChild(statBox('آخرین فعالیت', stats.lastTs ? jalaliShortFromTs(stats.lastTs) : '—'));
+      card.appendChild(statGrid);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function fillDayMonthSelects(daySel, monthSel){
+    daySel.innerHTML = '<option value="">روز</option>';
+    for(let i = 1; i <= 31; i++){
+      const o = document.createElement('option'); o.value = i; o.textContent = toFa(i);
+      daySel.appendChild(o);
+    }
+    monthSel.innerHTML = '<option value="">ماه</option>';
+    PERSIAN_MONTHS.forEach((m, idx) => {
+      const o = document.createElement('option'); o.value = idx + 1; o.textContent = m;
+      monthSel.appendChild(o);
+    });
+  }
+
+  function openProjectModal(name){
+    currentProjectModalName = name;
+    const meta = getProjectMeta(name);
+    document.getElementById('projectModalTitle').textContent = name;
+    document.getElementById('projectModalLogo').innerHTML = meta.logo ? `<img src="${meta.logo}">` : svgProjectDefault();
+
+    document.querySelectorAll('#projectStatusPills .status-pill').forEach(p => {
+      p.classList.toggle('selected', p.dataset.status === meta.status);
+    });
+
+    document.getElementById('startDay').value = meta.startDate ? meta.startDate.d : '';
+    document.getElementById('startMonth').value = meta.startDate ? meta.startDate.m : '';
+    document.getElementById('startYear').value = meta.startDate ? meta.startDate.y : '';
+    document.getElementById('endDay').value = meta.endDate ? meta.endDate.d : '';
+    document.getElementById('endMonth').value = meta.endDate ? meta.endDate.m : '';
+    document.getElementById('endYear').value = meta.endDate ? meta.endDate.y : '';
+    document.getElementById('startDateLabel').textContent = meta.startDate ? ('شروع: ' + jalaliDateObjLabel(meta.startDate)) : '';
+    document.getElementById('endDateLabel').textContent = meta.endDate ? ('تکمیل: ' + jalaliDateObjLabel(meta.endDate)) : '';
+
+    const donutEl = document.getElementById('projectDonut');
+    donutEl.innerHTML = '';
+    donutEl.appendChild(buildDonutSVG(getProjectStats(name).doneTasks, 180));
+
+    document.getElementById('projectModalOverlay').classList.add('open');
+  }
+  function closeProjectModal(){
+    document.getElementById('projectModalOverlay').classList.remove('open');
+    currentProjectModalName = null;
+  }
+
+  function buildEditRow(t, refreshFn, tsFn){
+    const row = document.createElement('div');
+    row.className = 'edit-row';
+
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text'; titleInput.value = t.title;
+
+    const descInput = document.createElement('textarea');
+    descInput.rows = 2; descInput.placeholder = 'توضیحات کوتاه (اختیاری)…';
+    descInput.value = t.description || '';
+
+    const projSel = document.createElement('select');
+    fillSelect(projSel, projects, '— بدون پروژه —'); projSel.value = t.project || '';
+
+    const editCategories = (t.categories || []).slice();
+    const catPicker = buildCategoryPicker(editCategories);
+
+    const statSel = document.createElement('select');
+    [['todo','برای انجام'],['doing','در حال انجام'],['done','انجام شد']].forEach(([v,l]) => {
+      const o = document.createElement('option'); o.value = v; o.textContent = l;
+      statSel.appendChild(o);
+    });
+    statSel.value = t.status;
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn small'; saveBtn.textContent = 'ذخیره'; saveBtn.type = 'button';
+    saveBtn.addEventListener('click', () => {
+      const newTitle = titleInput.value.trim();
+      if(!newTitle) return;
+      t.title = newTitle;
+      t.description = descInput.value.trim();
+      t.project = projSel.value;
+      t.categories = editCategories.slice();
+      setTaskStatus(t, statSel.value, tsFn ? tsFn() : Date.now());
+      save(KEYS.tasks, tasks);
+      editingId = null;
+      refreshFn();
+    });
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn secondary small'; cancelBtn.textContent = 'انصراف'; cancelBtn.type = 'button';
+    cancelBtn.addEventListener('click', () => { editingId = null; refreshFn(); });
+
+    row.appendChild(titleInput);
+    row.appendChild(descInput);
+    row.appendChild(projSel);
+    row.appendChild(catPicker);
+    row.appendChild(statSel);
+    row.appendChild(saveBtn);
+    row.appendChild(cancelBtn);
+    return row;
+  }
+
+  function buildTaskRow(t, opts){
+    const row = document.createElement('div');
+    row.className = 'task' + (t.status === 'done' ? ' done' : '');
+
+    const checkbox = document.createElement('div');
+    checkbox.className = 'checkbox';
+    checkbox.innerHTML = svgCheck();
+    checkbox.addEventListener('click', () => {
+      const becomingDone = t.status !== 'done';
+      const ts = opts.tsFn ? opts.tsFn() : Date.now();
+      if(becomingDone) row.classList.add('task-complete-pulse');
+      setTaskStatus(t, becomingDone ? 'done' : 'todo', ts);
+      t.rating = null;
+      t.completionNote = '';
+      save(KEYS.tasks, tasks);
+      if(becomingDone){
+        setTimeout(() => {
+          opts.refresh();
+          openRatingModal(t, opts.refresh);
+        }, 320);
+      }else{
+        opts.refresh();
+      }
+    });
+
+    const main = document.createElement('div'); main.className = 'task-main';
+    const title = document.createElement('div'); title.className = 'task-title'; title.textContent = t.title;
+    main.appendChild(title);
+    if(t.description){
+      const desc = document.createElement('div'); desc.className = 'task-desc'; desc.textContent = t.description;
+      main.appendChild(desc);
+    }
+    if(t.status === 'done'){
+      const ratingLine = buildRatingLine(t);
+      if(ratingLine) main.appendChild(ratingLine);
+    }
+    const tagsWrap = document.createElement('div'); tagsWrap.className = 'task-tags';
+    if(t.project){
+      const pt = document.createElement('span'); pt.className = 'mini-tag'; pt.textContent = '📁 ' + t.project;
+      tagsWrap.appendChild(pt);
+    }
+    (t.categories || []).forEach(c => tagsWrap.appendChild(categoryTagEl(c)));
+    if(opts.showStatus){
+      const st = document.createElement('span'); st.className = 'mini-tag status ' + t.status; st.textContent = STATUS_LABELS[t.status];
+      tagsWrap.appendChild(st);
+    }
+    main.appendChild(tagsWrap);
+
+    const actions = document.createElement('div'); actions.className = 'task-actions';
+    if(opts.onMove){
+      const moveBtn = document.createElement('button');
+      moveBtn.className = 'icon-btn move'; moveBtn.innerHTML = svgMoveToday(); moveBtn.title = 'انتقال به امروز';
+      moveBtn.addEventListener('click', opts.onMove);
+      actions.appendChild(moveBtn);
+    }
+    if(opts.onMoveToWorkspace){
+      const wsBtn = document.createElement('button');
+      wsBtn.className = 'icon-btn move'; wsBtn.innerHTML = svgToWorkspace(); wsBtn.title = 'انتقال به اتاق کار';
+      wsBtn.addEventListener('click', opts.onMoveToWorkspace);
+      actions.appendChild(wsBtn);
+    }
+    const editBtn = document.createElement('button');
+    editBtn.className = 'icon-btn'; editBtn.innerHTML = svgEdit(); editBtn.title = 'ویرایش';
+    editBtn.addEventListener('click', () => { editingId = t.id; opts.refresh(); });
+    const delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn danger'; delBtn.innerHTML = svgTrash(); delBtn.title = 'حذف';
+    delBtn.addEventListener('click', () => {
+      tasks = tasks.filter(x => x.id !== t.id);
+      save(KEYS.tasks, tasks);
+      opts.refresh();
+    });
+    actions.appendChild(editBtn); actions.appendChild(delBtn);
+
+    row.appendChild(checkbox); row.appendChild(main); row.appendChild(actions);
+    return row;
+  }
+
+  function renderTaskList(){
+    const el = document.getElementById('taskList');
+    el.innerHTML = '';
+    const daily = getDailyTasks();
+    const visible = daily.filter(matchesFilters).sort((a,b) => ((a.status==='done')-(b.status==='done')) || (b.createdAt - a.createdAt));
+
+    const isToday = dayOffset === 0;
+    if(daily.length === 0){
+      const msg = isToday ? 'برای امروز هنوز کاری ثبت نشده.' : 'برای این روز کاری ثبت نشده.';
+      el.innerHTML = `<div class="empty-state"><div class="glyph">✎</div><p>${msg}</p><p>از فرم پایین صفحه می‌تونی یک کار به این روز اضافه کنی.</p></div>`;
+      renderStats(); return;
+    }
+    if(visible.length === 0){
+      el.innerHTML = `<div class="empty-state"><div class="glyph">🔍</div><p>با این فیلترها کاری پیدا نشد.</p></div>`;
+      renderStats(); return;
+    }
+
+    const refresh = () => { renderTaskList(); renderFilterChips(); renderDailyDonut(); };
+    const tsFn = () => viewedDate().getTime();
+    visible.forEach(t => {
+      if(editingId === t.id){ el.appendChild(buildEditRow(t, refresh, tsFn)); return; }
+      el.appendChild(buildTaskRow(t, {
+        refresh, showStatus: true, tsFn,
+        onMoveToWorkspace: () => {
+          t.inWorkspace = true;
+          t.dayKey = null;
+          t.jalaliDate = null;
+          save(KEYS.tasks, tasks);
+          renderTaskList(); renderFilterChips(); renderDailyDonut(); renderWorkspaceList();
+        }
+      }));
+    });
+
+    renderStats();
+  }
+
+  function renderWorkspaceList(){
+    const el = document.getElementById('workspaceList');
+    el.innerHTML = '';
+    const items = tasks.filter(t => t.inWorkspace);
+    if(items.length === 0){
+      el.innerHTML = `<div class="empty-state"><div class="glyph">🗂️</div><p>اتاق کار خالیه.</p><p>کارهایی که فعلاً برای یک روز خاص نیستن رو اینجا بنویس.</p></div>`;
+      return;
+    }
+    const refresh = renderWorkspaceList;
+    items.forEach(t => {
+      if(editingId === t.id){ el.appendChild(buildEditRow(t, refresh, () => Date.now())); return; }
+      el.appendChild(buildTaskRow(t, {
+        refresh,
+        showStatus: true,
+        tsFn: () => Date.now(),
+        onMove: () => {
+          t.inWorkspace = false;
+          t.dayKey = viewedDayKey();
+          t.jalaliDate = viewedJalaliDisplay();
+          save(KEYS.tasks, tasks);
+          renderWorkspaceList(); renderTaskList(); renderFilterChips(); renderDailyDonut();
+        }
+      }));
+    });
+  }
+
+  function renderStats(){
+    const daily = getDailyTasks();
+    const total = daily.length;
+    const done = daily.filter(t => t.status === 'done').length;
+    const remaining = total - done;
+    const suffix = dayOffset === 0 ? '(امروز)' : '(این روز)';
+    document.getElementById('statsLine').textContent =
+      total === 0 ? 'برای این روز کاری ثبت نشده' : `${toFa(remaining)} کار باقی‌مانده از ${toFa(total)} ${suffix}`;
+  }
+
+  /* ---------------- Rendering: daily note ---------------- */
+  function loadViewedNote(){
+    const entry = notes[viewedDayKey()];
+    document.getElementById('dailyNoteInput').value = entry ? entry.text : '';
+  }
+  function flushNoteSave(){
+    clearTimeout(noteSaveTimer);
+    const key = viewedDayKey();
+    const val = document.getElementById('dailyNoteInput').value;
+    const entry = notes[key] || {};
+    entry.text = val;
+    entry.updatedAt = viewedDate().getTime();
+    notes[key] = entry;
+    save(KEYS.notes, notes);
+  }
+
+  /* ---------------- Rendering: monthly report ---------------- */
+  function renderMonthlyReport(){
+    document.getElementById('monthLabel').textContent = `${PERSIAN_MONTHS[reportView.m - 1]} ${toFa(reportView.y)}`;
+
+    const monthTasksByDay = {};
+    tasks.forEach(t => {
+      if(t.status === 'done' && t.completedAt){
+        const ymd = getJalaliYMD(new Date(t.completedAt));
+        if(ymd.y === reportView.y && ymd.m === reportView.m){
+          if(!monthTasksByDay[ymd.d]) monthTasksByDay[ymd.d] = [];
+          monthTasksByDay[ymd.d].push(t);
+        }
+      }
+    });
+
+    const monthNotesByDay = {};
+    Object.keys(notes).forEach(key => {
+      const parts = key.split('-').map(Number);
+      const y = parts[0], m = parts[1], d = parts[2];
+      if(y === reportView.y && m === reportView.m){
+        const n = notes[key];
+        const hasText = n && n.text && n.text.trim();
+        const hasTag = n && n.dayTag;
+        if(hasText || hasTag) monthNotesByDay[d] = n;
+      }
+    });
+
+    const totalCompleted = Object.values(monthTasksByDay).reduce((s,arr) => s+arr.length, 0);
+    const totalOpen = tasks.filter(t => t.status !== 'done' && !t.inWorkspace).length;
+    document.getElementById('monthSummary').innerHTML =
+      `<div><b>${toFa(totalCompleted)}</b> کار در این ماه تکمیل شده</div>` +
+      `<div><b>${toFa(totalOpen)}</b> کار هنوز باز است (کل)</div>`;
+
+    const grid = document.getElementById('monthlyReportBody');
+    grid.innerHTML = '';
+    const allDays = new Set([...Object.keys(monthTasksByDay).map(Number), ...Object.keys(monthNotesByDay).map(Number)]);
+
+    if(allDays.size === 0){
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="glyph">🗓️</div><p>در این ماه هنوز کاری تکمیل یا یادداشتی ثبت نشده.</p></div>`;
+      return;
+    }
+
+    [...allDays].sort((a,b) => a-b).forEach(d => {
+      const dayTasks = monthTasksByDay[d] || [];
+      const noteObj = monthNotesByDay[d] || null;
+      const ts = dayTasks.length ? dayTasks[0].completedAt : (noteObj ? noteObj.updatedAt : Date.now());
+      const weekday = jalaliPartsFor(new Date(ts)).weekday || '';
+
+      const box = document.createElement('div');
+      box.className = 'day-box';
+      if(noteObj){
+        const dot = document.createElement('div'); dot.className = 'dnote-dot';
+        box.appendChild(dot);
+      }
+      const dnum = document.createElement('div'); dnum.className = 'dnum'; dnum.textContent = toFa(d);
+      const dweekday = document.createElement('div'); dweekday.className = 'dweekday'; dweekday.textContent = weekday;
+      box.appendChild(dnum); box.appendChild(dweekday);
+      if(dayTasks.length){
+        const dcount = document.createElement('div'); dcount.className = 'dcount'; dcount.textContent = `${toFa(dayTasks.length)} کار`;
+        box.appendChild(dcount);
+      }
+      box.addEventListener('click', () => openDayModal(d, dayTasks, noteObj));
+      grid.appendChild(box);
+    });
+  }
+
+  /* ---------------- Rendering: monthly export report ---------------- */
+  function renderExportReport(){
+    document.getElementById('exportMonthLabel').textContent = `${PERSIAN_MONTHS[exportReportView.m - 1]} ${toFa(exportReportView.y)}`;
+
+    const monthDone = tasks.filter(t => {
+      if(t.status !== 'done' || !t.completedAt) return false;
+      const ymd = getJalaliYMD(new Date(t.completedAt));
+      return ymd.y === exportReportView.y && ymd.m === exportReportView.m;
+    });
+
+    const monthName = PERSIAN_MONTHS[exportReportView.m - 1];
+    document.getElementById('reportTitleLine1').textContent = `گزارش ماهیانه ${monthName} ماه`;
+    const deptPart = reportSettings.department ? `بخش ${reportSettings.department}` : '';
+    const namePart = reportSettings.name || '';
+    document.getElementById('reportTitleLine2').textContent = [deptPart, namePart].filter(Boolean).join(' | ');
+
+    const projCounts = {};
+    monthDone.forEach(t => {
+      const key = t.project || 'بدون پروژه';
+      projCounts[key] = (projCounts[key] || 0) + 1;
+    });
+    const totalDone = monthDone.length;
+    const barsEl = document.getElementById('reportProjectBars');
+    barsEl.innerHTML = '';
+    if(totalDone === 0){
+      barsEl.innerHTML = '<div class="empty-state"><p>کاری در این ماه تکمیل نشده.</p></div>';
+    }else{
+      Object.entries(projCounts).sort((a,b) => b[1]-a[1]).forEach(([proj,count]) => {
+        const pct = Math.round((count/totalDone)*100);
+        const row = document.createElement('div'); row.className = 'project-percent-row';
+        row.innerHTML = `<div class="project-percent-label"><span>${proj}</span><span>${toFa(pct)}٪ (${toFa(count)} کار)</span></div>
+          <div class="project-percent-track"><div class="project-percent-fill" style="width:${pct}%;"></div></div>`;
+        barsEl.appendChild(row);
+      });
+    }
+
+    const distinctProjects = new Set(monthDone.map(t => t.project).filter(Boolean)).size;
+    const rated = monthDone.filter(t => t.rating);
+    const avgRating = rated.length ? (rated.reduce((s,t) => s+t.rating, 0) / rated.length) : null;
+    const byDayCount = {};
+    monthDone.forEach(t => {
+      const ymd = getJalaliYMD(new Date(t.completedAt));
+      byDayCount[ymd.d] = (byDayCount[ymd.d] || 0) + 1;
+    });
+    const busiestDay = Object.entries(byDayCount).sort((a,b) => b[1]-a[1])[0];
+
+    const statsEl = document.getElementById('reportStatsGrid');
+    statsEl.innerHTML = '';
+    statsEl.appendChild(statBox('کل کارهای تکمیل‌شده', toFa(totalDone)));
+    statsEl.appendChild(statBox('پروژه‌های فعال این ماه', toFa(distinctProjects)));
+    statsEl.appendChild(statBox('میانگین امتیاز', avgRating ? ('★ ' + toFa(avgRating.toFixed(1))) : '—'));
+    statsEl.appendChild(statBox('پرکارترین روز', busiestDay ? (toFa(busiestDay[0]) + ' ام (' + toFa(busiestDay[1]) + ' کار)') : '—'));
+
+    const donutEl = document.getElementById('reportDonut');
+    donutEl.innerHTML = '';
+    donutEl.appendChild(buildDonutSVG(monthDone, 190));
+
+    const daysInMonth = getDaysInJalaliMonth(exportReportView.y, exportReportView.m);
+    const dailyCounts = [];
+    for(let d = 1; d <= daysInMonth; d++) dailyCounts.push(byDayCount[d] || 0);
+    document.getElementById('reportDailyChart').innerHTML = buildMonthlyDailyLineChartSVG(dailyCounts, 700, 180);
+  }
+
+  function openDayModal(d, dayTasks, noteObj){
+    const ts = dayTasks.length ? dayTasks[0].completedAt : (noteObj ? noteObj.updatedAt : Date.now());
+    const parts = jalaliPartsFor(new Date(ts));
+    document.getElementById('dayModalTitle').textContent =
+      `${parts.weekday}، ${toFa(d)} ${PERSIAN_MONTHS[reportView.m - 1]} ${toFa(reportView.y)}`;
+
+    const body = document.getElementById('dayModalBody');
+    body.innerHTML = '';
+
+    if(noteObj && noteObj.dayTag){
+      const tagBadge = document.createElement('div');
+      tagBadge.className = 'day-tag-chip selected';
+      tagBadge.style.cssText = 'display:inline-block; margin-bottom:14px; cursor:default;';
+      tagBadge.textContent = noteObj.dayTag;
+      body.appendChild(tagBadge);
+    }
+
+    if(noteObj && noteObj.text && noteObj.text.trim()){
+      const label = document.createElement('div'); label.className = 'modal-note-label'; label.textContent = '📝 یادداشت این روز';
+      const noteBox = document.createElement('div'); noteBox.className = 'modal-note'; noteBox.textContent = noteObj.text;
+      body.appendChild(label); body.appendChild(noteBox);
+    }
+
+    if(dayTasks.length === 0){
+      const p = document.createElement('div'); p.className = 'empty-state';
+      p.innerHTML = '<p>کاری برای این روز ثبت نشده.</p>';
+      body.appendChild(p);
+    }else{
+      dayTasks.forEach(t => {
+        const item = document.createElement('div'); item.className = 'modal-task-item';
+        const title = document.createElement('div'); title.className = 'modal-task-title'; title.textContent = t.title;
+        item.appendChild(title);
+        if(t.description){
+          const desc = document.createElement('div'); desc.className = 'modal-task-desc'; desc.textContent = t.description;
+          item.appendChild(desc);
+        }
+        const ratingLine = buildRatingLine(t);
+        if(ratingLine) item.appendChild(ratingLine);
+        const tags = document.createElement('div'); tags.className = 'task-tags';
+        if(t.project){
+          const pt = document.createElement('span'); pt.className = 'mini-tag'; pt.textContent = '📁 ' + t.project;
+          tags.appendChild(pt);
+        }
+        (t.categories || []).forEach(c => tags.appendChild(categoryTagEl(c)));
+        item.appendChild(tags);
+        body.appendChild(item);
+      });
+
+      const donutLabel = document.createElement('div');
+      donutLabel.className = 'modal-note-label';
+      donutLabel.style.marginTop = '16px';
+      donutLabel.textContent = '📊 ترکیب دسته‌بندی‌های این روز';
+      body.appendChild(donutLabel);
+      body.appendChild(buildDonutSVG(dayTasks, 150));
+
+      const chartLabel = document.createElement('div');
+      chartLabel.className = 'modal-note-label';
+      chartLabel.style.marginTop = '16px';
+      chartLabel.textContent = '📈 عملکرد بر اساس ساعت';
+      body.appendChild(chartLabel);
+      const chartWrap = document.createElement('div');
+      chartWrap.innerHTML = buildHourlyChartSVG(dayTasks, 660, 160);
+      body.appendChild(chartWrap);
+    }
+    document.getElementById('dayModalOverlay').classList.add('open');
+  }
+  function closeDayModal(){ document.getElementById('dayModalOverlay').classList.remove('open'); }
+
+  /* ---------------- Completion rating popup ---------------- */
+  function renderStarsUI(value){
+    document.querySelectorAll('#ratingStars .star-input').forEach(s => {
+      const v = parseInt(s.dataset.value, 10);
+      s.classList.toggle('filled', v <= value);
+    });
+  }
+  function openRatingModal(t, refreshFn){
+    currentRatingTask = t;
+    currentRatingRefresh = refreshFn;
+    ratingSelected = 0;
+    document.getElementById('ratingModalTitle').textContent = 'امتیاز به: ' + t.title;
+    document.getElementById('ratingNoteInput').value = '';
+    renderStarsUI(0);
+    document.getElementById('ratingModalOverlay').classList.add('open');
+  }
+  function closeRatingModal(){
+    document.getElementById('ratingModalOverlay').classList.remove('open');
+    currentRatingTask = null;
+    currentRatingRefresh = null;
+  }
+  function saveRatingModal(){
+    if(!currentRatingTask){ closeRatingModal(); return; }
+    currentRatingTask.rating = ratingSelected || null;
+    currentRatingTask.completionNote = document.getElementById('ratingNoteInput').value.trim();
+    save(KEYS.tasks, tasks);
+    const refreshFn = currentRatingRefresh;
+    closeRatingModal();
+    if(refreshFn) refreshFn();
+  }
+  function buildRatingLine(t){
+    if(!t.rating && !t.completionNote) return null;
+    const wrap = document.createElement('div');
+    wrap.className = 'rating-line';
+    if(t.rating){
+      const stars = document.createElement('span');
+      stars.className = 'rating-stars-mini';
+      stars.textContent = '★'.repeat(t.rating) + '☆'.repeat(5 - t.rating);
+      wrap.appendChild(stars);
+    }
+    if(t.completionNote){
+      const note = document.createElement('span');
+      note.className = 'rating-note-mini';
+      note.textContent = t.completionNote;
+      wrap.appendChild(note);
+    }
+    return wrap;
+  }
+
+  /* ---------------- Tabs ---------------- */
+  function switchTab(which){
+    document.getElementById('dailyView').style.display = which === 'daily' ? '' : 'none';
+    document.getElementById('workspaceView').style.display = which === 'workspace' ? '' : 'none';
+    document.getElementById('projectsView').style.display = which === 'projects' ? '' : 'none';
+    document.getElementById('monthlyView').style.display = which === 'monthly' ? '' : 'none';
+    document.getElementById('exportView').style.display = which === 'export' ? '' : 'none';
+    document.getElementById('tabDaily').classList.toggle('active', which === 'daily');
+    document.getElementById('tabWorkspace').classList.toggle('active', which === 'workspace');
+    document.getElementById('tabProjects').classList.toggle('active', which === 'projects');
+    document.getElementById('tabMonthly').classList.toggle('active', which === 'monthly');
+    document.getElementById('tabExport').classList.toggle('active', which === 'export');
+    if(which === 'monthly') renderMonthlyReport();
+    if(which === 'workspace') renderWorkspaceList();
+    if(which === 'projects') renderProjectsGrid();
+    if(which === 'export'){
+      document.getElementById('reportPersonName').value = reportSettings.name;
+      document.getElementById('reportDepartment').value = reportSettings.department;
+      renderExportReport();
+    }
+  }
+
+  function refreshDailyView(){
+    renderDayNav();
+    loadViewedNote();
+    renderFilterChips();
+    renderTaskList();
+    renderDailyDonut();
+  }
+
+  function renderAll(){
+    renderStamp();
+    renderQuoteCard();
+    renderProjectSelect();
+    renderCategoryPickers();
+    renderProjectTagList();
+    renderCategoryTagList();
+    refreshDailyView();
+    renderWorkspaceList();
+    renderProjectsGrid();
+  }
+
+  /* ---------------- Events ---------------- */
+  document.getElementById('addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const titleInput = document.getElementById('titleInput');
+    const title = titleInput.value.trim();
+    if(!title) return;
+    const description = document.getElementById('descInput').value.trim();
+    const project = document.getElementById('projectSelect').value;
+    const status = document.getElementById('statusSelect').value;
+    const vDate = viewedDate();
+    tasks.push({
+      id: uid(), title, description, project, categories: addFormCategories.slice(), status,
+      createdAt: Date.now(),
+      completedAt: status === 'done' ? vDate.getTime() : null,
+      dayKey: viewedDayKey(),
+      jalaliDate: viewedJalaliDisplay(),
+      inWorkspace: false,
+      rating: null, completionNote: ''
+    });
+    save(KEYS.tasks, tasks);
+    titleInput.value = '';
+    document.getElementById('descInput').value = '';
+    addFormCategories.length = 0;
+    if(addCategoryPickerEl) addCategoryPickerEl.refreshOptions();
+    titleInput.focus();
+    renderFilterChips();
+    renderTaskList();
+    renderDailyDonut();
+  });
+
+  document.getElementById('wsAddForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const titleInput = document.getElementById('wsTitleInput');
+    const title = titleInput.value.trim();
+    if(!title) return;
+    const description = document.getElementById('wsDescInput').value.trim();
+    const project = document.getElementById('wsProjectSelect').value;
+    tasks.push({
+      id: uid(), title, description, project, categories: wsFormCategories.slice(), status: 'todo',
+      createdAt: Date.now(), completedAt: null, dayKey: null, jalaliDate: null, inWorkspace: true,
+      rating: null, completionNote: ''
+    });
+    save(KEYS.tasks, tasks);
+    titleInput.value = '';
+    document.getElementById('wsDescInput').value = '';
+    wsFormCategories.length = 0;
+    if(wsCategoryPickerEl) wsCategoryPickerEl.refreshOptions();
+    titleInput.focus();
+    renderWorkspaceList();
+  });
+
+  document.getElementById('addProjectBtn').addEventListener('click', () => {
+    const input = document.getElementById('newProjectInput');
+    const val = input.value.trim();
+    if(!val || projects.includes(val)) return;
+    projects.push(val);
+    save(KEYS.projects, projects);
+    input.value = '';
+    renderAll();
+  });
+  document.getElementById('newProjectInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('addProjectBtn').click(); }
+  });
+
+  document.getElementById('addCategoryBtn').addEventListener('click', () => {
+    const input = document.getElementById('newCategoryInput');
+    const colorInput = document.getElementById('newCategoryColor');
+    const val = input.value.trim();
+    if(!val || categories.includes(val)) return;
+    categories.push(val);
+    categoryColors[val] = colorInput.value || CATEGORY_PALETTE[categories.length % CATEGORY_PALETTE.length];
+    save(KEYS.categories, categories);
+    save(KEYS.categoryColors, categoryColors);
+    input.value = '';
+    renderAll();
+  });
+  document.getElementById('newCategoryInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('addCategoryBtn').click(); }
+  });
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    filters.search = e.target.value;
+    renderTaskList();
+  });
+
+  document.getElementById('dailyNoteInput').addEventListener('input', (e) => {
+    clearTimeout(noteSaveTimer);
+    const val = e.target.value;
+    const key = viewedDayKey();
+    const ts = viewedDate().getTime();
+    noteSaveTimer = setTimeout(() => {
+      const entry = notes[key] || {};
+      entry.text = val;
+      entry.updatedAt = ts;
+      notes[key] = entry;
+      save(KEYS.notes, notes);
+    }, 400);
+  });
+
+  document.getElementById('tabDaily').addEventListener('click', () => switchTab('daily'));
+  document.getElementById('tabWorkspace').addEventListener('click', () => switchTab('workspace'));
+  document.getElementById('tabProjects').addEventListener('click', () => switchTab('projects'));
+  document.getElementById('tabMonthly').addEventListener('click', () => switchTab('monthly'));
+  document.getElementById('tabExport').addEventListener('click', () => switchTab('export'));
+
+  document.getElementById('prevDayBtn').addEventListener('click', () => {
+    flushNoteSave();
+    dayOffset -= 1;
+    refreshDailyView();
+  });
+  document.getElementById('nextDayBtn').addEventListener('click', () => {
+    flushNoteSave();
+    dayOffset += 1;
+    refreshDailyView();
+  });
+  document.getElementById('jumpTodayBtn').addEventListener('click', () => {
+    flushNoteSave();
+    dayOffset = 0;
+    refreshDailyView();
+  });
+
+  document.getElementById('endOfDayBtn').addEventListener('click', openEndOfDayModal);
+  document.getElementById('eodModalClose').addEventListener('click', closeEndOfDayModal);
+  document.getElementById('eodModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'eodModalOverlay') closeEndOfDayModal();
+  });
+
+  document.getElementById('dailyReportBtn').addEventListener('click', openDailyReportModal);
+  document.getElementById('dailyReportModalClose').addEventListener('click', closeDailyReportModal);
+  document.getElementById('dailyReportModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'dailyReportModalOverlay') closeDailyReportModal();
+  });
+  document.getElementById('copyDailyReportBtn').addEventListener('click', () => {
+    const text = document.getElementById('dailyReportText').textContent;
+    const btn = document.getElementById('copyDailyReportBtn');
+    const original = btn.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'کپی شد ✓';
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    }).catch(() => {
+      alert('کپی خودکار انجام نشد؛ متن را به‌صورت دستی انتخاب و کپی کن.');
+    });
+  });
+
+  document.getElementById('prevMonthBtn').addEventListener('click', () => {
+    reportView.m -= 1;
+    if(reportView.m < 1){ reportView.m = 12; reportView.y -= 1; }
+    renderMonthlyReport();
+  });
+  document.getElementById('nextMonthBtn').addEventListener('click', () => {
+    reportView.m += 1;
+    if(reportView.m > 12){ reportView.m = 1; reportView.y += 1; }
+    renderMonthlyReport();
+  });
+
+  document.getElementById('reportPersonName').addEventListener('input', (e) => {
+    reportSettings.name = e.target.value;
+    save(KEYS.reportSettings, reportSettings);
+    renderExportReport();
+  });
+  document.getElementById('reportDepartment').addEventListener('input', (e) => {
+    reportSettings.department = e.target.value;
+    save(KEYS.reportSettings, reportSettings);
+    renderExportReport();
+  });
+  document.getElementById('prevExportMonthBtn').addEventListener('click', () => {
+    exportReportView.m -= 1;
+    if(exportReportView.m < 1){ exportReportView.m = 12; exportReportView.y -= 1; }
+    renderExportReport();
+  });
+  document.getElementById('nextExportMonthBtn').addEventListener('click', () => {
+    exportReportView.m += 1;
+    if(exportReportView.m > 12){ exportReportView.m = 1; exportReportView.y += 1; }
+    renderExportReport();
+  });
+  document.getElementById('downloadReportImageBtn').addEventListener('click', () => {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    html2canvas(document.getElementById('reportExportArea'), { backgroundColor: bg, scale: 2 }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'karooz-report-' + exportReportView.y + '-' + exportReportView.m + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  });
+  document.getElementById('printReportBtn').addEventListener('click', () => { window.print(); });
+
+  document.getElementById('dayModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'dayModalOverlay') closeDayModal();
+  });
+  document.getElementById('dayModalClose').addEventListener('click', closeDayModal);
+
+  document.querySelectorAll('#ratingStars .star-input').forEach(s => {
+    s.addEventListener('mouseenter', () => renderStarsUI(parseInt(s.dataset.value, 10)));
+    s.addEventListener('click', () => {
+      ratingSelected = parseInt(s.dataset.value, 10);
+      renderStarsUI(ratingSelected);
+    });
+  });
+  document.getElementById('ratingStars').addEventListener('mouseleave', () => renderStarsUI(ratingSelected));
+  document.getElementById('ratingSaveBtn').addEventListener('click', saveRatingModal);
+  document.getElementById('ratingModalClose').addEventListener('click', closeRatingModal);
+  document.getElementById('ratingModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'ratingModalOverlay') closeRatingModal();
+  });
+
+  fillDayMonthSelects(document.getElementById('startDay'), document.getElementById('startMonth'));
+  fillDayMonthSelects(document.getElementById('endDay'), document.getElementById('endMonth'));
+
+  document.querySelectorAll('#projectStatusPills .status-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      if(!currentProjectModalName) return;
+      const meta = getProjectMeta(currentProjectModalName);
+      meta.status = p.dataset.status;
+      save(KEYS.projectMeta, projectMeta);
+      document.querySelectorAll('#projectStatusPills .status-pill').forEach(pp => pp.classList.toggle('selected', pp === p));
+      renderProjectsGrid();
+    });
+  });
+
+  document.getElementById('saveProjectDatesBtn').addEventListener('click', () => {
+    if(!currentProjectModalName) return;
+    const meta = getProjectMeta(currentProjectModalName);
+    const sd = document.getElementById('startDay').value, sm = document.getElementById('startMonth').value, sy = document.getElementById('startYear').value;
+    const ed = document.getElementById('endDay').value, em = document.getElementById('endMonth').value, ey = document.getElementById('endYear').value;
+    meta.startDate = (sd && sm && sy) ? { d:+sd, m:+sm, y:+sy } : null;
+    meta.endDate = (ed && em && ey) ? { d:+ed, m:+em, y:+ey } : null;
+    save(KEYS.projectMeta, projectMeta);
+    document.getElementById('startDateLabel').textContent = meta.startDate ? ('شروع: ' + jalaliDateObjLabel(meta.startDate)) : '';
+    document.getElementById('endDateLabel').textContent = meta.endDate ? ('تکمیل: ' + jalaliDateObjLabel(meta.endDate)) : '';
+    const btn = document.getElementById('saveProjectDatesBtn');
+    const original = btn.textContent;
+    btn.textContent = 'ذخیره شد ✓';
+    setTimeout(() => { btn.textContent = original; }, 1200);
+  });
+
+  document.getElementById('projectLogoInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file || !currentProjectModalName) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const meta = getProjectMeta(currentProjectModalName);
+      meta.logo = reader.result;
+      save(KEYS.projectMeta, projectMeta);
+      document.getElementById('projectModalLogo').innerHTML = `<img src="${meta.logo}">`;
+      renderProjectsGrid();
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('projectModalClose').addEventListener('click', closeProjectModal);
+  document.getElementById('projectModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'projectModalOverlay') closeProjectModal();
+  });
+
+  document.getElementById('settingsFab').addEventListener('click', () => {
+    document.getElementById('settingsDrawerOverlay').classList.add('open');
+  });
+  function closeSettingsDrawer(){ document.getElementById('settingsDrawerOverlay').classList.remove('open'); }
+  document.getElementById('settingsDrawerClose').addEventListener('click', closeSettingsDrawer);
+  document.getElementById('settingsDrawerOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'settingsDrawerOverlay') closeSettingsDrawer();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){ closeDayModal(); closeRatingModal(); closeProjectModal(); closeEndOfDayModal(); closeDailyReportModal(); closeSettingsDrawer(); }
+  });
+
+  const THEME_INPUT_MAP = {
+    themeBg: 'bg', themeBgElevated: 'bgElevated', themeBgCard: 'bgCard', themeBorder: 'border',
+    themeText: 'text', themeTextDim: 'textDim', themeRed: 'red', themeGold: 'gold', themeGreen: 'green'
+  };
+  function syncThemeInputs(){
+    const t = theme[theme.mode];
+    Object.keys(THEME_INPUT_MAP).forEach(id => {
+      document.getElementById(id).value = t[THEME_INPUT_MAP[id]];
+    });
+    document.getElementById('glassBlurSlider').value = theme.glassBlur;
+    document.getElementById('glassBlurValue').textContent = theme.glassBlur + 'px';
+    document.documentElement.dataset.mode = theme.mode;
+  }
+  Object.keys(THEME_INPUT_MAP).forEach(id => {
+    document.getElementById(id).addEventListener('input', (e) => {
+      theme[theme.mode][THEME_INPUT_MAP[id]] = e.target.value;
+      applyTheme();
+      save(KEYS.theme, theme);
+    });
+  });
+  document.getElementById('resetThemeBtn').addEventListener('click', () => {
+    theme[theme.mode] = Object.assign({}, theme.mode === 'dark' ? DEFAULT_THEME_DARK : DEFAULT_THEME_LIGHT);
+    applyTheme();
+    syncThemeInputs();
+    save(KEYS.theme, theme);
+  });
+  document.getElementById('modeToggleBtn').addEventListener('click', () => {
+    theme.mode = theme.mode === 'dark' ? 'light' : 'dark';
+    applyTheme();
+    syncThemeInputs();
+    save(KEYS.theme, theme);
+  });
+  document.getElementById('glassBlurSlider').addEventListener('input', (e) => {
+    theme.glassBlur = parseInt(e.target.value, 10);
+    document.getElementById('glassBlurValue').textContent = theme.glassBlur + 'px';
+    applyTheme();
+    save(KEYS.theme, theme);
+  });
+  document.getElementById('bgImageBtn').addEventListener('click', () => {
+    document.getElementById('bgImageInput').click();
+  });
+  document.getElementById('bgImageInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      theme.backgroundImage = reader.result;
+      applyBodyBackground();
+      save(KEYS.theme, theme);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+  document.getElementById('removeBgImageBtn').addEventListener('click', () => {
+    theme.backgroundImage = null;
+    applyBodyBackground();
+    save(KEYS.theme, theme);
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'karooz-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+  document.getElementById('importFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = JSON.parse(reader.result);
+        if(Array.isArray(data.tasks)) tasks = data.tasks;
+        if(Array.isArray(data.projects)) projects = data.projects;
+        if(Array.isArray(data.categories)) categories = data.categories;
+        if(data.categoryColors && typeof data.categoryColors === 'object') categoryColors = data.categoryColors;
+        if(data.projectMeta && typeof data.projectMeta === 'object') projectMeta = data.projectMeta;
+        if(data.notes && typeof data.notes === 'object') notes = data.notes;
+        if(data.theme && typeof data.theme === 'object'){
+          if(data.theme.dark && data.theme.light){
+            theme = {
+              mode: data.theme.mode || 'dark',
+              glassBlur: data.theme.glassBlur !== undefined ? data.theme.glassBlur : 14,
+              backgroundImage: data.theme.backgroundImage || null,
+              dark: Object.assign({}, DEFAULT_THEME_DARK, data.theme.dark),
+              light: Object.assign({}, DEFAULT_THEME_LIGHT, data.theme.light)
+            };
+          }else if(data.theme.bg){
+            theme = {
+              mode: 'dark', glassBlur: 14, backgroundImage: null,
+              dark: Object.assign({}, DEFAULT_THEME_DARK, data.theme),
+              light: Object.assign({}, DEFAULT_THEME_LIGHT)
+            };
+          }
+        }
+        tasks.forEach(t => {
+          if(t.categories === undefined){ t.categories = t.category ? [t.category] : []; }
+        });
+        save(KEYS.tasks, tasks);
+        save(KEYS.projects, projects);
+        save(KEYS.categories, categories);
+        save(KEYS.categoryColors, categoryColors);
+        save(KEYS.projectMeta, projectMeta);
+        save(KEYS.notes, notes);
+        save(KEYS.theme, theme);
+        applyTheme();
+        syncThemeInputs();
+        renderAll();
+        alert('بازیابی با موفقیت انجام شد.');
+      }catch(err){
+        alert('فایل پشتیبان معتبر نیست.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  /* ---------------- Init ---------------- */
+  reportView = getJalaliYMD(new Date());
+  exportReportView = getJalaliYMD(new Date());
+  lastKnownDayKey = todayDayKey();
+  applyTheme();
+  syncThemeInputs();
+
+  addCategoryPickerEl = buildCategoryPicker(addFormCategories);
+  document.getElementById('addCategoryPickerHost').appendChild(addCategoryPickerEl);
+  wsCategoryPickerEl = buildCategoryPicker(wsFormCategories);
+  document.getElementById('wsCategoryPickerHost').appendChild(wsCategoryPickerEl);
+
+  renderAll();
+
+  // Keep the header stamp fresh, and auto-refresh the daily view at midnight (only while parked on "today")
+  setInterval(() => {
+    renderStamp();
+    const nowKey = todayDayKey();
+    if(nowKey !== lastKnownDayKey){
+      lastKnownDayKey = nowKey;
+      renderQuoteCard();
+      if(dayOffset === 0){
+        refreshDailyView();
+      }
+    }
+  }, 60 * 1000);
+
+})();
+</script>
+</body>
+</html>
