@@ -491,8 +491,8 @@
   .icon-btn.danger:hover{ color: var(--red-bright); }
   .icon-btn.move{ color: var(--gold); }
   .icon-btn.move:hover{ background: var(--gold-dim); color: var(--gold); }
-  .icon-btn.idea{ color:#a98bd6; }
-  .icon-btn.idea:hover{ background: rgba(169,139,214,.17); color:#bda5e6; }
+  .icon-btn.to-idea{ color:#a98bd6; }
+  .icon-btn.to-idea:hover{ background: rgba(169,139,214,.17); color:#bda5e6; }
   .icon-btn svg{ width:16px; height:16px; }
 
   /* ---------- Status stepper (left side of card) ---------- */
@@ -575,11 +575,8 @@
   /* ---------- Category donut legend (compact chips) ---------- */
   .dn-legend{
     flex:1; min-width:170px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:6px;
-    max-height:188px; overflow-y:auto; padding:3px 3px 5px;
-    scrollbar-width:thin; scrollbar-color: var(--border) transparent;
+    padding:3px 3px 5px;
   }
-  .dn-legend::-webkit-scrollbar{ width:5px; }
-  .dn-legend::-webkit-scrollbar-thumb{ background:var(--border); border-radius:999px; }
   .dn-row{
     position:relative; display:inline-flex; align-items:center; gap:7px; max-width:100%;
     padding:5px 11px 8px; border:1px solid var(--border-soft); border-radius:999px; overflow:hidden;
@@ -969,7 +966,7 @@
   .pc-title-wrap{ flex:1; min-width:0; }
   .pc-name{ font-size:15.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .pc-status{
-    display:inline-flex; align-items:center; gap:6px; margin-top:5px;
+    display:inline-flex; align-items:center; gap:6px; flex:0 0 auto; margin-inline-start:auto;
     font-size:11px; font-weight:700; color:var(--ps);
     padding:2px 10px 3px; border-radius:999px; border:1px solid var(--ps); background:var(--bg-card);
   }
@@ -1005,6 +1002,18 @@
   }
   .pc-cat i{ width:7px; height:7px; border-radius:50%; background:var(--c, var(--text-faint)); flex:0 0 auto; }
   .pc-cat span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .project-stat-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .project-stat-box{
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 9px 6px;
+    text-align:center;
+  }
+  .project-stat-label{ font-size:9.5px; color:var(--text-faint); margin-bottom:5px; }
+  .project-stat-value{ font-size:12px; font-weight:700; color:var(--text); word-break:break-word; }
+  @media (max-width:640px){ .project-stat-grid{ grid-template-columns: repeat(2, 1fr); } }
 
   /* ---------- Project detail modal ---------- */
   .project-logo-lg{
@@ -1067,6 +1076,20 @@
   .project-percent-label{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:6px; }
   .project-percent-track{ height:8px; background:var(--bg-card); border-radius:999px; overflow:hidden; }
   .project-percent-fill{ height:100%; background:var(--red); border-radius:999px; }
+  .summary-input{
+    width:100%; min-height:84px; resize:vertical; margin-top:14px; padding:11px 14px; box-sizing:border-box;
+    background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text);
+    font-family:inherit; font-size:13px; line-height:1.9; outline:none;
+  }
+  .summary-input:focus{ border-color:var(--gold); }
+  .summary-input-label{ margin-top:16px; font-size:11px; color:var(--gold); font-weight:700; }
+  .month-summary{
+    position:relative; margin:0 0 22px; padding:16px 20px 16px 18px;
+    border-radius:14px; border:1px solid var(--border-soft); border-right:4px solid var(--gold);
+    background: linear-gradient(to left, rgba(201,154,82,.13), rgba(201,154,82,.03));
+  }
+  .month-summary-title{ font-size:12px; font-weight:800; color:var(--gold); margin-bottom:8px; }
+  .month-summary-text{ font-size:13.5px; line-height:2.05; color:var(--text); white-space:pre-wrap; word-break:break-word; }
   .report-stats-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:20px 0; }
   @media (max-width:640px){ .report-stats-grid{grid-template-columns:repeat(2,1fr);} }
 
@@ -1580,12 +1603,19 @@
         <div class="month-label" id="exportMonthLabel">—</div>
         <button class="btn secondary small" id="nextExportMonthBtn" type="button">ماه بعد ›</button>
       </div>
+      <div class="summary-input-label">📝 خلاصه فعالیت این ماه (در خروجی نمایش داده می‌شود)</div>
+      <textarea class="summary-input" id="monthSummaryInput" placeholder="یک خلاصه از کارها و دستاوردهای این ماه بنویس…" rows="3"></textarea>
     </div>
 
     <div class="card" id="reportExportArea">
       <div class="report-header">
         <h2 id="reportTitleLine1">—</h2>
         <div class="report-sub" id="reportTitleLine2">—</div>
+      </div>
+
+      <div class="month-summary" id="monthSummaryBox" style="display:none;">
+        <div class="month-summary-title">📝 خلاصه فعالیت این ماه</div>
+        <div class="month-summary-text" id="monthSummaryText"></div>
       </div>
 
       <div class="section-label">📁 سهم هر پروژه از این ماه</div>
@@ -1861,6 +1891,7 @@
     theme: 'karooz.theme.v1',
     notes: 'karooz.notes.v1',
     reportSettings: 'karooz.reportSettings.v1',
+    monthSummaries: 'karooz.monthSummaries.v1',
     overtime: 'karooz.overtime.v1',
     leaves: 'karooz.leaves.v1',
     absences: 'karooz.absences.v1',
@@ -2442,6 +2473,8 @@
   let projectMeta = load(KEYS.projectMeta, {});
   let notes = load(KEYS.notes, {});
   let reportSettings = load(KEYS.reportSettings, { name: '', department: '' });
+  let monthSummaries = load(KEYS.monthSummaries, {});   // { 'y-m': 'text' }
+  if(!monthSummaries || typeof monthSummaries !== 'object' || Array.isArray(monthSummaries)) monthSummaries = {};
   let leaves = load(KEYS.leaves, {});   // { 'y-m': 'y-m-d' } — one leave day per Jalali month
   let checklists = load(KEYS.checklists, []);   // [{ id, title, color (index), items:[{id,text,done}], createdAt }] — newest first
   if(!Array.isArray(checklists)) checklists = [];
@@ -3087,8 +3120,7 @@
       const pill = mk('div', 'pc-status');
       pill.appendChild(document.createElement('i'));
       pill.appendChild(mk('span', '', statusInfo.label));
-      tw.appendChild(pill);
-      top.appendChild(logo); top.appendChild(tw);
+      top.appendChild(logo); top.appendChild(tw); top.appendChild(pill);
       card.appendChild(top);
 
       // metrics
@@ -3298,7 +3330,7 @@
     }
     if(opts.onMoveToIdeas && t.status !== 'done'){
       const ideaBtn = document.createElement('button');
-      ideaBtn.className = 'icon-btn idea'; ideaBtn.innerHTML = svgIdea(); ideaBtn.setAttribute('data-tip', 'انتقال به ایده‌های آینده'); ideaBtn.setAttribute('aria-label', 'انتقال به ایده‌های آینده');
+      ideaBtn.className = 'icon-btn to-idea'; ideaBtn.innerHTML = svgIdea(); ideaBtn.setAttribute('data-tip', 'انتقال به ایده‌های آینده'); ideaBtn.setAttribute('aria-label', 'انتقال به ایده‌های آینده');
       ideaBtn.addEventListener('click', opts.onMoveToIdeas);
       actions.appendChild(ideaBtn);
     }
@@ -3558,6 +3590,15 @@
   }
 
   /* ---------------- Rendering: monthly export report ---------------- */
+  function monthSummaryKey(){ return exportReportView.y + '-' + exportReportView.m; }
+  function renderMonthSummary(syncInput){
+    const txt = (monthSummaries[monthSummaryKey()] || '');
+    const input = document.getElementById('monthSummaryInput');
+    if(syncInput && input.value !== txt) input.value = txt;
+    const has = txt.trim().length > 0;
+    document.getElementById('monthSummaryBox').style.display = has ? '' : 'none';
+    document.getElementById('monthSummaryText').textContent = txt.trim();
+  }
   function renderExportReport(){
     document.getElementById('exportMonthLabel').textContent = `${PERSIAN_MONTHS[exportReportView.m - 1]} ${toFa(exportReportView.y)}`;
 
@@ -3568,6 +3609,7 @@
     });
 
     const monthName = PERSIAN_MONTHS[exportReportView.m - 1];
+    renderMonthSummary(true);
     document.getElementById('reportTitleLine1').textContent = `گزارش ماهیانه ${monthName} ماه`;
     const deptPart = reportSettings.department ? `بخش ${reportSettings.department}` : '';
     const namePart = reportSettings.name || '';
@@ -4620,6 +4662,13 @@
       link.click();
     });
   });
+  document.getElementById('monthSummaryInput').addEventListener('input', (e) => {
+    const k = monthSummaryKey();
+    const v = e.target.value;
+    if(v.trim()) monthSummaries[k] = v; else delete monthSummaries[k];
+    save(KEYS.monthSummaries, monthSummaries);
+    renderMonthSummary(false);
+  });
   document.getElementById('printReportBtn').addEventListener('click', () => { window.print(); });
 
   document.getElementById('dayModalOverlay').addEventListener('click', (e) => {
@@ -4764,7 +4813,7 @@
   });
 
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, exportedAt: new Date().toISOString() };
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, monthSummaries, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -4796,6 +4845,7 @@
         if(Array.isArray(data.checklists)) checklists = data.checklists;
         if(Array.isArray(data.ideas)) ideas = data.ideas;
         if(validPalette(data.clPalette)) clPalette = data.clPalette;
+        if(data.monthSummaries && typeof data.monthSummaries === 'object' && !Array.isArray(data.monthSummaries)) monthSummaries = data.monthSummaries;
         if(data.theme && typeof data.theme === 'object'){
           if(data.theme.dark && data.theme.light){
             theme = {
@@ -4828,6 +4878,7 @@
         save(KEYS.checklists, checklists);
         save(KEYS.ideas, ideas);
         save(KEYS.clPalette, clPalette);
+        save(KEYS.monthSummaries, monthSummaries);
         save(KEYS.theme, theme);
         applyTheme();
         syncThemeInputs();
