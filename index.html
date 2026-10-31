@@ -491,6 +491,8 @@
   .icon-btn.danger:hover{ color: var(--red-bright); }
   .icon-btn.move{ color: var(--gold); }
   .icon-btn.move:hover{ background: var(--gold-dim); color: var(--gold); }
+  .icon-btn.idea{ color:#a98bd6; }
+  .icon-btn.idea:hover{ background: rgba(169,139,214,.17); color:#bda5e6; }
   .icon-btn svg{ width:16px; height:16px; }
 
   /* ---------- Status stepper (left side of card) ---------- */
@@ -570,30 +572,36 @@
   }
 
 
-  /* ---------- Category donut legend ---------- */
-  .dn-legend{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:7px; }
+  /* ---------- Category donut legend (compact chips) ---------- */
+  .dn-legend{
+    flex:1; min-width:170px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:6px;
+    max-height:188px; overflow-y:auto; padding:3px 3px 5px;
+    scrollbar-width:thin; scrollbar-color: var(--border) transparent;
+  }
+  .dn-legend::-webkit-scrollbar{ width:5px; }
+  .dn-legend::-webkit-scrollbar-thumb{ background:var(--border); border-radius:999px; }
   .dn-row{
-    display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:6px 10px;
-    padding:8px 11px 9px; border:1px solid var(--border-soft); border-radius:12px;
+    position:relative; display:inline-flex; align-items:center; gap:7px; max-width:100%;
+    padding:5px 11px 8px; border:1px solid var(--border-soft); border-radius:999px; overflow:hidden;
     background: var(--bg-card-glass);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.06), var(--lift-1);
     transition: transform .16s ease, border-color .16s ease, opacity .16s ease;
     cursor:default;
   }
-  .dn-chip{ width:7px; height:20px; border-radius:4px; background:var(--c); box-shadow:0 0 10px -2px var(--c); }
-  .dn-name{ font-size:12.5px; font-weight:600; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dn-chip{ width:8px; height:8px; border-radius:50%; background:var(--c); box-shadow:0 0 8px -1px var(--c); flex:0 0 auto; }
+  .dn-name{ font-size:11.5px; font-weight:600; color:var(--text); min-width:0; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .dn-count{
-    font-size:11px; color:var(--text-dim); white-space:nowrap;
-    padding:1px 9px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border-soft);
+    font-size:10px; color:var(--text-dim); white-space:nowrap; font-variant-numeric:tabular-nums;
+    padding:0 6px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border-soft); line-height:1.6;
   }
-  .dn-pct{ font-size:14.5px; font-weight:800; color:var(--c); min-width:38px; text-align:left; font-variant-numeric:tabular-nums; }
-  .dn-bar{ grid-column:1 / -1; height:4px; border-radius:999px; background:var(--border-soft); overflow:hidden; }
+  .dn-pct{ font-size:11.5px; font-weight:800; color:var(--c); font-variant-numeric:tabular-nums; }
+  .dn-bar{ position:absolute; right:0; left:0; bottom:0; height:3px; background:var(--border-soft); }
   .dn-bar i{
-    display:block; height:100%; width:var(--w); border-radius:inherit; background:var(--c);
+    display:block; height:100%; width:var(--w); background:var(--c); opacity:.9;
     transform-origin:right center; animation: dnGrow .7s cubic-bezier(.2,.8,.2,1) both;
   }
   @keyframes dnGrow{ from{ transform:scaleX(0); } }
-  .dn-row.on{ transform:translateX(-3px); border-color:var(--c); }
+  .dn-row.on{ transform:translateY(-2px); border-color:var(--c); }
   .donut-wrap.hl .dn-row:not(.on){ opacity:.45; }
   .dn-seg{ transition: opacity .16s ease, stroke-width .16s ease; }
   .donut-wrap.hl .dn-seg:not(.on){ opacity:.28; }
@@ -925,50 +933,78 @@
   /* ---------- Projects tab ---------- */
   .project-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
     gap: 16px;
   }
   .project-card{
+    --ps: var(--text-faint);
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; gap:14px;
     background: var(--bg-elevated-glass);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-soft);
     border-radius: var(--radius);
-    padding: 18px;
+    padding: 20px 18px 16px;
     cursor:pointer;
     transition: all .15s;
   }
-  .project-card:hover{ border-color: var(--red); background: var(--bg-card-hover); transform: translateY(-2px); }
-  .project-card-head{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .project-card::before{ content:''; position:absolute; top:0; right:0; left:0; height:3px; background:var(--ps); opacity:.9; }
+  .project-card::after{
+    content:''; position:absolute; top:-60px; left:-60px; width:170px; height:170px; border-radius:50%;
+    background: radial-gradient(circle, var(--ps) 0%, transparent 68%); opacity:.10; pointer-events:none; transition: opacity .2s;
+  }
+  .project-card:hover{ border-color: var(--ps); background: var(--bg-card-hover); transform: translateY(-2px); }
+  .project-card:hover::after{ opacity:.2; }
+  .pc-top, .pc-metrics, .pc-dates, .pc-foot{ position:relative; z-index:1; }
+  .pc-top{ display:flex; align-items:center; gap:12px; }
   .project-logo{
-    width:44px; height:44px; border-radius:12px; overflow:hidden;
-    background: var(--bg-card); border:1px solid var(--border);
+    width:48px; height:48px; border-radius:14px; overflow:hidden;
+    background: var(--bg-card); border:1px solid var(--ps);
     display:flex; align-items:center; justify-content:center; flex:0 0 auto;
     color: var(--gold);
   }
-  .project-logo svg{ width:22px; height:22px; }
+  .project-logo svg{ width:23px; height:23px; }
   .project-logo img{ width:100%; height:100%; object-fit:cover; }
-  .project-title-wrap{ flex:1; min-width:0; }
-  .project-title{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:7px; }
-  .project-title span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .project-status-dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
-  .project-stat-grid{
-    display:grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+  .pc-title-wrap{ flex:1; min-width:0; }
+  .pc-name{ font-size:15.5px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pc-status{
+    display:inline-flex; align-items:center; gap:6px; margin-top:5px;
+    font-size:11px; font-weight:700; color:var(--ps);
+    padding:2px 10px 3px; border-radius:999px; border:1px solid var(--ps); background:var(--bg-card);
   }
-  .project-stat-box{
-    background: var(--bg-card);
-    border: 1px solid var(--border-soft);
-    border-radius: var(--radius-sm);
-    padding: 9px 6px;
-    text-align:center;
+  @supports (background: color-mix(in srgb, red 10%, transparent)){
+    .pc-status{ background: color-mix(in srgb, var(--ps) 14%, transparent); border-color: color-mix(in srgb, var(--ps) 45%, transparent); }
   }
-  .project-stat-label{ font-size:9.5px; color:var(--text-faint); margin-bottom:5px; }
-  .project-stat-value{ font-size:12px; font-weight:700; color:var(--text); word-break:break-word; }
-  @media (max-width:640px){
-    .project-stat-grid{ grid-template-columns: repeat(2, 1fr); }
+  .pc-status i{ width:6px; height:6px; border-radius:50%; background:var(--ps); }
+  .pc-metrics{ display:grid; grid-template-columns: repeat(3, 1fr); }
+  .pc-metric{ text-align:center; padding:2px 6px; min-width:0; }
+  .pc-metric + .pc-metric{ border-right:1px solid var(--border-soft); }
+  .pc-metric-val{ font-size:21px; font-weight:800; color:var(--text); line-height:1.35; font-variant-numeric:tabular-nums; }
+  .pc-metric-val.sm{ font-size:14px; padding-top:6px; line-height:1.5; }
+  .pc-metric-val.gold{ color:var(--gold); }
+  .pc-metric-lbl{ font-size:10px; color:var(--text-faint); margin-top:2px; }
+  .pc-dates{
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    border-radius:var(--radius-sm); background:var(--bg-card); border:1px solid var(--border-soft); box-shadow: var(--sink);
   }
+  .pc-date{ min-width:0; }
+  .pc-date.end{ text-align:left; }
+  .pc-date-lbl{ font-size:9.5px; color:var(--text-faint); margin-bottom:2px; }
+  .pc-date-val{ font-size:12px; font-weight:700; color:var(--gold); white-space:nowrap; }
+  .pc-date-val.empty{ color:var(--text-faint); font-weight:500; }
+  .pc-line{ flex:1; height:2px; min-width:18px; position:relative; border-radius:2px; background: linear-gradient(to left, var(--ps), var(--border)); }
+  .pc-line::before, .pc-line::after{ content:''; position:absolute; top:50%; width:7px; height:7px; border-radius:50%; transform:translateY(-50%); box-sizing:border-box; }
+  .pc-line::before{ right:-2px; background:var(--ps); }
+  .pc-line::after{ left:-2px; background:var(--bg-card); border:1.5px solid var(--border); }
+  .pc-foot{ display:flex; align-items:center; gap:8px; }
+  .pc-foot-lbl{ font-size:10px; color:var(--text-faint); flex:0 0 auto; }
+  .pc-cat{
+    display:inline-flex; align-items:center; gap:6px; min-width:0; font-size:11.5px; font-weight:600;
+    padding:3px 11px 4px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border-soft);
+  }
+  .pc-cat i{ width:7px; height:7px; border-radius:50%; background:var(--c, var(--text-faint)); flex:0 0 auto; }
+  .pc-cat span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   /* ---------- Project detail modal ---------- */
   .project-logo-lg{
@@ -1185,23 +1221,31 @@
   /* ================= Checklists (چک‌لیست‌ها) — Pinterest-style masonry ================= */
   .cl-compose{ display:flex; gap:10px; align-items:center; }
   .cl-compose input[type="text"]{ flex:1; min-width:0; }
-  .cl-board{ column-width: 250px; column-gap: 14px; }
+  .cl-board{ position:relative; }
+  .cl-board.nt .cl-card{ transition:none !important; }
   .cl-card{
     /* per-card tone — set from JS based on the chosen palette colour (text flips light/dark automatically) */
     --clc:#d9b99b; --clc-d:#b79677; --clt:#2a2030; --clt-rgb:42,32,48;
     --clo:rgba(255,255,255,.45); --clo-hi:rgba(255,255,255,.8); --clx-bg:#f6c3c9; --clx-fg:#8d1f33;
-    position:relative; overflow:hidden;
-    display:inline-block; width:100%; margin:0 0 14px;
-    break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid;
+    position:absolute; top:0; right:0; width:250px; margin:0; box-sizing:border-box; overflow:hidden;
     background: var(--clc);
     color: var(--clt);
     border:1px solid var(--clc-d);
     border-radius: 16px;
     padding:15px 15px 15px;
     box-shadow: var(--lift-1);
-    transition: transform .15s ease, box-shadow .15s ease, opacity .4s ease, filter .4s ease;
+    transition: transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, opacity .4s ease, filter .4s ease;
   }
-  .cl-card:hover{ transform: translateY(-1px); box-shadow: var(--lift-2); }
+  .cl-card:hover{ box-shadow: var(--lift-2); }
+  .cl-card.dragging{ z-index:20; cursor:grabbing; box-shadow: 0 18px 38px rgba(0,0,0,.45), 0 0 0 1px var(--clc-d); }
+  .cl-card.dragging .cl-grip{ cursor:grabbing; color: rgba(var(--clt-rgb), .95); }
+  .cl-grip{
+    flex:0 0 auto; width:18px; height:26px; margin:0 -4px 0 0; display:flex; align-items:center; justify-content:center;
+    color: rgba(var(--clt-rgb), .42); cursor:grab; touch-action:none; user-select:none; border-radius:7px;
+    transition: color .12s, background .12s;
+  }
+  .cl-grip:hover{ color: rgba(var(--clt-rgb), .95); background: var(--clo); }
+  .cl-grip svg{ width:11px; height:15px; }
   /* fully completed: step back a little, but stay readable */
   .cl-card.all-done{ opacity:.6; filter: saturate(.7); }
   .cl-card.all-done:hover, .cl-card.all-done:focus-within{ opacity:.95; filter:none; }
@@ -1305,7 +1349,7 @@
   .idea-list.is-empty{ padding-right:0; }
   .idea-list.is-empty::before{ display:none; }
   .idea{
-    position:relative; padding:10px 8px 12px 44px; margin-bottom:4px; border-radius:12px;
+    position:relative; padding:10px 8px 12px 92px; margin-bottom:4px; border-radius:12px;
     transition: background .15s;
   }
   .idea:hover, .idea:focus-within{ background: var(--bg-card); }
@@ -1339,6 +1383,8 @@
   .idea-tool:hover{ background: var(--bg-elevated); color: var(--text); }
   .idea-tool.on{ color: var(--gold); }
   .idea-tool.del:hover{ color: var(--red-bright); }
+  .idea-tool svg{ width:15px; height:15px; }
+  .idea-tool.ws:hover{ color: var(--gold); }
 
   /* ---------- Monthly report: days not reached yet ---------- */
   .day-box.future, .day-box.future:hover{
@@ -2715,6 +2761,9 @@
   function svgToWorkspace(){
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"></rect><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"></path><line x1="10" y1="12" x2="14" y2="12"></line></svg>';
   }
+  function svgIdea(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"></path></svg>';
+  }
   function svgGrip(){
     return '<svg viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="3" r="1.4"/><circle cx="9" cy="3" r="1.4"/><circle cx="3" cy="8" r="1.4"/><circle cx="9" cy="8" r="1.4"/><circle cx="3" cy="13" r="1.4"/><circle cx="9" cy="13" r="1.4"/></svg>';
   }
@@ -2783,7 +2832,8 @@
       row.style.setProperty('--w', pct + '%');
       row.innerHTML = '<span class="dn-chip"></span><span class="dn-name"></span><span class="dn-count"></span><span class="dn-pct"></span><div class="dn-bar"><i></i></div>';
       row.querySelector('.dn-name').textContent = e.name;
-      row.querySelector('.dn-count').textContent = toFa(e.count) + ' کار';
+      row.querySelector('.dn-count').textContent = toFa(e.count);
+      row.title = e.name + ' — ' + toFa(e.count) + ' کار — ' + toFa(pct) + '٪';
       row.querySelector('.dn-pct').textContent = toFa(pct) + '٪';
       legend.appendChild(row);
     });
@@ -3022,29 +3072,64 @@
       const meta = getProjectMeta(name);
       const stats = getProjectStats(name);
       const statusInfo = PROJECT_STATUS[meta.status] || PROJECT_STATUS.not_started;
+      const mk = (tag, cls, txt) => { const e = document.createElement(tag); if(cls) e.className = cls; if(txt !== undefined) e.textContent = txt; return e; };
 
-      const card = document.createElement('div'); card.className = 'project-card';
+      const card = mk('div', 'project-card');
+      card.style.setProperty('--ps', statusInfo.color);
       card.addEventListener('click', () => openProjectModal(name));
 
-      const head = document.createElement('div'); head.className = 'project-card-head';
-      const logo = document.createElement('div'); logo.className = 'project-logo';
+      // top: logo + name + status pill
+      const top = mk('div', 'pc-top');
+      const logo = mk('div', 'project-logo');
       logo.innerHTML = meta.logo ? `<img src="${meta.logo}">` : svgProjectDefault();
-      const titleWrap = document.createElement('div'); titleWrap.className = 'project-title-wrap';
-      const title = document.createElement('div'); title.className = 'project-title';
-      const dot = document.createElement('span'); dot.className = 'project-status-dot'; dot.style.background = statusInfo.color;
-      const nameSpan = document.createElement('span'); nameSpan.textContent = name;
-      title.appendChild(dot); title.appendChild(nameSpan);
-      titleWrap.appendChild(title);
-      head.appendChild(logo); head.appendChild(titleWrap);
-      card.appendChild(head);
+      const tw = mk('div', 'pc-title-wrap');
+      tw.appendChild(mk('div', 'pc-name', name));
+      const pill = mk('div', 'pc-status');
+      pill.appendChild(document.createElement('i'));
+      pill.appendChild(mk('span', '', statusInfo.label));
+      tw.appendChild(pill);
+      top.appendChild(logo); top.appendChild(tw);
+      card.appendChild(top);
 
-      const statGrid = document.createElement('div'); statGrid.className = 'project-stat-grid';
-      statGrid.appendChild(statBox('وضعیت', statusInfo.label, statusInfo.color));
-      statGrid.appendChild(statBox('پرکارترین دسته', stats.busiest || '—', stats.busiest ? getCategoryColor(stats.busiest) : null));
-      statGrid.appendChild(statBox('کل کارهای انجام‌شده', toFa(stats.total)));
-      statGrid.appendChild(statBox('میانگین امتیاز', stats.avgRating ? ('★ ' + toFa(stats.avgRating.toFixed(1))) : '—'));
-      statGrid.appendChild(statBox('آخرین فعالیت', stats.lastTs ? jalaliShortFromTs(stats.lastTs) : '—'));
-      card.appendChild(statGrid);
+      // metrics
+      const metrics = mk('div', 'pc-metrics');
+      const metric = (val, lbl, cls) => {
+        const m = mk('div', 'pc-metric');
+        m.appendChild(mk('div', 'pc-metric-val' + (cls ? ' ' + cls : ''), val));
+        m.appendChild(mk('div', 'pc-metric-lbl', lbl));
+        metrics.appendChild(m);
+      };
+      metric(toFa(stats.total), 'کار انجام‌شده');
+      metric(stats.avgRating ? ('★ ' + toFa(stats.avgRating.toFixed(1))) : '—', 'میانگین امتیاز', stats.avgRating ? 'gold' : '');
+      metric(stats.lastTs ? jalaliShortFromTs(stats.lastTs) : '—', 'آخرین فعالیت', 'sm');
+      card.appendChild(metrics);
+
+      // start / end dates
+      const dates = mk('div', 'pc-dates');
+      const dateBox = (lbl, obj, cls) => {
+        const d = mk('div', 'pc-date' + (cls ? ' ' + cls : ''));
+        d.appendChild(mk('div', 'pc-date-lbl', lbl));
+        d.appendChild(mk('div', 'pc-date-val' + (obj ? '' : ' empty'), obj ? jalaliDateObjLabel(obj) : 'تعیین نشده'));
+        return d;
+      };
+      dates.appendChild(dateBox('تاریخ شروع', meta.startDate, ''));
+      dates.appendChild(mk('div', 'pc-line'));
+      dates.appendChild(dateBox('تاریخ پایان', meta.endDate, 'end'));
+      card.appendChild(dates);
+
+      // busiest category
+      const foot = mk('div', 'pc-foot');
+      foot.appendChild(mk('span', 'pc-foot-lbl', 'پرکارترین دسته'));
+      const cat = mk('span', 'pc-cat');
+      if(stats.busiest){
+        cat.style.setProperty('--c', getCategoryColor(stats.busiest));
+        cat.appendChild(document.createElement('i'));
+        cat.appendChild(mk('span', '', stats.busiest));
+      }else{
+        cat.appendChild(mk('span', '', '—'));
+      }
+      foot.appendChild(cat);
+      card.appendChild(foot);
 
       grid.appendChild(card);
     });
@@ -3211,6 +3296,12 @@
       wsBtn.addEventListener('click', opts.onMoveToWorkspace);
       actions.appendChild(wsBtn);
     }
+    if(opts.onMoveToIdeas && t.status !== 'done'){
+      const ideaBtn = document.createElement('button');
+      ideaBtn.className = 'icon-btn idea'; ideaBtn.innerHTML = svgIdea(); ideaBtn.setAttribute('data-tip', 'انتقال به ایده‌های آینده'); ideaBtn.setAttribute('aria-label', 'انتقال به ایده‌های آینده');
+      ideaBtn.addEventListener('click', opts.onMoveToIdeas);
+      actions.appendChild(ideaBtn);
+    }
     const editBtn = document.createElement('button');
     editBtn.className = 'icon-btn'; editBtn.innerHTML = svgEdit(); editBtn.setAttribute('data-tip', 'ویرایش'); editBtn.setAttribute('aria-label', 'ویرایش');
     editBtn.addEventListener('click', () => { editingId = t.id; opts.refresh(); });
@@ -3261,6 +3352,10 @@
           t.jalaliDate = null;
           save(KEYS.tasks, tasks);
           renderTaskList(); renderFilterChips(); renderDailyDonut(); renderWorkspaceList();
+        },
+        onMoveToIdeas: () => {
+          moveTaskToIdeas(t);
+          renderTaskList(); renderFilterChips(); renderDailyDonut();
         }
       }));
     });
@@ -3294,6 +3389,10 @@
           t.jalaliDate = viewedJalaliDisplay();
           save(KEYS.tasks, tasks);
           renderWorkspaceList(); renderTaskList(); renderFilterChips(); renderDailyDonut();
+        },
+        onMoveToIdeas: () => {
+          moveTaskToIdeas(t);
+          renderWorkspaceList();
         }
       }));
     });
@@ -3756,7 +3855,10 @@
       saveChecklists(); renderChecklists();
     });
     tools.appendChild(colorBtn); tools.appendChild(delBtn);
-    head.appendChild(title); head.appendChild(tools);
+    const grip = document.createElement('div');
+    grip.className = 'cl-grip'; grip.innerHTML = svgGrip();
+    grip.setAttribute('data-tip', 'بکش تا جابه‌جا شود');
+    head.appendChild(grip); head.appendChild(title); head.appendChild(tools);
     card.appendChild(head);
 
     const meta = document.createElement('div');
@@ -3817,19 +3919,156 @@
     return card;
   }
 
+  /* ---- masonry layout (JS) + smooth 2-D drag ---- */
+  const CL_GAP = 14, CL_COL_MIN = 250;
+  let clDragging = false, clLayoutRaf = 0;
+  const clRO = (typeof ResizeObserver !== 'undefined') ? new ResizeObserver(() => scheduleClLayout()) : null;
+  if(!clRO) window.addEventListener('resize', () => scheduleClLayout());
+
+  function clColumns(W){ return Math.max(1, Math.floor((W + CL_GAP) / (CL_COL_MIN + CL_GAP))); }
+  // list: [{id, h}] in display order -> shortest-column masonry. x is measured from the RIGHT edge (RTL).
+  function clCompute(list, W){
+    const n = clColumns(W);
+    const colW = (W - CL_GAP * (n - 1)) / n;
+    const hs = new Array(n).fill(0);
+    const pos = {};
+    list.forEach(it => {
+      let c = 0;
+      for(let i = 1; i < n; i++) if(hs[i] < hs[c] - 0.5) c = i;
+      pos[it.id] = { x: c * (colW + CL_GAP), y: hs[c] };
+      hs[c] += it.h + CL_GAP;
+    });
+    return { pos, colW, height: list.length ? Math.max.apply(null, hs) - CL_GAP : 0 };
+  }
+  function clPlace(card, p, extra){
+    card.style.transform = 'translate(' + (-p.x) + 'px,' + p.y + 'px)' + (extra || '');
+  }
+  function layoutChecklists(instant){
+    if(clDragging) return;
+    const board = document.getElementById('clBoard');
+    if(!board) return;
+    const cards = Array.from(board.querySelectorAll(':scope > .cl-card'));
+    if(!cards.length){ board.style.height = ''; return; }
+    const W = board.clientWidth;
+    if(!W) return;                       // tab hidden — will run again when it is shown
+    if(instant) board.classList.add('nt');
+    const colW = (W - CL_GAP * (clColumns(W) - 1)) / clColumns(W);
+    cards.forEach(c => { c.style.width = colW + 'px'; });
+    const L = clCompute(cards.map(c => ({ id: c.dataset.cl, h: c.offsetHeight })), W);
+    cards.forEach(c => clPlace(c, L.pos[c.dataset.cl]));
+    board.style.height = L.height + 'px';
+    if(instant){ void board.offsetHeight; board.classList.remove('nt'); }
+  }
+  function scheduleClLayout(){
+    if(clLayoutRaf) return;
+    clLayoutRaf = requestAnimationFrame(() => { clLayoutRaf = 0; layoutChecklists(false); });
+  }
+
+  (function initClDrag(){
+    const board = document.getElementById('clBoard');
+    if(!board) return;
+    board.addEventListener('pointerdown', e => {
+      const grip = e.target.closest('.cl-grip');
+      if(!grip || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      const card = grip.closest('.cl-card');
+      if(!card || card.parentElement !== board) return;
+      const cards = Array.from(board.querySelectorAll(':scope > .cl-card'));
+      const ids = cards.map(c => c.dataset.cl);
+      const id = card.dataset.cl;
+      const W = board.clientWidth;
+      if(!W) return;
+      const hmap = {}; cards.forEach(c => { hmap[c.dataset.cl] = c.offsetHeight; });
+      const hd = hmap[id];
+      const base = clCompute(ids.map(i => ({ id: i, h: hmap[i] })), W);
+      const colW = base.colW, start = base.pos[id];
+      const others = ids.filter(i => i !== id);
+
+      e.preventDefault();
+      try{ grip.setPointerCapture(e.pointerId); }catch(_){}
+      clDragging = true;
+      const sx = e.clientX, sy = e.clientY, scroll0 = window.scrollY;
+      let lastX = sx, lastY = sy, raf = 0;
+      let bestIdx = ids.indexOf(id), order = ids.slice(), L = base;
+
+      card.classList.add('dragging');
+      document.body.classList.add('is-dragging');
+      card.style.transition = 'box-shadow .15s ease';
+      document.querySelectorAll('.kz-tooltip.show').forEach(t => t.classList.remove('show'));
+
+      function update(){
+        const dx = lastX - sx, dy = (lastY - sy) + (window.scrollY - scroll0);
+        // RTL: moving the pointer to the right reduces the offset measured from the right edge
+        const curX = Math.max(0, Math.min(Math.max(0, W - colW), start.x - dx));
+        const curY = Math.max(-20, start.y + dy);
+        clPlace(card, { x: curX, y: curY }, ' scale(1.03)');
+        const cx = curX + colW / 2, cy = curY + hd / 2;
+        let bi = 0, bd = Infinity, bl = null;
+        for(let i = 0; i <= others.length; i++){
+          const o = others.slice(); o.splice(i, 0, id);
+          const lay = clCompute(o.map(k => ({ id: k, h: hmap[k] })), W);
+          const p = lay.pos[id];
+          const d = Math.pow(p.x + colW / 2 - cx, 2) + Math.pow(p.y + hd / 2 - cy, 2);
+          if(d < bd){ bd = d; bi = i; bl = lay; }
+        }
+        if(bi !== bestIdx){
+          bestIdx = bi; order = others.slice(); order.splice(bi, 0, id); L = bl;
+          cards.forEach(c => { if(c !== card) clPlace(c, L.pos[c.dataset.cl]); });
+          board.style.height = L.height + 'px';
+        }
+      }
+      function loop(){
+        const edge = 80;
+        if(lastY < edge) window.scrollBy(0, -Math.min(16, (edge - lastY) / 4 + 2));
+        else if(lastY > window.innerHeight - edge) window.scrollBy(0, Math.min(16, (lastY - (window.innerHeight - edge)) / 4 + 2));
+        update();
+        raf = requestAnimationFrame(loop);
+      }
+      function onMove(ev){ lastX = ev.clientX; lastY = ev.clientY; }
+      function end(){
+        cancelAnimationFrame(raf);
+        grip.removeEventListener('pointermove', onMove);
+        grip.removeEventListener('pointerup', end);
+        grip.removeEventListener('pointercancel', end);
+        update();
+        card.style.transition = 'transform .24s cubic-bezier(.2,.8,.2,1), box-shadow .2s ease';
+        clPlace(card, L.pos[id]);
+        setTimeout(() => {
+          card.classList.remove('dragging');
+          document.body.classList.remove('is-dragging');
+          card.style.transition = '';
+          clDragging = false;
+          if(order.join('|') !== ids.join('|')){
+            const byId = {}; checklists.forEach(c => { byId[String(c.id)] = c; });
+            const next = order.map(i => byId[i]).filter(Boolean);
+            if(next.length === checklists.length){ checklists = next; saveChecklists(); }
+            order.forEach(i => { const el = board.querySelector(':scope > .cl-card[data-cl="' + i + '"]'); if(el) board.appendChild(el); });
+          }
+          layoutChecklists(false);
+        }, 250);
+      }
+      grip.addEventListener('pointermove', onMove);
+      grip.addEventListener('pointerup', end);
+      grip.addEventListener('pointercancel', end);
+      raf = requestAnimationFrame(loop);
+    });
+  })();
+
   function renderChecklists(focusId){
     const board = document.getElementById('clBoard');
     if(!board) return;
+    if(clRO) clRO.disconnect();
     board.innerHTML = '';
     if(!checklists.length){
+      board.style.height = '';
       const empty = document.createElement('div');
       empty.className = 'empty-state';
-      empty.style.columnSpan = 'all';
       empty.innerHTML = '<div class="glyph">🗒️</div><p>هنوز چک‌لیستی نساخته‌ای.</p><p>یک عنوان بنویس و «چک‌لیست جدید» را بزن.</p>';
       board.appendChild(empty);
       return;
     }
     checklists.forEach(cl => board.appendChild(buildChecklistCard(cl)));
+    layoutChecklists(true);
+    if(clRO){ clRO.observe(board); board.querySelectorAll(':scope > .cl-card').forEach(c => clRO.observe(c)); }
     if(focusId){
       const el = board.querySelector('[data-cl="' + focusId + '"] .cl-new');
       if(el) el.focus();
@@ -3899,6 +4138,33 @@
       (b.star ? 1 : 0) - (a.star ? 1 : 0) || String(b.createdAt).localeCompare(String(a.createdAt)));
   }
 
+  // task (daily or workspace) -> future idea
+  function moveTaskToIdeas(t){
+    ideas.unshift({
+      id: uid(), text: t.title, note: t.description || '', star: false, createdAt: new Date().toISOString(),
+      project: t.project || '', categories: (t.categories || []).slice()
+    });
+    tasks = tasks.filter(x => x.id !== t.id);
+    save(KEYS.tasks, tasks);
+    saveIdeas();
+    renderIdeas();
+  }
+  // future idea -> workspace task
+  function moveIdeaToWorkspace(it){
+    tasks.push({
+      id: uid(), title: it.text, description: it.note || '',
+      project: (it.project && projects.includes(it.project)) ? it.project : '',
+      categories: Array.isArray(it.categories) ? it.categories.slice() : [],
+      status: 'todo', createdAt: Date.now(), completedAt: null, dayKey: null, jalaliDate: null, inWorkspace: true,
+      rating: null, completionNote: ''
+    });
+    ideas = ideas.filter(x => x.id !== it.id);
+    save(KEYS.tasks, tasks);
+    saveIdeas();
+    renderIdeas();
+    renderWorkspaceList();
+  }
+
   function buildIdea(it){
     const row = document.createElement('div');
     row.className = 'idea' + (it.star ? ' star' : '');
@@ -3949,7 +4215,11 @@
       ideas = ideas.filter(x => x.id !== it.id);
       saveIdeas(); renderIdeas();
     });
-    tools.appendChild(starBtn); tools.appendChild(delBtn);
+    const wsMoveBtn = document.createElement('button');
+    wsMoveBtn.type = 'button'; wsMoveBtn.className = 'idea-tool ws'; wsMoveBtn.innerHTML = svgToWorkspace();
+    wsMoveBtn.setAttribute('data-tip', 'انتقال به اتاق کار'); wsMoveBtn.setAttribute('aria-label', 'انتقال به اتاق کار');
+    wsMoveBtn.addEventListener('click', () => moveIdeaToWorkspace(it));
+    tools.appendChild(wsMoveBtn); tools.appendChild(starBtn); tools.appendChild(delBtn);
 
     row.appendChild(title); row.appendChild(note); row.appendChild(date); row.appendChild(tools);
     return row;
