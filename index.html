@@ -1187,71 +1187,164 @@
   .cl-compose input[type="text"]{ flex:1; min-width:0; }
   .cl-board{ column-width: 250px; column-gap: 14px; }
   .cl-card{
-    --clc:#fde2e4; --clc-d:#e9b8bd;
+    /* per-card tone — set from JS based on the chosen palette colour (text flips light/dark automatically) */
+    --clc:#d9b99b; --clc-d:#b79677; --clt:#2a2030; --clt-rgb:42,32,48;
+    --clo:rgba(255,255,255,.45); --clo-hi:rgba(255,255,255,.8); --clx-bg:#f6c3c9; --clx-fg:#8d1f33;
+    position:relative; overflow:hidden;
     display:inline-block; width:100%; margin:0 0 14px;
     break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid;
     background: var(--clc);
-    background-image: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 60%);
-    color:#33293a;
+    color: var(--clt);
     border:1px solid var(--clc-d);
-    border-radius: var(--radius);
-    padding:14px 14px 12px;
+    border-radius: 16px;
+    padding:15px 15px 15px;
     box-shadow: var(--lift-1);
-    transition: transform .15s ease, box-shadow .15s ease;
+    transition: transform .15s ease, box-shadow .15s ease, opacity .4s ease, filter .4s ease;
   }
   .cl-card:hover{ transform: translateY(-1px); box-shadow: var(--lift-2); }
-  .cl-head{ display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+  /* fully completed: step back a little, but stay readable */
+  .cl-card.all-done{ opacity:.6; filter: saturate(.7); }
+  .cl-card.all-done:hover, .cl-card.all-done:focus-within{ opacity:.95; filter:none; }
+
+  .cl-head{ display:flex; align-items:flex-start; gap:8px; margin-bottom:4px; }
   .cl-title{
-    flex:1; min-width:0; font-weight:800; font-size:15px; line-height:1.6;
+    flex:1; min-width:0; font-weight:800; font-size:15.5px; line-height:1.6;
     outline:none; border-radius:6px; padding:0 4px; margin:0 -4px; word-break:break-word;
   }
-  .cl-title:focus{ background: rgba(255,255,255,.6); }
-  .cl-tools{ display:flex; gap:4px; flex-shrink:0; }
+  .cl-title:focus, .cl-item-text:focus{ background: var(--clo-hi); }
+  .cl-tools{ display:flex; gap:4px; flex-shrink:0; opacity:0; transition: opacity .15s; }
+  .cl-card:hover .cl-tools, .cl-card:focus-within .cl-tools{ opacity:1; }
+  @media (hover:none){ .cl-tools{ opacity:.85; } }
   .cl-tool{
     width:26px; height:26px; border-radius:50%; border:none; cursor:pointer;
-    background: rgba(255,255,255,.55); color:#4a3d52; font-size:13px; line-height:1;
+    background: var(--clo); color: var(--clt); font-size:13px; line-height:1;
     display:flex; align-items:center; justify-content:center; font-family:inherit;
     transition: background .15s, transform .1s;
   }
-  .cl-tool:hover{ background: rgba(255,255,255,.95); }
+  .cl-tool:hover{ background: var(--clo-hi); }
   .cl-tool:active{ transform: scale(.92); }
-  .cl-tool.del:hover{ background:#f6c3c9; color:#8d1f33; }
-  .cl-items{ display:flex; flex-direction:column; gap:7px; }
-  .cl-item{ display:flex; align-items:flex-start; gap:9px; }
+  .cl-tool.del:hover{ background: var(--clx-bg); color: var(--clx-fg); }
+  .cl-meta{ font-size:11.5px; font-weight:600; color: rgba(var(--clt-rgb), .62); margin-bottom:8px; }
+
+  .cl-items{ display:flex; flex-direction:column; }
+  .cl-item{
+    display:flex; align-items:flex-start; gap:10px; padding:6px 0;
+    border-top:1px dashed rgba(var(--clt-rgb), .16);
+  }
+  .cl-item:first-child{ border-top:none; }
   .cl-item input[type="checkbox"]{
     -webkit-appearance:none; appearance:none; flex-shrink:0;
-    width:18px; height:18px; margin:3px 0 0; border-radius:6px; cursor:pointer;
-    border:2px solid rgba(51,41,58,.45); background: rgba(255,255,255,.55); position:relative;
-    transition: background .15s, border-color .15s;
+    width:19px; height:19px; margin:4px 0 0; border-radius:50%; cursor:pointer;
+    border:1.8px solid rgba(var(--clt-rgb), .5); background: var(--clo); position:relative;
+    transition: background .15s, border-color .15s, transform .1s;
   }
-  .cl-item input[type="checkbox"]:checked{ background:#33293a; border-color:#33293a; }
+  .cl-item input[type="checkbox"]:active{ transform: scale(.9); }
+  .cl-item input[type="checkbox"]:checked{ background: var(--clt); border-color: var(--clt); }
   .cl-item input[type="checkbox"]:checked::after{
-    content:''; position:absolute; left:4px; top:0px; width:5px; height:10px;
-    border:solid #fff; border-width:0 2px 2px 0; transform: rotate(40deg);
+    content:''; position:absolute; left:5px; top:1px; width:5px; height:9px;
+    border:solid var(--clc); border-width:0 2px 2px 0; transform: rotate(40deg);
   }
   .cl-item-text{
     flex:1; min-width:0; font-size:13.5px; line-height:1.7; outline:none; word-break:break-word;
-    border-radius:5px; padding:0 3px; margin:0 -3px;
+    border-radius:5px; padding:0 3px; margin:0 -3px; transition: opacity .2s;
   }
-  .cl-item-text:focus{ background: rgba(255,255,255,.6); }
   .cl-item.done .cl-item-text{ text-decoration: line-through; opacity:.5; }
   .cl-item-del{
-    border:none; background:transparent; color:#4a3d52; opacity:0; cursor:pointer;
+    border:none; background:transparent; color: var(--clt); opacity:0; cursor:pointer;
     font-size:15px; line-height:1; padding:2px 4px; border-radius:5px; font-family:inherit;
   }
   .cl-item:hover .cl-item-del, .cl-item-del:focus{ opacity:.65; }
-  .cl-item-del:hover{ opacity:1; background: rgba(255,255,255,.6); }
+  .cl-item-del:hover{ opacity:1; background: var(--clo); }
   @media (hover:none){ .cl-item-del{ opacity:.45; } }
   .cl-card input[type="text"].cl-new{
-    width:100%; margin-top:10px; padding:7px 10px; font-size:13px;
-    background: rgba(255,255,255,.55); border:1px dashed rgba(51,41,58,.3);
-    color:#33293a; box-shadow:none; border-radius:9px;
+    width:100%; margin-top:8px; padding:7px 10px; font-size:13px;
+    background: var(--clo); border:1px dashed rgba(var(--clt-rgb), .3);
+    color: var(--clt); box-shadow:none; border-radius:10px;
   }
-  .cl-card input[type="text"].cl-new::placeholder{ color: rgba(51,41,58,.55); }
-  .cl-card input[type="text"].cl-new:focus{ background: rgba(255,255,255,.9); border-style:solid; outline:none; }
-  .cl-foot{ margin-top:8px; font-size:11.5px; color: rgba(51,41,58,.65); font-weight:600; }
-  .cl-bar{ height:4px; border-radius:99px; background: rgba(51,41,58,.12); margin-top:6px; overflow:hidden; }
-  .cl-bar > i{ display:block; height:100%; background:#33293a; opacity:.7; border-radius:99px; transition: width .25s; }
+  .cl-card input[type="text"].cl-new::placeholder{ color: rgba(var(--clt-rgb), .55); }
+  .cl-card input[type="text"].cl-new:focus{ background: var(--clo-hi); border-style:solid; outline:none; }
+  .cl-bar{ height:4px; margin:14px -15px -15px; background: rgba(var(--clt-rgb), .10); overflow:hidden; }
+  .cl-bar > i{ display:block; height:100%; background: var(--clt); opacity:.55; transition: width .3s ease; }
+
+  /* ---------- Settings: checklist palette ---------- */
+  .cl-palette{ display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; }
+  .cl-sw{ position:relative; width:38px; height:38px; }
+  .cl-sw input[type="color"]{
+    -webkit-appearance:none; appearance:none; width:100%; height:100%; padding:0; cursor:pointer;
+    border:2px solid var(--border); border-radius:50%; background:none; overflow:hidden;
+  }
+  .cl-sw input[type="color"]::-webkit-color-swatch-wrapper{ padding:0; }
+  .cl-sw input[type="color"]::-webkit-color-swatch{ border:none; border-radius:50%; }
+  .cl-sw input[type="color"]::-moz-color-swatch{ border:none; border-radius:50%; }
+  .cl-sw-x{
+    position:absolute; top:-6px; right:-6px; width:17px; height:17px; border-radius:50%; border:none;
+    background: var(--red); color:#fff; font-size:11px; line-height:1; cursor:pointer;
+    display:none; align-items:center; justify-content:center; font-family:inherit; padding:0;
+  }
+  .cl-sw:hover .cl-sw-x{ display:flex; }
+  @media (hover:none){ .cl-sw-x{ display:flex; } }
+  .cl-palette-hint{ font-size:11.5px; color:var(--text-dim); line-height:1.8; margin-top:10px; }
+
+  /* ================= Workspace sub-switch + Future ideas ================= */
+  .ws-switch{
+    display:inline-flex; gap:2px; padding:3px; margin-bottom:16px;
+    background: var(--bg-elevated); border:1px solid var(--border-soft); border-radius:999px; box-shadow: var(--sink);
+  }
+  .ws-switch-btn{
+    border:none; background:transparent; color:var(--text-dim); font-family:inherit; font-size:13px; font-weight:600;
+    padding:7px 18px; border-radius:999px; cursor:pointer; transition: background .15s, color .15s;
+  }
+  .ws-switch-btn:hover{ color:var(--text); }
+  .ws-switch-btn.active{ background: var(--red-dim); color: var(--text); box-shadow: var(--lift-1); }
+  .ws-switch-count{ font-size:11px; opacity:.7; margin-right:5px; }
+
+  .idea-list{ position:relative; padding:4px 24px 4px 0; }
+  .idea-list::before{
+    content:''; position:absolute; top:14px; bottom:14px; right:6px; border-right:1px dashed var(--border);
+  }
+  .idea-list.is-empty{ padding-right:0; }
+  .idea-list.is-empty::before{ display:none; }
+  .idea{
+    position:relative; padding:10px 8px 12px 44px; margin-bottom:4px; border-radius:12px;
+    transition: background .15s;
+  }
+  .idea:hover, .idea:focus-within{ background: var(--bg-card); }
+  .idea::before{
+    content:''; position:absolute; right:-21px; top:17px; width:9px; height:9px; border-radius:2px;
+    transform: rotate(45deg); border:1.5px solid var(--gold); background: var(--bg);
+    transition: background .2s, box-shadow .2s;
+  }
+  .idea.star::before{ background: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+  .idea-title{
+    font-size:14.5px; font-weight:700; line-height:1.7; outline:none; word-break:break-word;
+    border-radius:5px; padding:0 4px; margin:0 -4px;
+  }
+  .idea-note{
+    font-size:12.8px; color:var(--text-dim); line-height:1.85; white-space:pre-wrap; outline:none; word-break:break-word;
+    border-radius:5px; padding:0 4px; margin:2px -4px 0;
+  }
+  .idea-note:empty{ display:none; }
+  .idea:hover .idea-note:empty, .idea-note:empty:focus{ display:block; min-height:1.8em; }
+  .idea-note:empty::before{ content: attr(data-ph); color: var(--text-faint); }
+  .idea-title:focus, .idea-note:focus{ background: var(--bg-elevated); }
+  .idea-date{ font-size:11px; color:var(--text-faint); margin-top:4px; }
+  .idea-tools{ position:absolute; left:8px; top:8px; display:flex; gap:2px; opacity:0; transition: opacity .15s; }
+  .idea:hover .idea-tools, .idea:focus-within .idea-tools{ opacity:1; }
+  @media (hover:none){ .idea-tools{ opacity:.8; } }
+  .idea-tool{
+    width:27px; height:27px; border:none; border-radius:50%; background:transparent; color:var(--text-dim);
+    cursor:pointer; font-size:14px; line-height:1; font-family:inherit;
+    display:flex; align-items:center; justify-content:center; transition: background .15s, color .15s;
+  }
+  .idea-tool:hover{ background: var(--bg-elevated); color: var(--text); }
+  .idea-tool.on{ color: var(--gold); }
+  .idea-tool.del:hover{ color: var(--red-bright); }
+
+  /* ---------- Monthly report: days not reached yet ---------- */
+  .day-box.future, .day-box.future:hover{
+    opacity:.32; filter: grayscale(1); cursor:default; pointer-events:none; transform:none;
+  }
+  .day-box{ transition: opacity .3s ease, filter .3s ease, transform .15s, border-color .15s, background .15s; }
 </style>
 </head>
 <body>
@@ -1360,6 +1453,12 @@
 
   <!-- ================= WORKSPACE VIEW ================= -->
   <div id="workspaceView" style="display:none;">
+    <div class="ws-switch" role="tablist">
+      <button type="button" class="ws-switch-btn active" id="wsSwTasks" role="tab">اتاق کار</button>
+      <button type="button" class="ws-switch-btn" id="wsSwIdeas" role="tab">ایده‌های آینده<span class="ws-switch-count" id="wsIdeasCount"></span></button>
+    </div>
+
+    <div id="wsTasksPane">
     <div class="card">
       <form class="add-form" id="wsAddForm">
         <div class="title-row">
@@ -1377,6 +1476,21 @@
       </form>
     </div>
     <div class="task-list" id="workspaceList"></div>
+    </div><!-- /#wsTasksPane -->
+
+    <div id="wsIdeasPane" style="display:none;">
+      <div class="card">
+        <form class="add-form" id="ideaForm">
+          <div class="compose-col-title">✦ ایده‌ی تازه</div>
+          <div class="title-row">
+            <input type="text" id="ideaTitleInput" placeholder="یک ایده برای آینده بنویس…" autocomplete="off" required>
+          </div>
+          <textarea class="desc-input" id="ideaNoteInput" placeholder="جزئیات یا فکرهای مرتبط (اختیاری)…" rows="2"></textarea>
+          <button type="submit" class="btn submit-btn">ثبت ایده</button>
+        </form>
+      </div>
+      <div class="idea-list" id="ideaList"></div>
+    </div><!-- /#wsIdeasPane -->
   </div><!-- /#workspaceView -->
 
   <!-- ================= CHECKLISTS VIEW ================= -->
@@ -1531,6 +1645,16 @@
           <button class="btn secondary small" id="resetThemeBtn" type="button">بازگشت به پیش‌فرض</button>
         </div>
       </div>
+    </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">🗒️ رنگ چک‌لیست‌ها</div>
+      <div class="cl-palette" id="clPaletteEditor"></div>
+      <div class="backup-actions">
+        <button id="clPaletteAdd" type="button">+ افزودن رنگ</button>
+        <button id="clPaletteReset" type="button">بازگشت به پیش‌فرض</button>
+      </div>
+      <div class="cl-palette-hint">هر چک‌لیست جدید به‌ترتیب یکی از این رنگ‌ها را می‌گیرد. رنگ متن کارت‌ها خودکار روشن یا تیره می‌شود تا خوانا بماند.</div>
     </div>
 
     <div class="settings-drawer-section">
@@ -1694,7 +1818,9 @@
     overtime: 'karooz.overtime.v1',
     leaves: 'karooz.leaves.v1',
     absences: 'karooz.absences.v1',
-    checklists: 'karooz.checklists.v1'
+    checklists: 'karooz.checklists.v1',
+    clPalette: 'karooz.clPalette.v1',
+    ideas: 'karooz.ideas.v1'
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
 
@@ -3277,14 +3403,16 @@
     if(leaveDay) activeDays.add(leaveDay);
     const absentDays = new Set(monthAbsenceDays(reportView.y, reportView.m));
     absentDays.forEach(d => activeDays.add(d));
-    const allDays = new Set([...activeDays, ...fridays]);
-
-    if(activeDays.size === 0){
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="glyph">🗓️</div><p>در این ماه هنوز کاری تکمیل یا یادداشتی ثبت نشده.</p></div>`;
-    }
+    // Every day of the month is shown; days not reached yet stay faded and inactive until their date arrives
+    const todayYMD = getJalaliYMD(new Date());
+    const todayNum = todayYMD.y * 10000 + todayYMD.m * 100 + todayYMD.d;
+    const isFutureDay = (d) => (reportView.y * 10000 + reportView.m * 100 + d) > todayNum && !activeDays.has(d);
+    const allDays = new Set();
+    for(let d = 1; d <= daysInMonth; d++) allDays.add(d);
 
     [...allDays].sort((a,b) => a-b).forEach(d => {
       const isFriday = fridays.has(d);
+      const isFuture = isFutureDay(d);
       const isLeave = !isFriday && leaveDay === d;
       const isAbsent = !isFriday && absentDays.has(d);
       const dayTasks = monthTasksByDay[d] || [];
@@ -3292,7 +3420,7 @@
       const weekday = jalaliPartsFor(dateOfDay(d)).weekday || '';
 
       const box = document.createElement('div');
-      box.className = 'day-box' + (isFriday ? ' friday' : '') + (isLeave ? ' leave' : '') + (isAbsent ? ' absent' : '');
+      box.className = 'day-box' + (isFriday ? ' friday' : '') + (isLeave ? ' leave' : '') + (isAbsent ? ' absent' : '') + (isFuture ? ' future' : '');
       if(noteObj){
         const dot = document.createElement('div'); dot.className = 'dnote-dot';
         box.appendChild(dot);
@@ -3321,7 +3449,7 @@
           box.appendChild(dr);
         }
       }
-      if(isFriday){
+      if(isFriday || isFuture){
         box.setAttribute('aria-disabled', 'true');
       }else{
         box.addEventListener('click', () => openDayModal(d, dayTasks, noteObj));
@@ -3550,19 +3678,57 @@
   }
 
   /* ---------------- Checklists (Pinterest-style cards) ---------------- */
-  const CL_COLORS = [
-    ['#fde2e4','#ebb9be'], ['#fff1c9','#e8d38f'], ['#d8f3dc','#a9d7b1'], ['#d6e8fb','#a8c7ea'],
-    ['#e8dcf8','#c7b2e6'], ['#ffe3cf','#efc2a2'], ['#cdeee9','#9ed3cb'], ['#f6dcef','#dfb4d3']
-  ];
+  const CL_DEFAULT_PALETTE = ['#d9b99b','#d49a9f','#a9bf9f','#9db4c9','#baa6cc','#e0c27a','#8fbdb5','#c7a0bd'];
+  const CL_MAX_COLORS = 12;
+  function validPalette(p){
+    return Array.isArray(p) && p.length >= 1 && p.length <= CL_MAX_COLORS && p.every(c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c));
+  }
+  let clPalette = load(KEYS.clPalette, null);
+  if(!validPalette(clPalette)) clPalette = CL_DEFAULT_PALETTE.slice();
+  function saveClPalette(){ save(KEYS.clPalette, clPalette); }
   function saveChecklists(){ save(KEYS.checklists, checklists); }
 
+  // Derive border / text / overlay tones from one base colour; text flips light or dark by luminance.
+  function clTone(hex){
+    const c = hexToRgb(hex);
+    const lum = (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
+    if(lum > 0.52){
+      return { border: rgbToHex(c.r * .84, c.g * .84, c.b * .84), text:'#2a2030', rgb:'42,32,48',
+               o:'rgba(255,255,255,.45)', oh:'rgba(255,255,255,.8)', xbg:'#f6c3c9', xfg:'#8d1f33' };
+    }
+    const lift = v => v + (255 - v) * .16;
+    return { border: rgbToHex(lift(c.r), lift(c.g), lift(c.b)), text:'#f6f0f2', rgb:'246,240,242',
+             o:'rgba(255,255,255,.12)', oh:'rgba(255,255,255,.2)', xbg:'rgba(239,77,99,.4)', xfg:'#ffe1e5' };
+  }
+
+  function refreshClCard(card, cl){
+    const total = cl.items.length;
+    const done = cl.items.filter(i => i.done).length;
+    const all = total > 0 && done === total;
+    card.classList.toggle('all-done', all);
+    const meta = card.querySelector('.cl-meta');
+    const bar = card.querySelector('.cl-bar');
+    if(!total){ meta.style.display = 'none'; bar.style.display = 'none'; return; }
+    meta.style.display = ''; bar.style.display = '';
+    meta.textContent = all ? 'همه انجام شد ✓' : toFa(done) + ' از ' + toFa(total) + ' انجام شد';
+    bar.firstChild.style.width = Math.round(done / total * 100) + '%';
+  }
+
   function buildChecklistCard(cl){
-    const col = CL_COLORS[((cl.color % CL_COLORS.length) + CL_COLORS.length) % CL_COLORS.length];
+    const n = clPalette.length;
+    const hex = clPalette[((cl.color % n) + n) % n];
+    const tone = clTone(hex);
     const card = document.createElement('div');
     card.className = 'cl-card';
     card.dataset.cl = cl.id;
-    card.style.setProperty('--clc', col[0]);
-    card.style.setProperty('--clc-d', col[1]);
+    card.style.setProperty('--clc', hex);
+    card.style.setProperty('--clc-d', tone.border);
+    card.style.setProperty('--clt', tone.text);
+    card.style.setProperty('--clt-rgb', tone.rgb);
+    card.style.setProperty('--clo', tone.o);
+    card.style.setProperty('--clo-hi', tone.oh);
+    card.style.setProperty('--clx-bg', tone.xbg);
+    card.style.setProperty('--clx-fg', tone.xfg);
 
     const head = document.createElement('div');
     head.className = 'cl-head';
@@ -3581,7 +3747,7 @@
     tools.className = 'cl-tools';
     const colorBtn = document.createElement('button');
     colorBtn.type = 'button'; colorBtn.className = 'cl-tool'; colorBtn.title = 'تغییر رنگ'; colorBtn.textContent = '🎨';
-    colorBtn.addEventListener('click', () => { cl.color = (cl.color + 1) % CL_COLORS.length; saveChecklists(); renderChecklists(); });
+    colorBtn.addEventListener('click', () => { cl.color = (cl.color + 1) % clPalette.length; saveChecklists(); renderChecklists(); });
     const delBtn = document.createElement('button');
     delBtn.type = 'button'; delBtn.className = 'cl-tool del'; delBtn.title = 'حذف چک‌لیست'; delBtn.textContent = '✕';
     delBtn.addEventListener('click', () => {
@@ -3593,6 +3759,10 @@
     head.appendChild(title); head.appendChild(tools);
     card.appendChild(head);
 
+    const meta = document.createElement('div');
+    meta.className = 'cl-meta';
+    card.appendChild(meta);
+
     const list = document.createElement('div');
     list.className = 'cl-items';
     cl.items.forEach(it => {
@@ -3600,7 +3770,12 @@
       row.className = 'cl-item' + (it.done ? ' done' : '');
       const cb = document.createElement('input');
       cb.type = 'checkbox'; cb.checked = !!it.done;
-      cb.addEventListener('change', () => { it.done = cb.checked; saveChecklists(); renderChecklists(); });
+      cb.addEventListener('change', () => {
+        it.done = cb.checked;
+        row.classList.toggle('done', it.done);
+        saveChecklists();
+        refreshClCard(card, cl);
+      });
       const tx = document.createElement('div');
       tx.className = 'cl-item-text';
       tx.contentEditable = 'true'; tx.spellcheck = false;
@@ -3633,18 +3808,12 @@
     });
     card.appendChild(inp);
 
-    if(cl.items.length){
-      const doneCount = cl.items.filter(i => i.done).length;
-      const foot = document.createElement('div');
-      foot.className = 'cl-foot';
-      foot.textContent = toFa(doneCount) + ' از ' + toFa(cl.items.length) + ' انجام شد';
-      const bar = document.createElement('div');
-      bar.className = 'cl-bar';
-      const fill = document.createElement('i');
-      fill.style.width = Math.round(doneCount / cl.items.length * 100) + '%';
-      bar.appendChild(fill);
-      card.appendChild(foot); card.appendChild(bar);
-    }
+    const bar = document.createElement('div');
+    bar.className = 'cl-bar';
+    bar.appendChild(document.createElement('i'));
+    card.appendChild(bar);
+
+    refreshClCard(card, cl);
     return card;
   }
 
@@ -3672,12 +3841,156 @@
     const input = document.getElementById('clTitleInput');
     const title = input.value.trim() || 'چک‌لیست';
     const lastColor = checklists.length ? checklists[0].color : -1;
-    const cl = { id: uid(), title, color: (lastColor + 1) % CL_COLORS.length, items: [], createdAt: new Date().toISOString() };
+    const cl = { id: uid(), title, color: (lastColor + 1) % clPalette.length, items: [], createdAt: new Date().toISOString() };
     checklists.unshift(cl);
     saveChecklists();
     input.value = '';
     renderChecklists(cl.id);
   });
+
+  /* ---- checklist palette editor (inside settings) ---- */
+  function renderClPaletteEditor(){
+    const host = document.getElementById('clPaletteEditor');
+    if(!host) return;
+    host.innerHTML = '';
+    clPalette.forEach((hex, i) => {
+      const sw = document.createElement('div');
+      sw.className = 'cl-sw';
+      const inp = document.createElement('input');
+      inp.type = 'color'; inp.value = hex; inp.title = 'تغییر رنگ';
+      inp.addEventListener('input', () => { clPalette[i] = inp.value; saveClPalette(); renderChecklists(); });
+      sw.appendChild(inp);
+      if(clPalette.length > 1){
+        const x = document.createElement('button');
+        x.type = 'button'; x.className = 'cl-sw-x'; x.title = 'حذف این رنگ'; x.textContent = '×';
+        x.addEventListener('click', () => { clPalette.splice(i, 1); saveClPalette(); renderClPaletteEditor(); renderChecklists(); });
+        sw.appendChild(x);
+      }
+      host.appendChild(sw);
+    });
+    document.getElementById('clPaletteAdd').disabled = clPalette.length >= CL_MAX_COLORS;
+  }
+  document.getElementById('clPaletteAdd').addEventListener('click', () => {
+    if(clPalette.length >= CL_MAX_COLORS) return;
+    clPalette.push(CL_DEFAULT_PALETTE[clPalette.length % CL_DEFAULT_PALETTE.length]);
+    saveClPalette(); renderClPaletteEditor(); renderChecklists();
+  });
+  document.getElementById('clPaletteReset').addEventListener('click', () => {
+    clPalette = CL_DEFAULT_PALETTE.slice();
+    saveClPalette(); renderClPaletteEditor(); renderChecklists();
+  });
+
+  /* ---------------- Future ideas (inside the workspace tab) ---------------- */
+  let ideas = load(KEYS.ideas, []);   // [{ id, text, note, star, createdAt }]
+  if(!Array.isArray(ideas)) ideas = [];
+  function saveIdeas(){ save(KEYS.ideas, ideas); }
+  const jalaliLongFmt = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { year:'numeric', month:'long', day:'numeric' });
+  function ideaDateLabel(iso){
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? '' : jalaliLongFmt.format(d);
+  }
+  function makeEditablePlain(el){
+    try{ el.contentEditable = 'plaintext-only'; }catch(err){}
+    if(el.contentEditable !== 'plaintext-only') el.contentEditable = 'true';
+    el.spellcheck = false;
+  }
+  function sortedIdeas(){
+    return ideas.slice().sort((a, b) =>
+      (b.star ? 1 : 0) - (a.star ? 1 : 0) || String(b.createdAt).localeCompare(String(a.createdAt)));
+  }
+
+  function buildIdea(it){
+    const row = document.createElement('div');
+    row.className = 'idea' + (it.star ? ' star' : '');
+    row.dataset.idea = it.id;
+
+    const title = document.createElement('div');
+    title.className = 'idea-title';
+    makeEditablePlain(title);
+    title.textContent = it.text;
+    title.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); title.blur(); } });
+    title.addEventListener('blur', () => {
+      const v = title.textContent.replace(/\s+/g, ' ').trim();
+      if(!v){ title.textContent = it.text; return; }
+      title.textContent = v;
+      if(v !== it.text){ it.text = v; saveIdeas(); }
+    });
+
+    const note = document.createElement('div');
+    note.className = 'idea-note';
+    note.dataset.ph = 'افزودن توضیح…';
+    makeEditablePlain(note);
+    note.textContent = it.note || '';
+    note.addEventListener('keydown', e => {
+      if(e.key === 'Escape' || (e.key === 'Enter' && (e.ctrlKey || e.metaKey))){ e.preventDefault(); note.blur(); }
+    });
+    note.addEventListener('blur', () => {
+      const v = (note.innerText || '').trim();
+      note.textContent = v;
+      if(v !== (it.note || '')){ it.note = v; saveIdeas(); }
+    });
+
+    const date = document.createElement('div');
+    date.className = 'idea-date';
+    date.textContent = ideaDateLabel(it.createdAt);
+
+    const tools = document.createElement('div');
+    tools.className = 'idea-tools';
+    const starBtn = document.createElement('button');
+    starBtn.type = 'button';
+    starBtn.className = 'idea-tool' + (it.star ? ' on' : '');
+    starBtn.title = it.star ? 'برداشتن علامت' : 'علامت‌گذاری (بالای فهرست)';
+    starBtn.textContent = it.star ? '★' : '☆';
+    starBtn.addEventListener('click', () => { it.star = !it.star; saveIdeas(); renderIdeas(); });
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button'; delBtn.className = 'idea-tool del'; delBtn.title = 'حذف ایده'; delBtn.textContent = '✕';
+    delBtn.addEventListener('click', () => {
+      if(!confirm('این ایده حذف شود؟')) return;
+      ideas = ideas.filter(x => x.id !== it.id);
+      saveIdeas(); renderIdeas();
+    });
+    tools.appendChild(starBtn); tools.appendChild(delBtn);
+
+    row.appendChild(title); row.appendChild(note); row.appendChild(date); row.appendChild(tools);
+    return row;
+  }
+
+  function renderIdeas(){
+    const list = document.getElementById('ideaList');
+    if(!list) return;
+    list.innerHTML = '';
+    const badge = document.getElementById('wsIdeasCount');
+    if(badge) badge.textContent = ideas.length ? toFa(ideas.length) : '';
+    list.classList.toggle('is-empty', !ideas.length);
+    if(!ideas.length){
+      list.innerHTML = '<div class="empty-state"><div class="glyph">💡</div><p>هنوز ایده‌ای ننوشته‌ای.</p><p>هر فکری که فعلاً وقتش نیست را همین‌جا نگه دار.</p></div>';
+      return;
+    }
+    sortedIdeas().forEach(it => list.appendChild(buildIdea(it)));
+  }
+
+  document.getElementById('ideaForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const tIn = document.getElementById('ideaTitleInput');
+    const nIn = document.getElementById('ideaNoteInput');
+    const text = tIn.value.trim();
+    if(!text) return;
+    ideas.unshift({ id: uid(), text, note: nIn.value.trim(), star: false, createdAt: new Date().toISOString() });
+    saveIdeas();
+    tIn.value = ''; nIn.value = '';
+    renderIdeas();
+    tIn.focus();
+  });
+
+  function setWsPane(which){
+    document.getElementById('wsTasksPane').style.display = which === 'tasks' ? '' : 'none';
+    document.getElementById('wsIdeasPane').style.display = which === 'ideas' ? '' : 'none';
+    document.getElementById('wsSwTasks').classList.toggle('active', which === 'tasks');
+    document.getElementById('wsSwIdeas').classList.toggle('active', which === 'ideas');
+    if(which === 'ideas') renderIdeas(); else renderWorkspaceList();
+  }
+  document.getElementById('wsSwTasks').addEventListener('click', () => setWsPane('tasks'));
+  document.getElementById('wsSwIdeas').addEventListener('click', () => setWsPane('ideas'));
 
   /* ---------------- Tabs ---------------- */
   function switchTab(which){
@@ -3747,6 +4060,7 @@
     refreshDailyView();
     renderWorkspaceList();
     renderChecklists();
+    renderIdeas();
     renderProjectsGrid();
   }
 
@@ -4180,7 +4494,7 @@
   });
 
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, exportedAt: new Date().toISOString() };
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -4210,6 +4524,8 @@
         if(data.leaves && typeof data.leaves === 'object') leaves = data.leaves;
         if(data.absences && typeof data.absences === 'object') absences = data.absences;
         if(Array.isArray(data.checklists)) checklists = data.checklists;
+        if(Array.isArray(data.ideas)) ideas = data.ideas;
+        if(validPalette(data.clPalette)) clPalette = data.clPalette;
         if(data.theme && typeof data.theme === 'object'){
           if(data.theme.dark && data.theme.light){
             theme = {
@@ -4240,9 +4556,12 @@
         save(KEYS.leaves, leaves);
         save(KEYS.absences, absences);
         save(KEYS.checklists, checklists);
+        save(KEYS.ideas, ideas);
+        save(KEYS.clPalette, clPalette);
         save(KEYS.theme, theme);
         applyTheme();
         syncThemeInputs();
+        renderClPaletteEditor();
         renderAll();
         alert('بازیابی با موفقیت انجام شد.');
       }catch(err){
@@ -4265,6 +4584,7 @@
   wsCategoryPickerEl = buildCategoryPicker(wsFormCategories);
   document.getElementById('wsCategoryPickerHost').appendChild(wsCategoryPickerEl);
 
+  renderClPaletteEditor();
   renderAll();
 
   // Keep the header stamp fresh, and auto-refresh the daily view at midnight (only while parked on "today")
