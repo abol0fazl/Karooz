@@ -1181,6 +1181,77 @@
   @media print{
     #reportExportArea, #reportExportArea *{ box-shadow: none !important; }
   }
+
+  /* ================= Checklists (چک‌لیست‌ها) — Pinterest-style masonry ================= */
+  .cl-compose{ display:flex; gap:10px; align-items:center; }
+  .cl-compose input[type="text"]{ flex:1; min-width:0; }
+  .cl-board{ column-width: 250px; column-gap: 14px; }
+  .cl-card{
+    --clc:#fde2e4; --clc-d:#e9b8bd;
+    display:inline-block; width:100%; margin:0 0 14px;
+    break-inside: avoid; -webkit-column-break-inside: avoid; page-break-inside: avoid;
+    background: var(--clc);
+    background-image: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 60%);
+    color:#33293a;
+    border:1px solid var(--clc-d);
+    border-radius: var(--radius);
+    padding:14px 14px 12px;
+    box-shadow: var(--lift-1);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .cl-card:hover{ transform: translateY(-1px); box-shadow: var(--lift-2); }
+  .cl-head{ display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+  .cl-title{
+    flex:1; min-width:0; font-weight:800; font-size:15px; line-height:1.6;
+    outline:none; border-radius:6px; padding:0 4px; margin:0 -4px; word-break:break-word;
+  }
+  .cl-title:focus{ background: rgba(255,255,255,.6); }
+  .cl-tools{ display:flex; gap:4px; flex-shrink:0; }
+  .cl-tool{
+    width:26px; height:26px; border-radius:50%; border:none; cursor:pointer;
+    background: rgba(255,255,255,.55); color:#4a3d52; font-size:13px; line-height:1;
+    display:flex; align-items:center; justify-content:center; font-family:inherit;
+    transition: background .15s, transform .1s;
+  }
+  .cl-tool:hover{ background: rgba(255,255,255,.95); }
+  .cl-tool:active{ transform: scale(.92); }
+  .cl-tool.del:hover{ background:#f6c3c9; color:#8d1f33; }
+  .cl-items{ display:flex; flex-direction:column; gap:7px; }
+  .cl-item{ display:flex; align-items:flex-start; gap:9px; }
+  .cl-item input[type="checkbox"]{
+    -webkit-appearance:none; appearance:none; flex-shrink:0;
+    width:18px; height:18px; margin:3px 0 0; border-radius:6px; cursor:pointer;
+    border:2px solid rgba(51,41,58,.45); background: rgba(255,255,255,.55); position:relative;
+    transition: background .15s, border-color .15s;
+  }
+  .cl-item input[type="checkbox"]:checked{ background:#33293a; border-color:#33293a; }
+  .cl-item input[type="checkbox"]:checked::after{
+    content:''; position:absolute; left:4px; top:0px; width:5px; height:10px;
+    border:solid #fff; border-width:0 2px 2px 0; transform: rotate(40deg);
+  }
+  .cl-item-text{
+    flex:1; min-width:0; font-size:13.5px; line-height:1.7; outline:none; word-break:break-word;
+    border-radius:5px; padding:0 3px; margin:0 -3px;
+  }
+  .cl-item-text:focus{ background: rgba(255,255,255,.6); }
+  .cl-item.done .cl-item-text{ text-decoration: line-through; opacity:.5; }
+  .cl-item-del{
+    border:none; background:transparent; color:#4a3d52; opacity:0; cursor:pointer;
+    font-size:15px; line-height:1; padding:2px 4px; border-radius:5px; font-family:inherit;
+  }
+  .cl-item:hover .cl-item-del, .cl-item-del:focus{ opacity:.65; }
+  .cl-item-del:hover{ opacity:1; background: rgba(255,255,255,.6); }
+  @media (hover:none){ .cl-item-del{ opacity:.45; } }
+  .cl-card input[type="text"].cl-new{
+    width:100%; margin-top:10px; padding:7px 10px; font-size:13px;
+    background: rgba(255,255,255,.55); border:1px dashed rgba(51,41,58,.3);
+    color:#33293a; box-shadow:none; border-radius:9px;
+  }
+  .cl-card input[type="text"].cl-new::placeholder{ color: rgba(51,41,58,.55); }
+  .cl-card input[type="text"].cl-new:focus{ background: rgba(255,255,255,.9); border-style:solid; outline:none; }
+  .cl-foot{ margin-top:8px; font-size:11.5px; color: rgba(51,41,58,.65); font-weight:600; }
+  .cl-bar{ height:4px; border-radius:99px; background: rgba(51,41,58,.12); margin-top:6px; overflow:hidden; }
+  .cl-bar > i{ display:block; height:100%; background:#33293a; opacity:.7; border-radius:99px; transition: width .25s; }
 </style>
 </head>
 <body>
@@ -1209,6 +1280,7 @@
   <div class="tabs">
     <button class="tab-btn active" id="tabDaily" type="button">امروز</button>
     <button class="tab-btn" id="tabWorkspace" type="button">اتاق کار</button>
+    <button class="tab-btn" id="tabChecklists" type="button">چک‌لیست‌ها</button>
     <button class="tab-btn" id="tabProjects" type="button">پروژه‌های من</button>
     <button class="tab-btn" id="tabMonthly" type="button">گزارش ماهانه</button>
     <button class="tab-btn" id="tabExport" type="button">خروجی ماهانه</button>
@@ -1306,6 +1378,17 @@
     </div>
     <div class="task-list" id="workspaceList"></div>
   </div><!-- /#workspaceView -->
+
+  <!-- ================= CHECKLISTS VIEW ================= -->
+  <div id="checklistsView" style="display:none;">
+    <div class="card">
+      <form class="cl-compose" id="clAddForm">
+        <input type="text" id="clTitleInput" placeholder="عنوان چک‌لیست جدید…" autocomplete="off">
+        <button type="submit" class="btn">➕ چک‌لیست جدید</button>
+      </form>
+    </div>
+    <div class="cl-board" id="clBoard"></div>
+  </div><!-- /#checklistsView -->
 
   <!-- ================= PROJECTS VIEW ================= -->
   <div id="projectsView" style="display:none;">
@@ -1610,7 +1693,8 @@
     reportSettings: 'karooz.reportSettings.v1',
     overtime: 'karooz.overtime.v1',
     leaves: 'karooz.leaves.v1',
-    absences: 'karooz.absences.v1'
+    absences: 'karooz.absences.v1',
+    checklists: 'karooz.checklists.v1'
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
 
@@ -2187,6 +2271,8 @@
   let notes = load(KEYS.notes, {});
   let reportSettings = load(KEYS.reportSettings, { name: '', department: '' });
   let leaves = load(KEYS.leaves, {});   // { 'y-m': 'y-m-d' } — one leave day per Jalali month
+  let checklists = load(KEYS.checklists, []);   // [{ id, title, color (index), items:[{id,text,done}], createdAt }] — newest first
+  if(!Array.isArray(checklists)) checklists = [];
   let absences = load(KEYS.absences, {});   // { 'y-m-d': { reason, createdAt } } — unlimited absence days, each with a free-text reason
   let absenceEditDay = null;
   let overtime = load(KEYS.overtime, {});   // { 'y-m-d': endHour (17..21) } — overtime applies to that single day only
@@ -3463,20 +3549,153 @@
     return wrap;
   }
 
+  /* ---------------- Checklists (Pinterest-style cards) ---------------- */
+  const CL_COLORS = [
+    ['#fde2e4','#ebb9be'], ['#fff1c9','#e8d38f'], ['#d8f3dc','#a9d7b1'], ['#d6e8fb','#a8c7ea'],
+    ['#e8dcf8','#c7b2e6'], ['#ffe3cf','#efc2a2'], ['#cdeee9','#9ed3cb'], ['#f6dcef','#dfb4d3']
+  ];
+  function saveChecklists(){ save(KEYS.checklists, checklists); }
+
+  function buildChecklistCard(cl){
+    const col = CL_COLORS[((cl.color % CL_COLORS.length) + CL_COLORS.length) % CL_COLORS.length];
+    const card = document.createElement('div');
+    card.className = 'cl-card';
+    card.dataset.cl = cl.id;
+    card.style.setProperty('--clc', col[0]);
+    card.style.setProperty('--clc-d', col[1]);
+
+    const head = document.createElement('div');
+    head.className = 'cl-head';
+    const title = document.createElement('div');
+    title.className = 'cl-title';
+    title.contentEditable = 'true';
+    title.spellcheck = false;
+    title.textContent = cl.title;
+    title.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); title.blur(); } });
+    title.addEventListener('blur', () => {
+      const v = title.textContent.trim() || 'چک‌لیست';
+      title.textContent = v;
+      if(v !== cl.title){ cl.title = v; saveChecklists(); }
+    });
+    const tools = document.createElement('div');
+    tools.className = 'cl-tools';
+    const colorBtn = document.createElement('button');
+    colorBtn.type = 'button'; colorBtn.className = 'cl-tool'; colorBtn.title = 'تغییر رنگ'; colorBtn.textContent = '🎨';
+    colorBtn.addEventListener('click', () => { cl.color = (cl.color + 1) % CL_COLORS.length; saveChecklists(); renderChecklists(); });
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button'; delBtn.className = 'cl-tool del'; delBtn.title = 'حذف چک‌لیست'; delBtn.textContent = '✕';
+    delBtn.addEventListener('click', () => {
+      if(!confirm('این چک‌لیست و همه آیتم‌هایش حذف شود؟')) return;
+      checklists = checklists.filter(x => x.id !== cl.id);
+      saveChecklists(); renderChecklists();
+    });
+    tools.appendChild(colorBtn); tools.appendChild(delBtn);
+    head.appendChild(title); head.appendChild(tools);
+    card.appendChild(head);
+
+    const list = document.createElement('div');
+    list.className = 'cl-items';
+    cl.items.forEach(it => {
+      const row = document.createElement('div');
+      row.className = 'cl-item' + (it.done ? ' done' : '');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox'; cb.checked = !!it.done;
+      cb.addEventListener('change', () => { it.done = cb.checked; saveChecklists(); renderChecklists(); });
+      const tx = document.createElement('div');
+      tx.className = 'cl-item-text';
+      tx.contentEditable = 'true'; tx.spellcheck = false;
+      tx.textContent = it.text;
+      tx.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); tx.blur(); } });
+      tx.addEventListener('blur', () => {
+        const v = tx.textContent.trim();
+        if(!v){ cl.items = cl.items.filter(x => x.id !== it.id); saveChecklists(); renderChecklists(); return; }
+        tx.textContent = v;
+        if(v !== it.text){ it.text = v; saveChecklists(); }
+      });
+      const x = document.createElement('button');
+      x.type = 'button'; x.className = 'cl-item-del'; x.title = 'حذف آیتم'; x.textContent = '×';
+      x.addEventListener('click', () => { cl.items = cl.items.filter(y => y.id !== it.id); saveChecklists(); renderChecklists(); });
+      row.appendChild(cb); row.appendChild(tx); row.appendChild(x);
+      list.appendChild(row);
+    });
+    card.appendChild(list);
+
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.className = 'cl-new'; inp.placeholder = '+ آیتم جدید…'; inp.autocomplete = 'off';
+    inp.addEventListener('keydown', e => {
+      if(e.key !== 'Enter') return;
+      e.preventDefault();
+      const v = inp.value.trim();
+      if(!v) return;
+      cl.items.push({ id: uid(), text: v, done: false });
+      saveChecklists();
+      renderChecklists(cl.id);
+    });
+    card.appendChild(inp);
+
+    if(cl.items.length){
+      const doneCount = cl.items.filter(i => i.done).length;
+      const foot = document.createElement('div');
+      foot.className = 'cl-foot';
+      foot.textContent = toFa(doneCount) + ' از ' + toFa(cl.items.length) + ' انجام شد';
+      const bar = document.createElement('div');
+      bar.className = 'cl-bar';
+      const fill = document.createElement('i');
+      fill.style.width = Math.round(doneCount / cl.items.length * 100) + '%';
+      bar.appendChild(fill);
+      card.appendChild(foot); card.appendChild(bar);
+    }
+    return card;
+  }
+
+  function renderChecklists(focusId){
+    const board = document.getElementById('clBoard');
+    if(!board) return;
+    board.innerHTML = '';
+    if(!checklists.length){
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.style.columnSpan = 'all';
+      empty.innerHTML = '<div class="glyph">🗒️</div><p>هنوز چک‌لیستی نساخته‌ای.</p><p>یک عنوان بنویس و «چک‌لیست جدید» را بزن.</p>';
+      board.appendChild(empty);
+      return;
+    }
+    checklists.forEach(cl => board.appendChild(buildChecklistCard(cl)));
+    if(focusId){
+      const el = board.querySelector('[data-cl="' + focusId + '"] .cl-new');
+      if(el) el.focus();
+    }
+  }
+
+  document.getElementById('clAddForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('clTitleInput');
+    const title = input.value.trim() || 'چک‌لیست';
+    const lastColor = checklists.length ? checklists[0].color : -1;
+    const cl = { id: uid(), title, color: (lastColor + 1) % CL_COLORS.length, items: [], createdAt: new Date().toISOString() };
+    checklists.unshift(cl);
+    saveChecklists();
+    input.value = '';
+    renderChecklists(cl.id);
+  });
+
   /* ---------------- Tabs ---------------- */
   function switchTab(which){
     document.getElementById('dailyView').style.display = which === 'daily' ? '' : 'none';
     document.getElementById('workspaceView').style.display = which === 'workspace' ? '' : 'none';
+    document.getElementById('checklistsView').style.display = which === 'checklists' ? '' : 'none';
     document.getElementById('projectsView').style.display = which === 'projects' ? '' : 'none';
     document.getElementById('monthlyView').style.display = which === 'monthly' ? '' : 'none';
     document.getElementById('exportView').style.display = which === 'export' ? '' : 'none';
     document.getElementById('tabDaily').classList.toggle('active', which === 'daily');
     document.getElementById('tabWorkspace').classList.toggle('active', which === 'workspace');
+    document.getElementById('tabChecklists').classList.toggle('active', which === 'checklists');
     document.getElementById('tabProjects').classList.toggle('active', which === 'projects');
     document.getElementById('tabMonthly').classList.toggle('active', which === 'monthly');
     document.getElementById('tabExport').classList.toggle('active', which === 'export');
     if(which === 'monthly') renderMonthlyReport();
     if(which === 'workspace') renderWorkspaceList();
+    if(which === 'checklists') renderChecklists();
     if(which === 'projects') renderProjectsGrid();
     if(which === 'export'){
       document.getElementById('reportPersonName').value = reportSettings.name;
@@ -3527,6 +3746,7 @@
     renderCategoryTagList();
     refreshDailyView();
     renderWorkspaceList();
+    renderChecklists();
     renderProjectsGrid();
   }
 
@@ -3631,6 +3851,7 @@
 
   document.getElementById('tabDaily').addEventListener('click', () => switchTab('daily'));
   document.getElementById('tabWorkspace').addEventListener('click', () => switchTab('workspace'));
+  document.getElementById('tabChecklists').addEventListener('click', () => switchTab('checklists'));
   document.getElementById('tabProjects').addEventListener('click', () => switchTab('projects'));
   document.getElementById('tabMonthly').addEventListener('click', () => switchTab('monthly'));
   document.getElementById('tabExport').addEventListener('click', () => switchTab('export'));
@@ -3959,7 +4180,7 @@
   });
 
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, exportedAt: new Date().toISOString() };
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -3988,6 +4209,7 @@
         if(data.overtime && typeof data.overtime === 'object') overtime = data.overtime;
         if(data.leaves && typeof data.leaves === 'object') leaves = data.leaves;
         if(data.absences && typeof data.absences === 'object') absences = data.absences;
+        if(Array.isArray(data.checklists)) checklists = data.checklists;
         if(data.theme && typeof data.theme === 'object'){
           if(data.theme.dark && data.theme.light){
             theme = {
@@ -4017,6 +4239,7 @@
         save(KEYS.overtime, overtime);
         save(KEYS.leaves, leaves);
         save(KEYS.absences, absences);
+        save(KEYS.checklists, checklists);
         save(KEYS.theme, theme);
         applyTheme();
         syncThemeInputs();
