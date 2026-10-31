@@ -569,6 +569,66 @@
     .status-thumb, .kz-tooltip, .task.dragging{ transition:none; animation:none !important; }
   }
 
+
+  /* ---------- Category donut legend ---------- */
+  .dn-legend{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:7px; }
+  .dn-row{
+    display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:6px 10px;
+    padding:8px 11px 9px; border:1px solid var(--border-soft); border-radius:12px;
+    background: var(--bg-card-glass);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), var(--lift-1);
+    transition: transform .16s ease, border-color .16s ease, opacity .16s ease;
+    cursor:default;
+  }
+  .dn-chip{ width:7px; height:20px; border-radius:4px; background:var(--c); box-shadow:0 0 10px -2px var(--c); }
+  .dn-name{ font-size:12.5px; font-weight:600; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dn-count{
+    font-size:11px; color:var(--text-dim); white-space:nowrap;
+    padding:1px 9px; border-radius:999px; background:var(--bg-card); border:1px solid var(--border-soft);
+  }
+  .dn-pct{ font-size:14.5px; font-weight:800; color:var(--c); min-width:38px; text-align:left; font-variant-numeric:tabular-nums; }
+  .dn-bar{ grid-column:1 / -1; height:4px; border-radius:999px; background:var(--border-soft); overflow:hidden; }
+  .dn-bar i{
+    display:block; height:100%; width:var(--w); border-radius:inherit; background:var(--c);
+    transform-origin:right center; animation: dnGrow .7s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes dnGrow{ from{ transform:scaleX(0); } }
+  .dn-row.on{ transform:translateX(-3px); border-color:var(--c); }
+  .donut-wrap.hl .dn-row:not(.on){ opacity:.45; }
+  .dn-seg{ transition: opacity .16s ease, stroke-width .16s ease; }
+  .donut-wrap.hl .dn-seg:not(.on){ opacity:.28; }
+  .dn-seg.on{ stroke-width:26; }
+  @media (prefers-reduced-motion: reduce){ .dn-bar i{ animation:none; } .dn-row, .dn-seg{ transition:none; } }
+
+  /* ---------- Hourly chart point tooltip ---------- */
+  .hp{ cursor:pointer; }
+  .hp-ring{ fill:none; stroke:var(--red); stroke-width:1.2; opacity:0; transition:opacity .15s, r .15s; }
+  .hp:hover .hp-ring, .hp.active .hp-ring{ opacity:.55; }
+  .hp-dot{ transition:r .15s; }
+  .hp:hover .hp-dot, .hp.active .hp-dot{ r:4.6; }
+  .kz-hp-tip{
+    position:fixed; z-index:9999; pointer-events:none;
+    min-width:130px; max-width:240px; padding:7px 10px 8px;
+    border-radius:11px; background:var(--bg-card); color:var(--text);
+    border:1px solid var(--border); box-shadow: var(--shadow);
+    opacity:0; transform:translateY(4px) scale(.97);
+    transition: opacity .12s, transform .12s;
+  }
+  .kz-hp-tip.show{ opacity:1; transform:translateY(0) scale(1); }
+  .kz-hp-tip::after{
+    content:''; position:absolute; left:var(--ax, 50%); width:8px; height:8px; margin-left:-4px;
+    background:var(--bg-card); border:1px solid var(--border); transform:rotate(45deg);
+  }
+  .kz-hp-tip[data-side="top"]::after{ bottom:-5px; border-top:none; border-left:none; }
+  .kz-hp-tip[data-side="bottom"]::after{ top:-5px; border-bottom:none; border-right:none; }
+  .hpt-head{ font-size:10px; color:var(--text-dim); margin-bottom:5px; padding-bottom:4px; border-bottom:1px solid var(--border-soft); }
+  .hpt-row{ display:flex; align-items:center; gap:7px; font-size:11.5px; line-height:1.9; }
+  .hpt-dot{ width:5px; height:5px; border-radius:50%; flex:0 0 auto; }
+  .hpt-title{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hpt-time{ color:var(--gold); font-weight:700; font-size:10.5px; font-variant-numeric:tabular-nums; }
+  .hpt-more{ font-size:10.5px; color:var(--text-dim); margin-top:2px; }
+  @media (prefers-reduced-motion: reduce){ .kz-hp-tip, .hp-ring, .hp-dot{ transition:none; } }
+
   /* ---------- Edit row ---------- */
   .edit-row{
     display:flex; flex-wrap:wrap; gap:8px; align-items:center;
@@ -666,23 +726,6 @@
     font-family:inherit; font-size:12px; padding:6px 12px; border-radius: 999px; cursor:pointer;
   }
   .settings-drawer .backup-actions button:hover{ border-color: var(--red); color: var(--text); }
-
-  .autobackup-status{ font-size:12px; color:var(--text-dim); line-height:1.9; margin-bottom:12px; }
-  .autobackup-status b{ color:var(--text); }
-  .backup-banner{
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    margin: 0 0 16px; padding: 9px 14px;
-    border:1px solid var(--gold); border-radius: 12px;
-    background: linear-gradient(160deg, var(--gold-dim), var(--bg-card-glass) 130%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--lift-1);
-    font-size:12.5px; color:var(--text);
-  }
-  .backup-banner button{
-    font-family:inherit; font-size:12px; cursor:pointer; padding:4px 12px; border-radius:999px;
-    background:none; border:1px solid var(--gold); color:var(--text);
-  }
-  .backup-banner button:hover{ background: var(--gold-dim); }
-  .backup-banner .bb-close{ margin-inline-start:auto; border:none; color:var(--text-dim); padding:2px 8px; }
 
   /* ---------- Dark/Light mode toggle ---------- */
   .mode-toggle-wrap{ display:flex; justify-content:center; }
@@ -1143,11 +1186,6 @@
 <body>
 
 <div class="wrap">
-  <div class="backup-banner" id="backupBanner" style="display:none">
-    <span id="backupBannerText"></span>
-    <button type="button" id="backupBannerBtn"></button>
-    <button type="button" id="backupBannerClose" class="bb-close" title="بستن">✕</button>
-  </div>
 
   <div class="header">
     <div class="brand">
@@ -1420,16 +1458,6 @@
         <input type="file" id="importFile" accept="application/json" style="display:none">
       </div>
     </div>
-
-    <div class="settings-drawer-section">
-      <div class="settings-drawer-section-title">💾 بکاپ خودکار</div>
-      <div class="autobackup-status" id="autoBackupStatus"></div>
-      <div class="backup-actions">
-        <button id="autoBackupPickBtn" type="button">انتخاب فایل بکاپ</button>
-        <button id="autoBackupNowBtn" type="button" style="display:none">ذخیره همین حالا</button>
-        <button id="autoBackupOffBtn" type="button" style="display:none">غیرفعال کردن</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -1586,15 +1614,6 @@
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
 
-  /* ---- Auto-backup state (declared early because save() below triggers it) ---- */
-  const AB_META_KEY = 'karooz.autobackup.meta.v1';
-  const AB_SUPPORTED = typeof window.showSaveFilePicker === 'function';
-  let abMeta = {};            // { at: last auto-save ISO, manualAt: last manual export ISO }
-  let abHandle = null;        // FileSystemFileHandle chosen by the user (kept in IndexedDB)
-  let abTimer = null;
-  let abState = AB_SUPPORTED ? 'off' : 'unsupported';   // off | ok | needsPermission | error | unsupported
-  let abBannerDismissed = false;
-
   function load(key, fallback){
     try{
       const raw = localStorage.getItem(key);
@@ -1605,7 +1624,6 @@
   function save(key, value){
     try{ localStorage.setItem(key, JSON.stringify(value)); }
     catch(e){ console.error('ذخیره‌سازی ناموفق بود', e); }
-    if(key !== AB_META_KEY && abHandle) scheduleAutoBackup();
   }
 
   function uid(){
@@ -1930,6 +1948,61 @@
     document.addEventListener('focusin', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if(el) show(el); });
     document.addEventListener('focusout', hide);
     document.addEventListener('pointerdown', hide);
+    window.addEventListener('scroll', hide, true);
+  })();
+
+  // Hover/tap tooltip for hourly chart points (tasks done in that hour)
+  (function initHourlyPointTip(){
+    const tip = document.createElement('div');
+    tip.className = 'kz-hp-tip';
+    document.body.appendChild(tip);
+    let cur = null;
+    function build(data){
+      tip.innerHTML = '';
+      const head = document.createElement('div'); head.className = 'hpt-head';
+      head.textContent = 'ساعت ' + toFa(data.h) + ' · ' + toFa(data.list.length) + ' کار';
+      tip.appendChild(head);
+      const MAX = 5;
+      data.list.slice(0, MAX).forEach(it => {
+        const row = document.createElement('div'); row.className = 'hpt-row';
+        const dot = document.createElement('span'); dot.className = 'hpt-dot'; dot.style.background = it.c;
+        const ti = document.createElement('span'); ti.className = 'hpt-title'; ti.textContent = it.t;
+        const tm = document.createElement('span'); tm.className = 'hpt-time'; tm.textContent = it.m;
+        row.appendChild(dot); row.appendChild(ti); row.appendChild(tm);
+        tip.appendChild(row);
+      });
+      if(data.list.length > MAX){
+        const more = document.createElement('div'); more.className = 'hpt-more';
+        more.textContent = '+ ' + toFa(data.list.length - MAX) + ' کار دیگر';
+        tip.appendChild(more);
+      }
+    }
+    function show(g){
+      let data; try{ data = JSON.parse(decodeURIComponent(g.getAttribute('data-hp'))); }catch(e){ return; }
+      if(cur) cur.classList.remove('active');
+      cur = g; g.classList.add('active');
+      build(data);
+      tip.style.left = '0px'; tip.style.top = '0px';
+      const dot = g.querySelector('.hp-dot').getBoundingClientRect();
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      const cx = dot.left + dot.width / 2;
+      let side = 'top', top = dot.top - th - 11;
+      if(top < 6){ side = 'bottom'; top = dot.bottom + 11; }
+      let left = Math.max(6, Math.min(cx - tw / 2, window.innerWidth - tw - 6));
+      tip.dataset.side = side;
+      tip.style.setProperty('--ax', (cx - left) + 'px');
+      tip.style.left = left + 'px'; tip.style.top = top + 'px';
+      tip.classList.add('show');
+    }
+    function hide(){ if(cur) cur.classList.remove('active'); cur = null; tip.classList.remove('show'); }
+    document.addEventListener('mouseover', e => {
+      const g = e.target.closest && e.target.closest('.hp');
+      if(g && g !== cur) show(g); else if(!g && cur) hide();
+    });
+    document.addEventListener('click', e => {
+      const g = e.target.closest && e.target.closest('.hp');
+      if(g && g !== cur) show(g); else if(!g) hide();
+    });
     window.addEventListener('scroll', hide, true);
   })();
 
@@ -2475,7 +2548,7 @@
       const frac = e.count / tagTotal;
       const len = frac * c;
       const gap = Math.max(c - len, 0);
-      segments += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${e.color}" stroke-width="${stroke}" stroke-dasharray="${len} ${gap}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
+      segments += `<circle class="dn-seg" data-i="${entries.indexOf(e)}" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${e.color}" stroke-width="${stroke}" stroke-dasharray="${len} ${gap}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"/>`;
       offset += len;
     });
 
@@ -2490,16 +2563,28 @@
       </svg>`;
 
     const legend = document.createElement('div');
-    legend.style.cssText = 'flex:1; min-width:150px; display:flex; flex-direction:column; gap:8px;';
-    entries.forEach(e => {
+    legend.className = 'dn-legend';
+    entries.forEach((e, i) => {
       const pct = Math.round((e.count / tagTotal) * 100);
-      const row = document.createElement('div'); row.style.cssText = 'display:flex; align-items:center; gap:8px; font-size:12.5px;';
-      const dot = document.createElement('span'); dot.style.cssText = 'width:10px;height:10px;border-radius:3px;flex:0 0 auto;'; dot.style.background = e.color;
-      const name = document.createElement('span'); name.style.cssText = 'flex:1; color:var(--text);'; name.textContent = e.name;
-      const pctEl = document.createElement('span'); pctEl.style.cssText = 'color:var(--text-dim); font-variant-numeric: tabular-nums;'; pctEl.textContent = `${toFa(pct)}٪ (${toFa(e.count)})`;
-      row.appendChild(dot); row.appendChild(name); row.appendChild(pctEl);
+      const row = document.createElement('div'); row.className = 'dn-row'; row.dataset.i = i;
+      row.style.setProperty('--c', e.color);
+      row.style.setProperty('--w', pct + '%');
+      row.innerHTML = '<span class="dn-chip"></span><span class="dn-name"></span><span class="dn-count"></span><span class="dn-pct"></span><div class="dn-bar"><i></i></div>';
+      row.querySelector('.dn-name').textContent = e.name;
+      row.querySelector('.dn-count').textContent = toFa(e.count) + ' کار';
+      row.querySelector('.dn-pct').textContent = toFa(pct) + '٪';
       legend.appendChild(row);
     });
+
+    const setHl = idx => {
+      wrapper.classList.toggle('hl', idx !== null);
+      legend.querySelectorAll('.dn-row').forEach(r => r.classList.toggle('on', +r.dataset.i === idx));
+      chart.querySelectorAll('.dn-seg').forEach(c => c.classList.toggle('on', +c.dataset.i === idx));
+    };
+    legend.addEventListener('mouseover', ev => { const r = ev.target.closest('.dn-row'); if(r) setHl(+r.dataset.i); });
+    legend.addEventListener('mouseleave', () => setHl(null));
+    chart.addEventListener('mouseover', ev => { const c = ev.target.closest('.dn-seg'); if(c) setHl(+c.dataset.i); });
+    chart.addEventListener('mouseleave', () => setHl(null));
 
     wrapper.appendChild(chart);
     wrapper.appendChild(legend);
@@ -2518,11 +2603,20 @@
     const hours = [];
     for(let h = 8; h <= Math.max(16, endHour || 16); h++) hours.push(h);
     const counts = hours.map(() => 0);
-    doneTasks.forEach(t => {
+    const byHour = hours.map(() => []);
+    doneTasks.slice().sort((a,b) => (a.completedAt||0) - (b.completedAt||0)).forEach(t => {
       if(!t.completedAt) return;
-      const hr = new Date(t.completedAt).getHours();
-      const idx = hours.indexOf(hr);
-      if(idx !== -1) counts[idx]++;
+      const d = new Date(t.completedAt);
+      const idx = hours.indexOf(d.getHours());
+      if(idx !== -1){
+        counts[idx]++;
+        const cat = (t.categories && t.categories.length) ? t.categories[0] : null;
+        byHour[idx].push({
+          t: t.title,
+          m: toFa(String(d.getHours()).padStart(2,'0')) + ':' + toFa(String(d.getMinutes()).padStart(2,'0')),
+          c: cat ? getCategoryColor(cat) : '#5c5364'
+        });
+      }
     });
     const maxCount = Math.max(1, ...counts);
     const padX = 24, padTop = 20, padBottom = 30;
@@ -2542,7 +2636,15 @@
     });
     const areaD = lineD + ` L ${points[points.length-1].x} ${padTop+plotH} L ${points[0].x} ${padTop+plotH} Z`;
 
-    const dots = points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" style="fill:var(--red)"/>`).join('');
+    const dots = points.map((p,i) => {
+      if(!p.count) return `<circle cx="${p.x}" cy="${p.y}" r="3.5" style="fill:var(--red)"/>`;
+      const data = encodeURIComponent(JSON.stringify({ h: p.hour, list: byHour[i] }));
+      return `<g class="hp" data-hp="${data}">
+        <circle cx="${p.x}" cy="${p.y}" r="14" fill="transparent"/>
+        <circle class="hp-ring" cx="${p.x}" cy="${p.y}" r="8"/>
+        <circle class="hp-dot" cx="${p.x}" cy="${p.y}" r="3.5" style="fill:var(--red)"/>
+      </g>`;
+    }).join('');
     const labels = points.map(p => `<text x="${p.x}" y="${heightPx-8}" text-anchor="middle" font-size="10" style="fill:var(--text-faint)" font-family="Vazirmatn, Tahoma, sans-serif">${toFa(p.hour)}</text>`).join('');
     const countLabels = points.filter(p=>p.count>0).map(p => `<text x="${p.x}" y="${p.y-9}" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--text)" font-family="Vazirmatn, Tahoma, sans-serif">${toFa(p.count)}</text>`).join('');
 
@@ -3856,165 +3958,9 @@
     save(KEYS.theme, theme);
   });
 
-  /* ---------------- Auto backup (File System Access API — Chrome / Edge) ----------------
-     The user picks ONE .json file once; the handle is kept in IndexedDB (same origin as localStorage,
-     so replacing karooz.html with a newer version keeps it). Every change rewrites that file. */
-  function buildBackupObject(){
-    return { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, exportedAt: new Date().toISOString() };
-  }
-  function dataLooksEmpty(){
-    return !tasks.length && !Object.keys(notes || {}).length && !Object.keys(overtime || {}).length &&
-           !Object.keys(leaves || {}).length && !Object.keys(absences || {}).length;
-  }
-  function abDb(){
-    return new Promise((res, rej) => {
-      const r = indexedDB.open('karooz-autobackup', 1);
-      r.onupgradeneeded = () => r.result.createObjectStore('h');
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
-  }
-  async function abStoreHandle(h){
-    const db = await abDb();
-    return new Promise((res, rej) => {
-      const tx = db.transaction('h', 'readwrite');
-      if(h) tx.objectStore('h').put(h, 'file'); else tx.objectStore('h').delete('file');
-      tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
-    });
-  }
-  async function abLoadHandle(){
-    try{
-      const db = await abDb();
-      return await new Promise((res) => {
-        const q = db.transaction('h').objectStore('h').get('file');
-        q.onsuccess = () => res(q.result || null); q.onerror = () => res(null);
-      });
-    }catch(e){ return null; }
-  }
-  async function abHasPermission(request){
-    if(!abHandle) return false;
-    const opts = { mode: 'readwrite' };
-    try{
-      if(await abHandle.queryPermission(opts) === 'granted') return true;
-      if(request && await abHandle.requestPermission(opts) === 'granted') return true;
-    }catch(e){}
-    return false;
-  }
-  function scheduleAutoBackup(){
-    if(!abHandle || abState === 'needsPermission') return;
-    clearTimeout(abTimer);
-    abTimer = setTimeout(() => abWrite(false), 1500);
-  }
-  async function abWrite(force){
-    clearTimeout(abTimer); abTimer = null;
-    if(!abHandle) return false;
-    if(dataLooksEmpty() && !force){ return false; }   // never overwrite a good backup with an empty dataset
-    if(dataLooksEmpty()){ renderAutoBackupUI(); return false; }
-    try{
-      const w = await abHandle.createWritable();
-      await w.write(JSON.stringify(buildBackupObject(), null, 2));
-      await w.close();
-      abMeta.at = new Date().toISOString(); save(AB_META_KEY, abMeta);
-      abState = 'ok';
-      renderAutoBackupUI();
-      return true;
-    }catch(e){
-      console.error('بکاپ خودکار ناموفق بود', e);
-      abState = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'needsPermission' : 'error';
-      renderAutoBackupUI();
-      return false;
-    }
-  }
-  async function abPick(){
-    if(!AB_SUPPORTED) return;
-    try{
-      const h = await window.showSaveFilePicker({
-        suggestedName: 'karooz-backup.json',
-        types: [{ description: 'Karooz backup', accept: { 'application/json': ['.json'] } }]
-      });
-      abHandle = h;
-      await abStoreHandle(h);
-      abState = 'ok';
-      await abWrite(true);
-      renderAutoBackupUI();
-    }catch(e){
-      if(!e || e.name !== 'AbortError') console.error(e);
-    }
-  }
-  async function abDisable(){
-    abHandle = null; clearTimeout(abTimer);
-    try{ await abStoreHandle(null); }catch(e){}
-    abState = 'off'; delete abMeta.at; save(AB_META_KEY, abMeta);
-    renderAutoBackupUI();
-  }
-  function abFaDate(iso){
-    try{ return new Date(iso).toLocaleString('fa-IR-u-ca-persian', { dateStyle: 'medium', timeStyle: 'short' }); }
-    catch(e){ return ''; }
-  }
-  function renderAutoBackupUI(){
-    const st = document.getElementById('autoBackupStatus');
-    const pick = document.getElementById('autoBackupPickBtn');
-    const now = document.getElementById('autoBackupNowBtn');
-    const off = document.getElementById('autoBackupOffBtn');
-    const active = !!abHandle;
-    let msg;
-    if(abState === 'unsupported') msg = 'این مرورگر از بکاپ خودکار پشتیبانی نمی‌کند. با Chrome یا Edge (روی کامپیوتر) باز کن؛ تا آن موقع از «خروجی پشتیبان» استفاده کن.';
-    else if(!active) msg = 'غیرفعال است. یک فایل بکاپ انتخاب کن تا بعد از هر تغییر، خودکار در همان فایل ذخیره شود.';
-    else if(abState === 'needsPermission') msg = `<b>منتظر اجازه</b> — مرورگر بعد از هر بار باز کردن دوباره اجازه‌ی نوشتن می‌خواهد. روی «ذخیره همین حالا» کلیک کن.`;
-    else if(abState === 'error') msg = 'ذخیره‌ی خودکار ناموفق بود. «ذخیره همین حالا» را امتحان کن یا فایل بکاپ را دوباره انتخاب کن.';
-    else msg = '<b>فعال است</b>' + (abMeta.at ? ' — آخرین ذخیره: ' + abFaDate(abMeta.at) : ' — منتظر اولین تغییر');
-    st.innerHTML = msg;
-    pick.style.display = (abState === 'unsupported') ? 'none' : '';
-    pick.textContent = active ? 'تغییر فایل بکاپ' : 'انتخاب فایل بکاپ';
-    now.style.display = active ? '' : 'none';
-    off.style.display = active ? '' : 'none';
-
-    // top banner
-    const bn = document.getElementById('backupBanner');
-    const txt = document.getElementById('backupBannerText');
-    const btn = document.getElementById('backupBannerBtn');
-    let show = false;
-    if(active && abState === 'needsPermission'){
-      show = true; txt.textContent = '💾 بکاپ خودکار متوقف است — برای ادامه یک بار اجازه بده.'; btn.textContent = 'ادامه بکاپ';
-    }else if(!active){
-      const days = abMeta.manualAt ? Math.floor((Date.now() - new Date(abMeta.manualAt).getTime()) / 86400000) : null;
-      if(days === null || days >= 7){
-        show = true;
-        txt.textContent = days === null ? '💾 هنوز بکاپی از اطلاعاتت نگرفته‌ای.' : `💾 آخرین بکاپ دستی ${toFa(days)} روز پیش بود.`;
-        btn.textContent = AB_SUPPORTED ? 'فعال‌سازی بکاپ خودکار' : 'گرفتن بکاپ';
-      }
-    }
-    bn.style.display = (show && !abBannerDismissed) ? 'flex' : 'none';
-  }
-  document.getElementById('autoBackupPickBtn').addEventListener('click', abPick);
-  document.getElementById('autoBackupOffBtn').addEventListener('click', () => {
-    if(confirm('بکاپ خودکار غیرفعال شود؟ (فایل بکاپ فعلی پاک نمی‌شود)')) abDisable();
-  });
-  document.getElementById('autoBackupNowBtn').addEventListener('click', async () => {
-    if(!await abHasPermission(true)){ abState = 'needsPermission'; renderAutoBackupUI(); return; }
-    await abWrite(true);
-  });
-  document.getElementById('backupBannerClose').addEventListener('click', () => { abBannerDismissed = true; renderAutoBackupUI(); });
-  document.getElementById('backupBannerBtn').addEventListener('click', async () => {
-    if(abHandle && abState === 'needsPermission'){
-      if(await abHasPermission(true)){ abState = 'ok'; await abWrite(true); }
-      renderAutoBackupUI();
-    }else if(AB_SUPPORTED) abPick();
-    else document.getElementById('exportBtn').click();
-  });
-  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden' && abTimer) abWrite(false); });
-  (async function abInit(){
-    abMeta = load(AB_META_KEY, {}) || {};
-    if(AB_SUPPORTED){
-      abHandle = await abLoadHandle();
-      if(abHandle) abState = (await abHasPermission(false)) ? 'ok' : 'needsPermission';
-    }
-    renderAutoBackupUI();
-  })();
-
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(buildBackupObject(), null, 2)], { type: 'application/json' });
-    abMeta.manualAt = new Date().toISOString(); save(AB_META_KEY, abMeta); renderAutoBackupUI();
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
