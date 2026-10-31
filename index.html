@@ -53,7 +53,7 @@
   ::-webkit-scrollbar-thumb:hover{ background: var(--red-dim); }
 
   .wrap{
-    max-width: 880px;
+    max-width: 950px;
     margin: 0 auto;
     padding: 28px 20px 90px;
   }
@@ -232,6 +232,8 @@
     }
   }
   .compose-col{ min-width:0; }
+  .compose-col.note-col{ display:flex; flex-direction:column; }
+  .compose-col.note-col .note-textarea{ flex:1 1 auto; height:auto; min-height:160px; }
   .compose-col-title{
     font-size:12.5px; font-weight:700; color:var(--gold); margin-bottom:10px;
   }
@@ -665,6 +667,23 @@
   }
   .settings-drawer .backup-actions button:hover{ border-color: var(--red); color: var(--text); }
 
+  .autobackup-status{ font-size:12px; color:var(--text-dim); line-height:1.9; margin-bottom:12px; }
+  .autobackup-status b{ color:var(--text); }
+  .backup-banner{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin: 0 0 16px; padding: 9px 14px;
+    border:1px solid var(--gold); border-radius: 12px;
+    background: linear-gradient(160deg, var(--gold-dim), var(--bg-card-glass) 130%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--lift-1);
+    font-size:12.5px; color:var(--text);
+  }
+  .backup-banner button{
+    font-family:inherit; font-size:12px; cursor:pointer; padding:4px 12px; border-radius:999px;
+    background:none; border:1px solid var(--gold); color:var(--text);
+  }
+  .backup-banner button:hover{ background: var(--gold-dim); }
+  .backup-banner .bb-close{ margin-inline-start:auto; border:none; color:var(--text-dim); padding:2px 8px; }
+
   /* ---------- Dark/Light mode toggle ---------- */
   .mode-toggle-wrap{ display:flex; justify-content:center; }
   .mode-toggle{
@@ -716,11 +735,48 @@
   }
   .month-nav .month-label{ font-size:16px; font-weight:700; }
   .month-summary{
-    display:flex; gap:22px; flex-wrap:wrap;
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(112px, 1fr)); gap:10px;
     margin-bottom: 20px;
-    font-size:13px; color:var(--text-dim);
   }
-  .month-summary b{ color:var(--text); font-size:16px; }
+  .sum-box{
+    display:flex; align-items:center; gap:11px;
+    padding:10px 11px; border:1px solid var(--border); border-radius:14px;
+    background: var(--bg-card-glass);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--lift-1);
+  }
+  .sum-box .sicon{
+    flex:0 0 auto; width:32px; height:32px; border-radius:10px;
+    display:grid; place-items:center; font-size:16px;
+    background: rgba(255,255,255,.06);
+  }
+  .sum-box .sval{ font-size:20px; font-weight:800; color:var(--text); line-height:1.15; }
+  .sum-box .sval small{ font-size:11px; font-weight:600; color:var(--text-dim); margin-inline-start:3px; }
+  .sum-box .slabel{ font-size:11px; color:var(--text-dim); margin-top:2px; line-height:1.5; }
+  .sum-box.done{ border-color: rgba(111,156,118,.55); background: linear-gradient(160deg, var(--green-dim), var(--bg-card-glass) 130%); }
+  .sum-box.done .sicon{ background: rgba(111,156,118,.22); }
+  .sum-box.done .sval{ color: var(--green); }
+  .sum-box.leave{
+    border: 2px dashed var(--gold); border-radius: 22px 8px 22px 8px;
+    background: linear-gradient(160deg, var(--gold-dim), var(--bg-card-glass) 130%);
+  }
+  .sum-box.leave .sicon{ background: rgba(201,154,82,.22); }
+  .sum-box.leave .sval{ color: var(--gold); }
+  .sum-box.absent{
+    border: 2px dotted #9a86c4; border-radius: 8px 22px 8px 22px;
+    background: linear-gradient(160deg, rgba(154,134,196,.20), var(--bg-card-glass) 130%);
+  }
+  .sum-box.absent .sicon{ background: rgba(154,134,196,.25); }
+  .sum-box.absent .sval{ color:#9a86c4; }
+  .sum-box.unpaid{
+    border-color: var(--red);
+    background: linear-gradient(160deg, var(--red-dim), var(--bg-card-glass) 130%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 18px var(--red-glow);
+  }
+  .sum-box.unpaid .sicon{ background: var(--red-glow); }
+  .sum-box.unpaid .sval{ color: var(--red-bright); }
+  .sum-box.ot{ border-color: var(--gold); background: linear-gradient(160deg, rgba(201,154,82,.14), var(--bg-card-glass) 130%); }
+  .sum-box.ot .sicon{ background: rgba(201,154,82,.22); }
+  .sum-box.ot .sval{ color: var(--gold); }
   .day-box-grid{
     display:grid;
     grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
@@ -1042,6 +1098,34 @@
   .day-box.leave .dnum{ color: var(--gold); }
   .day-box.leave .dlabel{ background: var(--gold); color: #1a1208; }
 
+  .day-box.absent{
+    border: 2px dotted #9a86c4;
+    border-radius: 8px 22px 8px 22px;
+    background: linear-gradient(160deg, rgba(154,134,196,.20), var(--bg-card-glass) 130%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 20px rgba(154,134,196,.14), var(--lift-1);
+  }
+  .day-box.absent:hover{ border-color:#9a86c4; background: linear-gradient(160deg, rgba(154,134,196,.28), var(--bg-card-hover) 130%); }
+  .day-box.absent .dnum{ color:#9a86c4; }
+  .day-box.absent .dlabel{ background:#9a86c4; color:#1a1426; }
+  .day-box .dreason{
+    font-size:10px; color:var(--text-dim); margin-top:5px; max-width:100%;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  #absenceBtn{ color:#9a86c4; border-color:#9a86c4; }
+  #absenceBtn:hover{ color:#9a86c4; border-color:#9a86c4; }
+  #absenceBtn:disabled{ color: var(--text-dim); border-color: var(--border); }
+  #absenceBtn.on:disabled, #absenceBtn.on{
+    opacity:.95; filter:none; color:#9a86c4; border-color:#9a86c4; background-color: rgba(154,134,196,.18);
+  }
+  .absence-block{
+    border:2px dotted #9a86c4; border-radius:12px; padding:12px 14px; margin-bottom:14px;
+    background: rgba(154,134,196,.12);
+  }
+  .absence-block .ab-title{ font-weight:700; color:#9a86c4; margin-bottom:6px; font-size:13px; }
+  .absence-block .ab-reason{ font-size:13px; color:var(--text); white-space:pre-wrap; line-height:1.8; }
+  .absence-block .ab-actions{ display:flex; gap:8px; margin-top:10px; }
+  #absenceReasonInput{ width:100%; min-height:96px; }
+
   /* ---------- Leave button (daily tab) ---------- */
   #leaveBtn{ color: var(--gold); border-color: var(--gold); }
   #leaveBtn:hover{ color: var(--gold); border-color: var(--gold); }
@@ -1059,6 +1143,11 @@
 <body>
 
 <div class="wrap">
+  <div class="backup-banner" id="backupBanner" style="display:none">
+    <span id="backupBannerText"></span>
+    <button type="button" id="backupBannerBtn"></button>
+    <button type="button" id="backupBannerClose" class="bb-close" title="بستن">✕</button>
+  </div>
 
   <div class="header">
     <div class="brand">
@@ -1143,17 +1232,18 @@
           <button type="submit" class="btn submit-btn">افزودن</button>
         </form>
       </div>
-      <div class="compose-col">
+      <div class="compose-col note-col">
         <div class="compose-col-title">📝 یادداشت این روز</div>
         <textarea class="note-textarea" id="dailyNoteInput" placeholder="یادداشت‌های این روز را اینجا بنویس…"></textarea>
       </div>
     </div>
 
     <div class="card" style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-      <button class="btn" id="endOfDayBtn" type="button" style="padding:12px 32px; font-size:15px;">🌙 پایان روز</button>
-      <button class="btn secondary" id="dailyReportBtn" type="button" style="padding:12px 32px; font-size:15px;">📋 خروجی گزارش روزانه</button>
-      <button class="btn secondary" id="leaveBtn" type="button" style="padding:12px 32px; font-size:15px;">🏖️ مرخصی</button>
-      <button class="btn secondary" id="overtimeBtn" type="button" style="padding:12px 32px; font-size:15px;">⏱️ اضافه‌کاری</button>
+      <button class="btn" id="endOfDayBtn" type="button" style="padding:12px 28px; font-size:15px;">🌙 پایان روز</button>
+      <button class="btn secondary" id="dailyReportBtn" type="button" style="padding:12px 28px; font-size:15px;">📋 خروجی گزارش روزانه</button>
+      <button class="btn secondary" id="leaveBtn" type="button" style="padding:12px 28px; font-size:15px;">🏖️ مرخصی</button>
+      <button class="btn secondary" id="absenceBtn" type="button" style="padding:12px 28px; font-size:15px;">🚫 غیبت</button>
+      <button class="btn secondary" id="overtimeBtn" type="button" style="padding:12px 28px; font-size:15px;">⏱️ اضافه‌کاری</button>
     </div>
 
   </div><!-- /#dailyView -->
@@ -1330,6 +1420,16 @@
         <input type="file" id="importFile" accept="application/json" style="display:none">
       </div>
     </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">💾 بکاپ خودکار</div>
+      <div class="autobackup-status" id="autoBackupStatus"></div>
+      <div class="backup-actions">
+        <button id="autoBackupPickBtn" type="button">انتخاب فایل بکاپ</button>
+        <button id="autoBackupNowBtn" type="button" style="display:none">ذخیره همین حالا</button>
+        <button id="autoBackupOffBtn" type="button" style="display:none">غیرفعال کردن</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1372,6 +1472,20 @@
     <div id="overtimeSummary" style="margin:16px 0 4px; font-size:13px; color:var(--gold); font-weight:600;"></div>
     <button class="btn submit-btn" id="overtimeSaveBtn" type="button" style="margin-top:12px;">ثبت اضافه‌کاری</button>
     <button class="btn secondary" id="overtimeClearBtn" type="button" style="display:none; margin:8px auto 0; width:100%;">حذف اضافه‌کاری این روز</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="absenceModalOverlay">
+  <div class="modal-panel" id="absenceModalPanel" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title" id="absenceModalTitle">🚫 ثبت غیبت</div>
+      <button class="modal-close" id="absenceModalClose" type="button">✕</button>
+    </div>
+    <div class="field-mini-label">دلیل غیبت</div>
+    <textarea class="note-textarea" id="absenceReasonInput" placeholder="مثلاً: درد شدید چشم، نتوانستم به دفتر بیایم…"></textarea>
+    <div id="absenceHint" style="margin:10px 0 0; font-size:12px; color:var(--text-dim); line-height:1.8;"></div>
+    <button class="btn submit-btn" id="absenceSaveBtn" type="button" style="margin-top:14px;">ثبت غیبت</button>
+    <button class="btn secondary" id="absenceDeleteBtn" type="button" style="display:none; margin:8px auto 0; width:100%;">حذف این غیبت</button>
   </div>
 </div>
 
@@ -1467,9 +1581,19 @@
     notes: 'karooz.notes.v1',
     reportSettings: 'karooz.reportSettings.v1',
     overtime: 'karooz.overtime.v1',
-    leaves: 'karooz.leaves.v1'
+    leaves: 'karooz.leaves.v1',
+    absences: 'karooz.absences.v1'
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
+
+  /* ---- Auto-backup state (declared early because save() below triggers it) ---- */
+  const AB_META_KEY = 'karooz.autobackup.meta.v1';
+  const AB_SUPPORTED = typeof window.showSaveFilePicker === 'function';
+  let abMeta = {};            // { at: last auto-save ISO, manualAt: last manual export ISO }
+  let abHandle = null;        // FileSystemFileHandle chosen by the user (kept in IndexedDB)
+  let abTimer = null;
+  let abState = AB_SUPPORTED ? 'off' : 'unsupported';   // off | ok | needsPermission | error | unsupported
+  let abBannerDismissed = false;
 
   function load(key, fallback){
     try{
@@ -1481,6 +1605,7 @@
   function save(key, value){
     try{ localStorage.setItem(key, JSON.stringify(value)); }
     catch(e){ console.error('ذخیره‌سازی ناموفق بود', e); }
+    if(key !== AB_META_KEY && abHandle) scheduleAutoBackup();
   }
 
   function uid(){
@@ -1989,6 +2114,8 @@
   let notes = load(KEYS.notes, {});
   let reportSettings = load(KEYS.reportSettings, { name: '', department: '' });
   let leaves = load(KEYS.leaves, {});   // { 'y-m': 'y-m-d' } — one leave day per Jalali month
+  let absences = load(KEYS.absences, {});   // { 'y-m-d': { reason, createdAt } } — unlimited absence days, each with a free-text reason
+  let absenceEditDay = null;
   let overtime = load(KEYS.overtime, {});   // { 'y-m-d': endHour (17..21) } — overtime applies to that single day only
   const OT_BASE = 16;
   function otLabel(end){ return `اضافه‌کاری تا ساعت ${toFa(end)} (${toFa(end - OT_BASE)} ساعت)`; }
@@ -2149,7 +2276,7 @@
     document.getElementById('dayNavTitle').textContent = isToday ? 'امروز' : parts.weekday;
     const vy = viewedYMD();
     const isLeaveDay = leaves[vy.y + '-' + vy.m] === viewedDayKey();
-    document.getElementById('dayNavSub').textContent = `${toFa(parts.day)} ${parts.month} ${toFa(parts.year)}` + (isLeaveDay ? ' · 🏖️ مرخصی' : '') + (overtime[viewedDayKey()] ? ' · اضافه‌کاری تا ' + toFa(overtime[viewedDayKey()]) : '');
+    document.getElementById('dayNavSub').textContent = `${toFa(parts.day)} ${parts.month} ${toFa(parts.year)}` + (isLeaveDay ? ' · 🏖️ مرخصی' : '') + (absences[viewedDayKey()] ? ' · 🚫 غیبت' : '') + (overtime[viewedDayKey()] ? ' · اضافه‌کاری تا ' + toFa(overtime[viewedDayKey()]) : '');
     document.getElementById('jumpTodayBtn').style.display = isToday ? 'none' : 'inline-block';
   }
 
@@ -2885,6 +3012,32 @@
   }
 
   /* ---------------- Rendering: monthly report ---------------- */
+  function monthAbsenceDays(y, m){
+    const out = [];
+    Object.keys(absences).forEach(k => {
+      const p = k.split('-').map(Number);
+      if(p[0] === y && p[1] === m) out.push(p[2]);
+    });
+    return out.sort((a,b) => a-b);
+  }
+  // Office rule: one leave day per month is paid; every off day beyond that is unpaid and may reduce salary.
+  function sumBox(cls, icon, value, unit, label){
+    return `<div class="sum-box ${cls}"><div class="sicon">${icon}</div><div><div class="sval">${value}${unit ? `<small>${unit}</small>` : ''}</div><div class="slabel">${label}</div></div></div>`;
+  }
+  function monthSummaryHtml(totalCompleted, totalOpen){
+    const y = reportView.y, m = reportView.m;
+    const leaveKey = leaves[y + '-' + m] || null;
+    const abs = monthAbsenceDays(y, m).length;
+    const ot = monthOvertime(y, m);
+    const unpaid = Math.max(0, abs + (leaveKey ? 1 : 0) - 1);
+    let h = sumBox('done', '✅', toFa(totalCompleted), 'کار', 'تکمیل‌شده');
+    h += sumBox('open', '📌', toFa(totalOpen), 'کار', 'باز (کل)');
+    if(leaveKey) h += sumBox('leave', '🏖️', 'روز ' + toFa(leaveKey.split('-')[2]), '', 'مرخصی');
+    if(abs) h += sumBox('absent', '🚫', toFa(abs), 'روز', 'غیبت');
+    if(unpaid) h += sumBox('unpaid', '⚠️', toFa(unpaid), 'روز', 'بدون حقوق');
+    if(ot.days) h += sumBox('ot', '⏱️', toFa(ot.hours), 'ساعت', `اضافه‌کاری (${toFa(ot.days)} روز)`);
+    return h;
+  }
   function renderMonthlyReport(){
     document.getElementById('monthLabel').textContent = `${PERSIAN_MONTHS[reportView.m - 1]} ${toFa(reportView.y)}`;
 
@@ -2913,11 +3066,7 @@
 
     const totalCompleted = Object.values(monthTasksByDay).reduce((s,arr) => s+arr.length, 0);
     const totalOpen = tasks.filter(t => t.status !== 'done' && !t.inWorkspace).length;
-    document.getElementById('monthSummary').innerHTML =
-      `<div><b>${toFa(totalCompleted)}</b> کار در این ماه تکمیل شده</div>` +
-      `<div><b>${toFa(totalOpen)}</b> کار هنوز باز است (کل)</div>` +
-      (leaves[reportView.y + '-' + reportView.m] ? `<div>🏖️ مرخصی این ماه: روز <b>${toFa(leaves[reportView.y + '-' + reportView.m].split('-')[2])}</b></div>` : '') +
-      (monthOvertime(reportView.y, reportView.m).days ? `<div><b>${toFa(monthOvertime(reportView.y, reportView.m).hours)}</b> ساعت اضافه‌کاری (${toFa(monthOvertime(reportView.y, reportView.m).days)} روز)</div>` : '');
+    document.getElementById('monthSummary').innerHTML = monthSummaryHtml(totalCompleted, totalOpen);
 
     const grid = document.getElementById('monthlyReportBody');
     grid.innerHTML = '';
@@ -2938,6 +3087,8 @@
     });
     const activeDays = new Set([...Object.keys(monthTasksByDay).map(Number), ...Object.keys(monthNotesByDay).map(Number), ...Object.keys(monthOtByDay).map(Number)]);
     if(leaveDay) activeDays.add(leaveDay);
+    const absentDays = new Set(monthAbsenceDays(reportView.y, reportView.m));
+    absentDays.forEach(d => activeDays.add(d));
     const allDays = new Set([...activeDays, ...fridays]);
 
     if(activeDays.size === 0){
@@ -2947,12 +3098,13 @@
     [...allDays].sort((a,b) => a-b).forEach(d => {
       const isFriday = fridays.has(d);
       const isLeave = !isFriday && leaveDay === d;
+      const isAbsent = !isFriday && absentDays.has(d);
       const dayTasks = monthTasksByDay[d] || [];
       const noteObj = monthNotesByDay[d] || null;
       const weekday = jalaliPartsFor(dateOfDay(d)).weekday || '';
 
       const box = document.createElement('div');
-      box.className = 'day-box' + (isFriday ? ' friday' : '') + (isLeave ? ' leave' : '');
+      box.className = 'day-box' + (isFriday ? ' friday' : '') + (isLeave ? ' leave' : '') + (isAbsent ? ' absent' : '');
       if(noteObj){
         const dot = document.createElement('div'); dot.className = 'dnote-dot';
         box.appendChild(dot);
@@ -2969,10 +3121,17 @@
         dot.textContent = `اضافه‌کاری ${toFa(monthOtByDay[d] - OT_BASE)} ساعت`;
         box.appendChild(dot);
       }
-      if(isFriday || isLeave){
+      if(isFriday || isLeave || isAbsent){
         const lbl = document.createElement('div'); lbl.className = 'dlabel';
-        lbl.textContent = isFriday ? 'تعطیل' : '🏖️ مرخصی';
+        lbl.textContent = isFriday ? 'تعطیل' : (isLeave ? '🏖️ مرخصی' : '🚫 غیبت');
         box.appendChild(lbl);
+      }
+      if(isAbsent){
+        const rs = (absences[dayKeyOf(reportView.y, reportView.m, d)] || {}).reason;
+        if(rs){
+          const dr = document.createElement('div'); dr.className = 'dreason'; dr.textContent = rs; dr.title = rs;
+          box.appendChild(dr);
+        }
       }
       if(isFriday){
         box.setAttribute('aria-disabled', 'true');
@@ -3057,6 +3216,25 @@
     const body = document.getElementById('dayModalBody');
     body.innerHTML = '';
 
+    const absKey = dayKeyOf(reportView.y, reportView.m, d);
+    if(absences[absKey]){
+      const blk = document.createElement('div'); blk.className = 'absence-block';
+      const ttl = document.createElement('div'); ttl.className = 'ab-title'; ttl.textContent = '🚫 این روز غیبت ثبت شده';
+      const rsn = document.createElement('div'); rsn.className = 'ab-reason';
+      rsn.textContent = absences[absKey].reason ? ('دلیل: ' + absences[absKey].reason) : 'دلیلی ثبت نشده.';
+      const acts = document.createElement('div'); acts.className = 'ab-actions';
+      const eb = document.createElement('button'); eb.type = 'button'; eb.className = 'btn secondary small'; eb.textContent = '✏️ ویرایش';
+      eb.addEventListener('click', () => { closeDayModal(); openAbsenceModal(absKey); });
+      const db = document.createElement('button'); db.type = 'button'; db.className = 'btn secondary small'; db.textContent = '🗑️ حذف غیبت';
+      db.addEventListener('click', () => {
+        if(!confirm('غیبت این روز حذف شود؟')) return;
+        delete absences[absKey]; save(KEYS.absences, absences); closeDayModal(); renderAll(); renderMonthlyReport();
+      });
+      acts.appendChild(eb); acts.appendChild(db);
+      blk.appendChild(ttl); blk.appendChild(rsn); blk.appendChild(acts);
+      body.appendChild(blk);
+    }
+
     if(leaves[reportView.y + '-' + reportView.m] === dayKeyOf(reportView.y, reportView.m, d)){
       const leaveBadge = document.createElement('div');
       leaveBadge.className = 'day-tag-chip selected';
@@ -3088,9 +3266,11 @@
     }
 
     if(dayTasks.length === 0){
-      const p = document.createElement('div'); p.className = 'empty-state';
-      p.innerHTML = '<p>کاری برای این روز ثبت نشده.</p>';
-      body.appendChild(p);
+      if(!absences[absKey]){
+        const p = document.createElement('div'); p.className = 'empty-state';
+        p.innerHTML = '<p>کاری برای این روز ثبت نشده.</p>';
+        body.appendChild(p);
+      }
     }else{
       dayTasks.forEach(t => {
         const item = document.createElement('div'); item.className = 'modal-task-item';
@@ -3228,6 +3408,7 @@
 
   function refreshDailyView(){
     renderLeaveBtn();
+    renderAbsenceBtn();
     renderDayNav();
     loadViewedNote();
     renderFilterChips();
@@ -3427,11 +3608,64 @@
     });
   });
 
+  /* ---------------- Absence (غیبت) popup — works on a specific day key ---------------- */
+  function absenceDayLabel(key){
+    const p = key.split('-').map(Number);
+    const pj = jalaliPartsFor(findGregorianForJalali(p[0], p[1], p[2]));
+    return `${pj.weekday} ${toFa(p[2])} ${PERSIAN_MONTHS[p[1] - 1]}`;
+  }
+  function openAbsenceModal(key){
+    absenceEditDay = key;
+    const ex = absences[key] || null;
+    document.getElementById('absenceReasonInput').value = ex && ex.reason ? ex.reason : '';
+    document.getElementById('absenceModalTitle').textContent = (ex ? '✏️ ویرایش غیبت — ' : '🚫 ثبت غیبت — ') + absenceDayLabel(key);
+    document.getElementById('absenceSaveBtn').textContent = ex ? 'ذخیره تغییرات' : 'ثبت غیبت';
+    document.getElementById('absenceDeleteBtn').style.display = ex ? 'block' : 'none';
+    document.getElementById('absenceHint').textContent = 'طبق قوانین دفتر، یک روز مرخصی در ماه با حقوق است و روزهای بیشتر بدون حقوق و مشمول کسر خواهند بود.';
+    document.getElementById('absenceModalOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('absenceReasonInput').focus(), 50);
+  }
+  function closeAbsenceModal(){ document.getElementById('absenceModalOverlay').classList.remove('open'); }
+  function refreshAfterAbsence(){ closeAbsenceModal(); renderAll(); renderMonthlyReport(); }
+  function renderAbsenceBtn(){
+    const btn = document.getElementById('absenceBtn');
+    if(!btn) return;
+    const ymd = viewedYMD(), key = viewedDayKey();
+    btn.classList.remove('on'); btn.disabled = false;
+    btn.textContent = '🚫 غیبت'; btn.title = 'ثبت غیبت برای این روز';
+    if(absences[key]){
+      btn.classList.add('on'); btn.textContent = '🚫 غیبت ثبت شد';
+      btn.title = 'برای ویرایش دلیل یا حذف غیبت کلیک کن';
+    }else if(leaves[ymd.y + '-' + ymd.m] === key){
+      btn.disabled = true; btn.title = 'این روز مرخصی است';
+    }else if(viewedDate().getDay() === 5){
+      btn.disabled = true; btn.title = 'جمعه تعطیل است';
+    }
+  }
+  document.getElementById('absenceBtn').addEventListener('click', () => openAbsenceModal(viewedDayKey()));
+  document.getElementById('absenceModalClose').addEventListener('click', closeAbsenceModal);
+  document.getElementById('absenceModalOverlay').addEventListener('click', (e) => { if(e.target.id === 'absenceModalOverlay') closeAbsenceModal(); });
+  document.getElementById('absenceSaveBtn').addEventListener('click', () => {
+    if(!absenceEditDay) return;
+    const prev = absences[absenceEditDay];
+    absences[absenceEditDay] = { reason: document.getElementById('absenceReasonInput').value.trim(), createdAt: (prev && prev.createdAt) || new Date().toISOString() };
+    save(KEYS.absences, absences);
+    refreshAfterAbsence();
+  });
+  document.getElementById('absenceDeleteBtn').addEventListener('click', () => {
+    if(!absenceEditDay) return;
+    if(!confirm('غیبت این روز حذف شود؟')) return;
+    delete absences[absenceEditDay];
+    save(KEYS.absences, absences);
+    refreshAfterAbsence();
+  });
+
   document.getElementById('leaveBtn').addEventListener('click', () => {
     const ymd = viewedYMD();
     const mk = ymd.y + '-' + ymd.m;
     if(leaves[mk]) return;
     if(viewedDate().getDay() === 5) return;
+    if(absences[viewedDayKey()]){ alert('برای این روز غیبت ثبت شده است. اول غیبت را از گزارش ماهیانه حذف کن.'); return; }
     if(!confirm('مرخصی این ماه روی ' + toFa(viewedJalaliDisplay()) + ' ثبت شود؟\nفقط یک‌بار در ماه قابل استفاده است و بعد از ثبت قابل تغییر نیست.')) return;
     leaves[mk] = viewedDayKey();
     save(KEYS.leaves, leaves);
@@ -3622,9 +3856,165 @@
     save(KEYS.theme, theme);
   });
 
+  /* ---------------- Auto backup (File System Access API — Chrome / Edge) ----------------
+     The user picks ONE .json file once; the handle is kept in IndexedDB (same origin as localStorage,
+     so replacing karooz.html with a newer version keeps it). Every change rewrites that file. */
+  function buildBackupObject(){
+    return { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, exportedAt: new Date().toISOString() };
+  }
+  function dataLooksEmpty(){
+    return !tasks.length && !Object.keys(notes || {}).length && !Object.keys(overtime || {}).length &&
+           !Object.keys(leaves || {}).length && !Object.keys(absences || {}).length;
+  }
+  function abDb(){
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('karooz-autobackup', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('h');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function abStoreHandle(h){
+    const db = await abDb();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('h', 'readwrite');
+      if(h) tx.objectStore('h').put(h, 'file'); else tx.objectStore('h').delete('file');
+      tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+    });
+  }
+  async function abLoadHandle(){
+    try{
+      const db = await abDb();
+      return await new Promise((res) => {
+        const q = db.transaction('h').objectStore('h').get('file');
+        q.onsuccess = () => res(q.result || null); q.onerror = () => res(null);
+      });
+    }catch(e){ return null; }
+  }
+  async function abHasPermission(request){
+    if(!abHandle) return false;
+    const opts = { mode: 'readwrite' };
+    try{
+      if(await abHandle.queryPermission(opts) === 'granted') return true;
+      if(request && await abHandle.requestPermission(opts) === 'granted') return true;
+    }catch(e){}
+    return false;
+  }
+  function scheduleAutoBackup(){
+    if(!abHandle || abState === 'needsPermission') return;
+    clearTimeout(abTimer);
+    abTimer = setTimeout(() => abWrite(false), 1500);
+  }
+  async function abWrite(force){
+    clearTimeout(abTimer); abTimer = null;
+    if(!abHandle) return false;
+    if(dataLooksEmpty() && !force){ return false; }   // never overwrite a good backup with an empty dataset
+    if(dataLooksEmpty()){ renderAutoBackupUI(); return false; }
+    try{
+      const w = await abHandle.createWritable();
+      await w.write(JSON.stringify(buildBackupObject(), null, 2));
+      await w.close();
+      abMeta.at = new Date().toISOString(); save(AB_META_KEY, abMeta);
+      abState = 'ok';
+      renderAutoBackupUI();
+      return true;
+    }catch(e){
+      console.error('بکاپ خودکار ناموفق بود', e);
+      abState = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) ? 'needsPermission' : 'error';
+      renderAutoBackupUI();
+      return false;
+    }
+  }
+  async function abPick(){
+    if(!AB_SUPPORTED) return;
+    try{
+      const h = await window.showSaveFilePicker({
+        suggestedName: 'karooz-backup.json',
+        types: [{ description: 'Karooz backup', accept: { 'application/json': ['.json'] } }]
+      });
+      abHandle = h;
+      await abStoreHandle(h);
+      abState = 'ok';
+      await abWrite(true);
+      renderAutoBackupUI();
+    }catch(e){
+      if(!e || e.name !== 'AbortError') console.error(e);
+    }
+  }
+  async function abDisable(){
+    abHandle = null; clearTimeout(abTimer);
+    try{ await abStoreHandle(null); }catch(e){}
+    abState = 'off'; delete abMeta.at; save(AB_META_KEY, abMeta);
+    renderAutoBackupUI();
+  }
+  function abFaDate(iso){
+    try{ return new Date(iso).toLocaleString('fa-IR-u-ca-persian', { dateStyle: 'medium', timeStyle: 'short' }); }
+    catch(e){ return ''; }
+  }
+  function renderAutoBackupUI(){
+    const st = document.getElementById('autoBackupStatus');
+    const pick = document.getElementById('autoBackupPickBtn');
+    const now = document.getElementById('autoBackupNowBtn');
+    const off = document.getElementById('autoBackupOffBtn');
+    const active = !!abHandle;
+    let msg;
+    if(abState === 'unsupported') msg = 'این مرورگر از بکاپ خودکار پشتیبانی نمی‌کند. با Chrome یا Edge (روی کامپیوتر) باز کن؛ تا آن موقع از «خروجی پشتیبان» استفاده کن.';
+    else if(!active) msg = 'غیرفعال است. یک فایل بکاپ انتخاب کن تا بعد از هر تغییر، خودکار در همان فایل ذخیره شود.';
+    else if(abState === 'needsPermission') msg = `<b>منتظر اجازه</b> — مرورگر بعد از هر بار باز کردن دوباره اجازه‌ی نوشتن می‌خواهد. روی «ذخیره همین حالا» کلیک کن.`;
+    else if(abState === 'error') msg = 'ذخیره‌ی خودکار ناموفق بود. «ذخیره همین حالا» را امتحان کن یا فایل بکاپ را دوباره انتخاب کن.';
+    else msg = '<b>فعال است</b>' + (abMeta.at ? ' — آخرین ذخیره: ' + abFaDate(abMeta.at) : ' — منتظر اولین تغییر');
+    st.innerHTML = msg;
+    pick.style.display = (abState === 'unsupported') ? 'none' : '';
+    pick.textContent = active ? 'تغییر فایل بکاپ' : 'انتخاب فایل بکاپ';
+    now.style.display = active ? '' : 'none';
+    off.style.display = active ? '' : 'none';
+
+    // top banner
+    const bn = document.getElementById('backupBanner');
+    const txt = document.getElementById('backupBannerText');
+    const btn = document.getElementById('backupBannerBtn');
+    let show = false;
+    if(active && abState === 'needsPermission'){
+      show = true; txt.textContent = '💾 بکاپ خودکار متوقف است — برای ادامه یک بار اجازه بده.'; btn.textContent = 'ادامه بکاپ';
+    }else if(!active){
+      const days = abMeta.manualAt ? Math.floor((Date.now() - new Date(abMeta.manualAt).getTime()) / 86400000) : null;
+      if(days === null || days >= 7){
+        show = true;
+        txt.textContent = days === null ? '💾 هنوز بکاپی از اطلاعاتت نگرفته‌ای.' : `💾 آخرین بکاپ دستی ${toFa(days)} روز پیش بود.`;
+        btn.textContent = AB_SUPPORTED ? 'فعال‌سازی بکاپ خودکار' : 'گرفتن بکاپ';
+      }
+    }
+    bn.style.display = (show && !abBannerDismissed) ? 'flex' : 'none';
+  }
+  document.getElementById('autoBackupPickBtn').addEventListener('click', abPick);
+  document.getElementById('autoBackupOffBtn').addEventListener('click', () => {
+    if(confirm('بکاپ خودکار غیرفعال شود؟ (فایل بکاپ فعلی پاک نمی‌شود)')) abDisable();
+  });
+  document.getElementById('autoBackupNowBtn').addEventListener('click', async () => {
+    if(!await abHasPermission(true)){ abState = 'needsPermission'; renderAutoBackupUI(); return; }
+    await abWrite(true);
+  });
+  document.getElementById('backupBannerClose').addEventListener('click', () => { abBannerDismissed = true; renderAutoBackupUI(); });
+  document.getElementById('backupBannerBtn').addEventListener('click', async () => {
+    if(abHandle && abState === 'needsPermission'){
+      if(await abHasPermission(true)){ abState = 'ok'; await abWrite(true); }
+      renderAutoBackupUI();
+    }else if(AB_SUPPORTED) abPick();
+    else document.getElementById('exportBtn').click();
+  });
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden' && abTimer) abWrite(false); });
+  (async function abInit(){
+    abMeta = load(AB_META_KEY, {}) || {};
+    if(AB_SUPPORTED){
+      abHandle = await abLoadHandle();
+      if(abHandle) abState = (await abHasPermission(false)) ? 'ok' : 'needsPermission';
+    }
+    renderAutoBackupUI();
+  })();
+
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, exportedAt: new Date().toISOString() };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(buildBackupObject(), null, 2)], { type: 'application/json' });
+    abMeta.manualAt = new Date().toISOString(); save(AB_META_KEY, abMeta); renderAutoBackupUI();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -3651,6 +4041,7 @@
         if(data.notes && typeof data.notes === 'object') notes = data.notes;
         if(data.overtime && typeof data.overtime === 'object') overtime = data.overtime;
         if(data.leaves && typeof data.leaves === 'object') leaves = data.leaves;
+        if(data.absences && typeof data.absences === 'object') absences = data.absences;
         if(data.theme && typeof data.theme === 'object'){
           if(data.theme.dark && data.theme.light){
             theme = {
@@ -3679,6 +4070,7 @@
         save(KEYS.notes, notes);
         save(KEYS.overtime, overtime);
         save(KEYS.leaves, leaves);
+        save(KEYS.absences, absences);
         save(KEYS.theme, theme);
         applyTheme();
         syncThemeInputs();
