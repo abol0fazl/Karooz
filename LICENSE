@@ -1,14 +1,9 @@
-<div align="center" dir="rtl">
-
 # مجوز اختصاصی کاروز
 **Karooz Source-Available License (KSAL) 1.0**
 
 حق نشر © ۲۰۲۶ ابوالفضل تیردست (Abolfazl Tirdast)  
 تمامی حقوق محفوظ است.
 
-</div>
-
-<div dir="rtl">
 
 ## ۱. حقوق مجاز
 
@@ -44,7 +39,7 @@
 
 حقوق مربوط به کدها، طراحی، مستندات و نشان‌های اصلی کاروز متعلق به صاحبان قانونی آن‌هاست. مالک و نگهدارنده‌ی پروژه‌ی اصلی:
 
-**ابوالفضل تیردست (Abolfazl Tirdast)**
+ابوالفضل تیردست (Abolfazl Tirdast)
 
 مخزن رسمی: [github.com/abol0fazl/Karooz](https://github.com/abol0fazl/Karooz)
 
@@ -60,20 +55,15 @@
 
 این مجوز پیش‌نویس اختصاصی پروژه است و تفسیر و اجرای آن تابع قوانین قابل اعمال خواهد بود. در صورت اختلاف میان متن فارسی و انگلیسی، متن انگلیسی نسخه‌ی مرجع این مجوز است.
 
-</div>
-
 ---
-
-<div align="center">
 
 # English
 
-**Karooz Source-Available License (KSAL) 1.0**
+Karooz Source-Available License (KSAL) 1.0
 
 Copyright © 2026 Abolfazl Tirdast  
 All rights reserved.
 
-</div>
 
 ## 1. Permissions
 
@@ -109,7 +99,7 @@ Contributions are accepted or rejected at the project maintainer's discretion. S
 
 Rights to the original Karooz code, design, documentation, and branding belong to their respective lawful rights holders. The owner and maintainer of the original project is:
 
-**Abolfazl Tirdast**
+Abolfazl Tirdast
 
 Official repository: [github.com/abol0fazl/Karooz](https://github.com/abol0fazl/Karooz)
 
@@ -127,6 +117,6 @@ This is a project-specific license draft, and its interpretation and enforceabil
 
 ---
 
-**Copyright © 2026 Abolfazl Tirdast**  
-**Karooz Source-Available License (KSAL) 1.0**  
-**All rights reserved.**
+Copyright © 2026 Abolfazl Tirdast
+Karooz Source-Available License (KSAL) 1.0
+All rights reserved.
