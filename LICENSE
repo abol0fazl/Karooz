@@ -1,0 +1,132 @@
+<div align="center" dir="rtl">
+
+# مجوز اختصاصی کاروز
+**Karooz Source-Available License (KSAL) 1.0**
+
+حق نشر © ۲۰۲۶ ابوالفضل تیردست (Abolfazl Tirdast)  
+تمامی حقوق محفوظ است.
+
+</div>
+
+<div dir="rtl">
+
+## ۱. حقوق مجاز
+
+با رعایت شرایط این مجوز، شما مجاز هستید:
+
+- نسخه‌ی رسمی و تغییرنیافته‌ی کاروز را به‌صورت رایگان دانلود و استفاده کنید.
+- از تمام امکانات نسخه‌ی رسمی، برای استفاده‌ی شخصی یا تجاری، بدون پرداخت هزینه استفاده کنید.
+- کد منبع عمومی را مشاهده، مطالعه و بررسی کنید.
+- اصلاحات، رفع اشکال‌ها و قابلیت‌های پیشنهادی خود را از طریق Pull Request برای بررسی و احتمال ادغام در پروژه ارسال کنید.
+
+## ۲. محدودیت‌ها
+
+بدون اجازه‌ی کتبی قبلی صاحب حقوق اثر، شما مجاز نیستید:
+
+- نسخه‌ی اصلی یا نسخه‌های تغییر‌یافته و مشتق‌شده‌ی کاروز را بازنشر یا توزیع کنید.
+- نسخه‌ی تغییر‌یافته‌ی کاروز را با نام خود، نامی دیگر یا تحت برند دیگری منتشر کنید؛ چه رایگان و چه در ازای دریافت وجه.
+- کاروز یا کد اصلی آن را متعلق به خود معرفی کنید.
+- اعلان‌های حق نشر یا اطلاعات انتساب اثر را حذف یا تغییر دهید.
+
+این محدودیت‌ها شامل انتشار کد منبع، فایل اجرایی و هر شکل دیگری از توزیع نسخه‌ی تغییر‌یافته می‌شود. ایجاد تغییر برای آماده‌سازی و ارسال Pull Request، به‌تنهایی مجوز انتشار مستقل آن تغییرات نیست.
+
+## ۳. مشارکت‌ها
+
+ارسال Pull Request به معنی تأیید این موارد است:
+
+- شما حق ارسال کد یا محتوای مشارکت‌شده را دارید.
+- مالکیت مشارکت اصلی خود را حفظ می‌کنید، مگر اینکه توافق کتبی دیگری وجود داشته باشد.
+- به نگهدارنده‌ی کاروز اجازه‌ای دائمی، جهانی، غیرانحصاری و بدون حق امتیاز می‌دهید تا مشارکت شما را برای استفاده در کاروز بررسی، اصلاح، تکثیر و در نسخه‌های رسمی پروژه منتشر کند.
+
+پذیرش یا رد هر مشارکت به تشخیص نگهدارنده‌ی پروژه است. جزئیات فرایند مشارکت در فایل [CONTRIBUTING.md](CONTRIBUTING.md) آمده است.
+
+## ۴. مالکیت و نسخه‌های رسمی
+
+حقوق مربوط به کدها، طراحی، مستندات و نشان‌های اصلی کاروز متعلق به صاحبان قانونی آن‌هاست. مالک و نگهدارنده‌ی پروژه‌ی اصلی:
+
+**ابوالفضل تیردست (Abolfazl Tirdast)**
+
+مخزن رسمی: [github.com/abol0fazl/Karooz](https://github.com/abol0fazl/Karooz)
+
+فقط نسخه‌هایی که توسط نگهدارنده منتشر یا به‌صورت کتبی تأیید شده‌اند، می‌توانند به‌عنوان نسخه‌ی رسمی کاروز معرفی شوند.
+
+## ۵. سلب ضمانت و مسئولیت
+
+کاروز به همان شکل موجود (AS IS) و بدون هرگونه ضمانت، تا حداکثر میزان مجاز طبق قوانین قابل اجرا ارائه می‌شود. صاحب حقوق اثر، تا حداکثر میزان مجاز قانونی، مسئول خسارت‌های ناشی از استفاده یا ناتوانی در استفاده از نرم‌افزار نیست.
+
+## ۶. اجازه‌های جداگانه و اعتبار مجوز
+
+هرگونه استفاده یا توزیعی که در این مجوز صراحتا مجاز نشده باشد، به اجازه‌ی کتبی صاحب حقوق اثر نیاز دارد. صاحب حقوق اثر می‌تواند اجازه‌های جداگانه‌ای صادر کند.
+
+این مجوز پیش‌نویس اختصاصی پروژه است و تفسیر و اجرای آن تابع قوانین قابل اعمال خواهد بود. در صورت اختلاف میان متن فارسی و انگلیسی، متن انگلیسی نسخه‌ی مرجع این مجوز است.
+
+</div>
+
+---
+
+<div align="center">
+
+# English
+
+**Karooz Source-Available License (KSAL) 1.0**
+
+Copyright © 2026 Abolfazl Tirdast  
+All rights reserved.
+
+</div>
+
+## 1. Permissions
+
+Subject to the terms of this license, you are permitted to:
+
+- Download and use the official, unmodified version of Karooz free of charge.
+- Use all features of the official version for personal or commercial purposes without payment.
+- View, study, and inspect the publicly available source code.
+- Submit proposed fixes, improvements, and features through Pull Requests for review and possible inclusion in the project.
+
+## 2. Restrictions
+
+Without prior written permission from the copyright holder, you may not:
+
+- Redistribute the original or any modified or derivative version of Karooz.
+- Publish a modified version of Karooz under your own name, another name, or another brand, whether free of charge or for a fee.
+- Claim ownership of Karooz or its original code.
+- Remove or alter copyright notices or attribution information.
+
+These restrictions apply to source code, executable files, and any other form of distributing a modified version. Making changes solely to prepare and submit a Pull Request does not, by itself, grant permission to independently distribute those changes.
+
+## 3. Contributions
+
+By submitting a Pull Request, you confirm that:
+
+- You have the right to submit the contributed code or material.
+- You retain ownership of your original contribution unless otherwise agreed in writing.
+- You grant the Karooz maintainer a perpetual, worldwide, non-exclusive, royalty-free license to review, modify, reproduce, and publish your contribution as part of Karooz and its official releases.
+
+Contributions are accepted or rejected at the project maintainer's discretion. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution process.
+
+## 4. Ownership and Official Releases
+
+Rights to the original Karooz code, design, documentation, and branding belong to their respective lawful rights holders. The owner and maintainer of the original project is:
+
+**Abolfazl Tirdast**
+
+Official repository: [github.com/abol0fazl/Karooz](https://github.com/abol0fazl/Karooz)
+
+Only releases published or expressly authorized in writing by the maintainer may be represented as official Karooz releases.
+
+## 5. Disclaimer of Warranty and Liability
+
+Karooz is provided "AS IS", without warranties of any kind, to the maximum extent permitted by applicable law. To the maximum extent permitted by law, the copyright holder is not liable for damages arising from the use of, or inability to use, the software.
+
+## 6. Separate Permissions and Interpretation
+
+Any use or distribution not expressly permitted by this license requires prior written permission from the copyright holder. The copyright holder may grant separate permissions.
+
+This is a project-specific license draft, and its interpretation and enforceability are subject to applicable law. If the Persian and English texts conflict, the English text is the authoritative version.
+
+---
+
+**Copyright © 2026 Abolfazl Tirdast**  
+**Karooz Source-Available License (KSAL) 1.0**  
+**All rights reserved.**
