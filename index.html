@@ -1055,6 +1055,17 @@
     transition: all .12s;
   }
   .day-tag-chip.selected{ background: var(--red-dim); border-color: var(--red); color:var(--text); }
+
+  /* ---------- Recurring tasks ---------- */
+  .task{ cursor:pointer; }
+  .mini-tag.recur{ background: var(--gold-dim); color: var(--gold); border:none; font-weight:600; }
+  .recur-task-name{
+    font-size:13px; color:var(--text); background: var(--bg-card);
+    border:1px solid var(--border-soft); border-radius: var(--radius-sm);
+    padding:8px 12px; margin-bottom:16px; word-break:break-word; line-height:1.7;
+  }
+  .recur-summary{ margin:16px 0 4px; font-size:13px; color:var(--gold); font-weight:600; min-height:20px; }
+  .recur-hint{ font-size:12px; color:var(--text-dim); line-height:1.9; margin:6px 0 14px; }
   .eod-task-item{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:8px 0; border-bottom:1px solid var(--border-soft); font-size:13px;
@@ -1800,6 +1811,24 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="recurModalOverlay">
+  <div class="modal-panel" id="recurModalPanel" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title" id="recurModalTitle">🔁 تکرار کار</div>
+      <button class="modal-close" id="recurModalClose" type="button">✕</button>
+    </div>
+    <div class="recur-task-name" id="recurTaskName"></div>
+    <div class="section-label">تکرار سریع</div>
+    <div class="day-tag-picker" id="recurPresetPicker"></div>
+    <div class="section-label" style="margin-top:18px;">یا روزهای هفته را دستی انتخاب کن</div>
+    <div class="day-tag-picker" id="recurDayPicker"></div>
+    <div class="recur-summary" id="recurSummary"></div>
+    <div class="recur-hint" id="recurHint"></div>
+    <button class="btn submit-btn" id="recurSaveBtn" type="button">ذخیره تکرار</button>
+    <button class="btn secondary" id="recurRemoveBtn" type="button" style="display:none; margin:8px auto 0; width:100%;">حذف تکرار</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="projectModalOverlay">
   <div class="modal-panel wide" id="projectModalPanel">
     <div class="modal-header">
@@ -1897,7 +1926,8 @@
     absences: 'karooz.absences.v1',
     checklists: 'karooz.checklists.v1',
     clPalette: 'karooz.clPalette.v1',
-    ideas: 'karooz.ideas.v1'
+    ideas: 'karooz.ideas.v1',
+    recurring: 'karooz.recurring.v1'
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
 
@@ -2480,6 +2510,13 @@
   if(!Array.isArray(checklists)) checklists = [];
   let absences = load(KEYS.absences, {});   // { 'y-m-d': { reason, createdAt } } — unlimited absence days, each with a free-text reason
   let absenceEditDay = null;
+  let recurring = load(KEYS.recurring, []);   // [{ id, title, description, project, categories, days:[0..6], startKey, generated:[dayKey], createdAt }] — days: 0=شنبه … 6=جمعه
+  if(!Array.isArray(recurring)) recurring = [];
+  recurring.forEach(r => {
+    if(!Array.isArray(r.days)) r.days = [];
+    if(!Array.isArray(r.generated)) r.generated = [];
+    if(!Array.isArray(r.categories)) r.categories = [];
+  });
   let overtime = load(KEYS.overtime, {});   // { 'y-m-d': endHour (17..21) } — overtime applies to that single day only
   const OT_BASE = 16;
   function otLabel(end){ return `اضافه‌کاری تا ساعت ${toFa(end)} (${toFa(end - OT_BASE)} ساعت)`; }
@@ -3236,6 +3273,7 @@
       t.description = descInput.value.trim();
       t.project = projSel.value;
       t.categories = editCategories.slice();
+      syncSeriesFromTask(t);
       save(KEYS.tasks, tasks);
       editingId = null;
       refreshFn();
@@ -3313,6 +3351,13 @@
       tagsWrap.appendChild(pt);
     }
     (t.categories || []).forEach(c => tagsWrap.appendChild(categoryTagEl(c)));
+    const recurSeries = seriesOf(t);
+    if(recurSeries && recurSeries.days.length){
+      const rt = document.createElement('span'); rt.className = 'mini-tag recur';
+      rt.textContent = '🔁 ' + recurBadgeText(recurSeries.days);
+      rt.title = recurSeries.days.map(i => WEEKDAY_NAMES[i]).join('، ');
+      tagsWrap.appendChild(rt);
+    }
     main.appendChild(tagsWrap);
 
     const actions = document.createElement('div'); actions.className = 'task-actions';
@@ -3347,6 +3392,15 @@
     actions.appendChild(editBtn); actions.appendChild(delBtn);
 
     row.appendChild(dragHandle); row.appendChild(checkbox); row.appendChild(main); row.appendChild(actions); row.appendChild(stepper);
+
+    // Click on the card or its text (not on the checkbox / status / action buttons / drag handle) → recurrence settings
+    row.addEventListener('click', (e) => {
+      if(e.target.closest('.checkbox, .status-stepper, .task-actions, .drag-handle, button, a, input, textarea, select')) return;
+      if(row.classList.contains('dragging')) return;
+      const sel = window.getSelection && window.getSelection().toString();
+      if(sel) return;
+      openRecurModal(t);
+    });
     return row;
   }
 
@@ -4353,6 +4407,7 @@
   }
 
   function refreshDailyView(){
+    ensureRecurringFor(viewedDayKey());
     renderLeaveBtn();
     renderAbsenceBtn();
     renderDayNav();
@@ -4555,6 +4610,173 @@
     }).catch(() => {
       alert('کپی خودکار انجام نشد؛ متن را به‌صورت دستی انتخاب و کپی کن.');
     });
+  });
+
+  /* ---------------- Recurring tasks (کارهای تکرارشونده) ---------------- */
+  // Weekday index: 0 = شنبه … 6 = جمعه.  زوج = شنبه/دوشنبه/چهارشنبه ، فرد = یکشنبه/سه‌شنبه/پنجشنبه
+  const WEEKDAY_NAMES = ['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
+  const RECUR_PRESETS = [
+    { key: 'every', label: 'هر روز', days: [0,1,2,3,4,5,6] },
+    { key: 'odd', label: 'روزهای فرد', days: [1,3,5] },
+    { key: 'even', label: 'روزهای زوج', days: [0,2,4] }
+  ];
+  function dayNum(key){ const p = key.split('-').map(Number); return p[0] * 10000 + p[1] * 100 + p[2]; }
+  function weekdayIndexOfKey(key){
+    const p = key.split('-').map(Number);
+    return (findGregorianForJalali(p[0], p[1], p[2]).getDay() + 1) % 7;
+  }
+  function sameDays(a, b){
+    if(a.length !== b.length) return false;
+    const sa = a.slice().sort(), sb = b.slice().sort();
+    return sa.every((v, i) => v === sb[i]);
+  }
+  function recurBadgeText(days){
+    const pre = RECUR_PRESETS.find(x => sameDays(x.days, days));
+    if(pre) return pre.label;
+    const sorted = days.slice().sort((a, b) => a - b);
+    return sorted.length <= 3 ? sorted.map(i => WEEKDAY_NAMES[i]).join('، ') : toFa(sorted.length) + ' روز در هفته';
+  }
+  function seriesOf(t){
+    if(!t || !t.seriesId) return null;
+    return recurring.find(r => r.id === t.seriesId) || null;
+  }
+  function saveRecurring(){ save(KEYS.recurring, recurring); }
+
+  // Create the missing task for `dayKey` from every series that repeats on that weekday.
+  // A day is generated once per series (tracked in `generated`), so deleting or moving a generated task never brings it back.
+  function ensureRecurringFor(dayKey){
+    if(!recurring.length) return;
+    const num = dayNum(dayKey);
+    let wd = null, changed = false, seq = 0;
+    recurring.forEach(s => {
+      if(!s.days.length || num < dayNum(s.startKey)) return;
+      if(wd === null) wd = weekdayIndexOfKey(dayKey);
+      if(s.days.indexOf(wd) === -1) return;
+      if(s.generated.indexOf(dayKey) !== -1) return;
+      if(tasks.some(x => x.seriesId === s.id && !x.inWorkspace && x.dayKey === dayKey)) return;
+      const p = dayKey.split('-').map(Number);
+      const jp = jalaliPartsFor(findGregorianForJalali(p[0], p[1], p[2]));
+      tasks.push({
+        id: uid(), title: s.title, description: s.description || '', project: s.project || '',
+        categories: (s.categories || []).slice(), status: 'todo',
+        createdAt: Date.now() + (seq++),
+        completedAt: null, dayKey, jalaliDate: `${jp.day} ${jp.month} ${jp.year}`, inWorkspace: false,
+        rating: null, completionNote: '', seriesId: s.id
+      });
+      s.generated.push(dayKey);
+      changed = true;
+    });
+    if(changed){ save(KEYS.tasks, tasks); saveRecurring(); }
+  }
+
+  // Remove untouched (still "todo") generated tasks of future days so a changed schedule can regenerate them correctly.
+  function purgeFutureInstances(s, keep){
+    const todayNum = dayNum(todayDayKey());
+    const removed = new Set();
+    tasks = tasks.filter(x => {
+      if(x.seriesId !== s.id || x === keep) return true;
+      if(x.inWorkspace || !x.dayKey || dayNum(x.dayKey) <= todayNum) return true;
+      if(x.status !== 'todo') return true;
+      removed.add(x.dayKey);
+      return false;
+    });
+    s.generated = s.generated.filter(k => !removed.has(k));
+  }
+
+  function syncSeriesFromTask(t){
+    const s = seriesOf(t);
+    if(!s) return;
+    s.title = t.title; s.description = t.description || ''; s.project = t.project || '';
+    s.categories = (t.categories || []).slice();
+    saveRecurring();
+  }
+
+  function applyRecurrence(t, days){
+    let s = seriesOf(t);
+    if(!s){
+      const hasDay = !t.inWorkspace && !!t.dayKey;
+      s = { id: 's' + uid(), title: t.title, description: t.description || '', project: t.project || '',
+            categories: (t.categories || []).slice(), days, startKey: hasDay ? t.dayKey : todayDayKey(),
+            generated: hasDay ? [t.dayKey] : [], createdAt: Date.now() };
+      recurring.push(s);
+      t.seriesId = s.id;
+    }else{
+      s.days = days;
+      s.title = t.title; s.description = t.description || ''; s.project = t.project || '';
+      s.categories = (t.categories || []).slice();
+    }
+    purgeFutureInstances(s, t);
+    save(KEYS.tasks, tasks); saveRecurring();
+  }
+
+  function removeRecurrence(t){
+    const s = seriesOf(t);
+    if(!s) return;
+    purgeFutureInstances(s, t);
+    recurring = recurring.filter(x => x.id !== s.id);
+    tasks.forEach(x => { if(x.seriesId === s.id) delete x.seriesId; });
+    save(KEYS.tasks, tasks); saveRecurring();
+  }
+
+  let recurTask = null, recurPending = [];
+  function renderRecurPicker(){
+    const presetEl = document.getElementById('recurPresetPicker'); presetEl.innerHTML = '';
+    RECUR_PRESETS.forEach(pr => {
+      const chip = document.createElement('div');
+      chip.className = 'day-tag-chip' + (sameDays(recurPending, pr.days) ? ' selected' : '');
+      chip.textContent = pr.label;
+      chip.addEventListener('click', () => {
+        recurPending = sameDays(recurPending, pr.days) ? [] : pr.days.slice();
+        renderRecurPicker();
+      });
+      presetEl.appendChild(chip);
+    });
+    const dayEl = document.getElementById('recurDayPicker'); dayEl.innerHTML = '';
+    WEEKDAY_NAMES.forEach((name, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'day-tag-chip' + (recurPending.indexOf(i) !== -1 ? ' selected' : '');
+      chip.textContent = name;
+      chip.addEventListener('click', () => {
+        const at = recurPending.indexOf(i);
+        if(at === -1) recurPending.push(i); else recurPending.splice(at, 1);
+        renderRecurPicker();
+      });
+      dayEl.appendChild(chip);
+    });
+    const sorted = recurPending.slice().sort((a, b) => a - b);
+    document.getElementById('recurSummary').textContent = sorted.length
+      ? 'تکرار: ' + (sameDays(sorted, [0,1,2,3,4,5,6]) ? 'هر روز' : sorted.map(i => WEEKDAY_NAMES[i]).join('، '))
+      : 'هنوز روزی انتخاب نشده.';
+    document.getElementById('recurSaveBtn').disabled = !sorted.length;
+  }
+  function openRecurModal(t){
+    recurTask = t;
+    const s = seriesOf(t);
+    recurPending = s ? s.days.slice() : [];
+    document.getElementById('recurTaskName').textContent = t.title;
+    document.getElementById('recurModalTitle').textContent = s ? '🔁 ویرایش تکرار کار' : '🔁 تکرار کار';
+    const startKey = s ? s.startKey : ((!t.inWorkspace && t.dayKey) ? t.dayKey : todayDayKey());
+    document.getElementById('recurHint').innerHTML =
+      'روزهای فرد: یکشنبه، سه‌شنبه، پنجشنبه — روزهای زوج: شنبه، دوشنبه، چهارشنبه.<br>' +
+      'از ' + absenceDayLabel(startKey) + ' به بعد، این کار در روزهای انتخاب‌شده خودکار به لیست همان روز اضافه می‌شود.' +
+      (t.inWorkspace && !s ? '<br>این کار در اتاق کار می‌ماند و نسخه‌های روزانه‌اش از امروز ساخته می‌شوند.' : '');
+    document.getElementById('recurRemoveBtn').style.display = s ? 'block' : 'none';
+    renderRecurPicker();
+    document.getElementById('recurModalOverlay').classList.add('open');
+  }
+  function closeRecurModal(){ document.getElementById('recurModalOverlay').classList.remove('open'); recurTask = null; }
+  function refreshAfterRecur(){ closeRecurModal(); renderAll(); renderMonthlyReport(); }
+  document.getElementById('recurModalClose').addEventListener('click', closeRecurModal);
+  document.getElementById('recurModalOverlay').addEventListener('click', (e) => { if(e.target.id === 'recurModalOverlay') closeRecurModal(); });
+  document.getElementById('recurSaveBtn').addEventListener('click', () => {
+    if(!recurTask || !recurPending.length) return;
+    applyRecurrence(recurTask, recurPending.slice().sort((a, b) => a - b));
+    refreshAfterRecur();
+  });
+  document.getElementById('recurRemoveBtn').addEventListener('click', () => {
+    if(!recurTask) return;
+    removeRecurrence(recurTask);
+    refreshAfterRecur();
   });
 
   /* ---------------- Absence (غیبت) popup — works on a specific day key ---------------- */
@@ -4813,7 +5035,7 @@
   });
 
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, monthSummaries, exportedAt: new Date().toISOString() };
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, monthSummaries, recurring, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -4844,6 +5066,7 @@
         if(data.absences && typeof data.absences === 'object') absences = data.absences;
         if(Array.isArray(data.checklists)) checklists = data.checklists;
         if(Array.isArray(data.ideas)) ideas = data.ideas;
+        if(Array.isArray(data.recurring)) recurring = data.recurring;
         if(validPalette(data.clPalette)) clPalette = data.clPalette;
         if(data.monthSummaries && typeof data.monthSummaries === 'object' && !Array.isArray(data.monthSummaries)) monthSummaries = data.monthSummaries;
         if(data.theme && typeof data.theme === 'object'){
@@ -4877,6 +5100,7 @@
         save(KEYS.absences, absences);
         save(KEYS.checklists, checklists);
         save(KEYS.ideas, ideas);
+        save(KEYS.recurring, recurring);
         save(KEYS.clPalette, clPalette);
         save(KEYS.monthSummaries, monthSummaries);
         save(KEYS.theme, theme);
