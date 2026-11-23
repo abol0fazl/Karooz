@@ -1066,6 +1066,24 @@
   }
   .recur-summary{ margin:16px 0 4px; font-size:13px; color:var(--gold); font-weight:600; min-height:20px; }
   .recur-hint{ font-size:12px; color:var(--text-dim); line-height:1.9; margin:6px 0 14px; }
+
+  /* ---------- Update notification ---------- */
+  .update-banner{
+    display:none; align-items:center; gap:12px; flex-wrap:wrap;
+    background: var(--gold-dim); border:1px solid var(--gold); color: var(--text);
+    border-radius: var(--radius-sm); padding:10px 14px; margin-bottom:14px; font-size:13px;
+  }
+  .update-banner-text{ flex:1; min-width:180px; font-weight:600; }
+  .update-banner-close{ background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:16px; line-height:1; padding:4px; }
+  .update-banner-close:hover{ color: var(--text); }
+  .update-versions{ font-size:13px; color:var(--gold); font-weight:700; margin-bottom:14px; }
+  .update-notes{
+    max-height:200px; overflow:auto; white-space:pre-wrap; word-break:break-word;
+    font-size:12.5px; line-height:1.9; color:var(--text-dim);
+    background: var(--bg-card); border:1px solid var(--border-soft); border-radius: var(--radius-sm);
+    padding:10px 12px; margin-bottom:14px;
+  }
+  .update-status{ font-size:12px; color:var(--text-dim); margin-top:10px; min-height:16px; line-height:1.8; }
   .eod-task-item{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
     padding:8px 0; border-bottom:1px solid var(--border-soft); font-size:13px;
@@ -1444,6 +1462,12 @@
     </div>
   </div>
 
+  <div class="update-banner" id="updateBanner">
+    <span class="update-banner-text" id="updateBannerText"></span>
+    <button class="btn small" id="updateBannerOpen" type="button">مشاهده و بروزرسانی</button>
+    <button class="update-banner-close" id="updateBannerClose" type="button" aria-label="بستن">✕</button>
+  </div>
+
   <div class="quote-card">
     <div class="quote-mark">"</div>
     <div class="quote-text" id="quoteText">—</div>
@@ -1752,6 +1776,15 @@
         <input type="file" id="importFile" accept="application/json" style="display:none">
       </div>
     </div>
+
+    <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">🔔 بروزرسانی</div>
+      <div style="font-size:12.5px; color:var(--text-dim); margin-bottom:10px;">نسخه‌ی فعلی: <b id="appVersionLabel" dir="ltr"></b></div>
+      <div class="backup-actions">
+        <button id="checkUpdateBtn" type="button">بررسی بروزرسانی</button>
+      </div>
+      <div class="update-status" id="updateStatus"></div>
+    </div>
   </div>
 </div>
 
@@ -1826,6 +1859,25 @@
     <div class="recur-hint" id="recurHint"></div>
     <button class="btn submit-btn" id="recurSaveBtn" type="button">ذخیره تکرار</button>
     <button class="btn secondary" id="recurRemoveBtn" type="button" style="display:none; margin:8px auto 0; width:100%;">حذف تکرار</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="updateModalOverlay">
+  <div class="modal-panel" id="updateModalPanel" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">🔔 نسخه‌ی جدید کاروز</div>
+      <button class="modal-close" id="updateModalClose" type="button">✕</button>
+    </div>
+    <div class="update-versions" id="updateVersions"></div>
+    <div class="section-label">تغییرات این نسخه</div>
+    <div class="update-notes" id="updateNotes"></div>
+    <div class="recur-hint">
+      ۱) با زدن دکمه‌ی زیر، اول یک فایل پشتیبان از اطلاعاتت خودکار دانلود می‌شود.<br>
+      ۲) بعد فایل نسخه‌ی جدید دانلود می‌شود؛ آن را جای فایل فعلی (همان پوشه و همان نام) بگذار.<br>
+      ۳) اپ را دوباره باز کن؛ اطلاعاتت سر جایش است.
+    </div>
+    <button class="btn submit-btn" id="updateDownloadBtn" type="button">پشتیبان‌گیری و دانلود نسخه‌ی جدید</button>
+    <button class="btn secondary" id="updateLaterBtn" type="button" style="display:block; margin:8px auto 0; width:100%;">بعداً</button>
   </div>
 </div>
 
@@ -5034,16 +5086,17 @@
     save(KEYS.theme, theme);
   });
 
-  document.getElementById('exportBtn').addEventListener('click', () => {
+  function downloadBackup(tag){
     const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, monthSummaries, recurring, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'karooz-backup-' + new Date().toISOString().slice(0,10) + '.json';
+    a.download = 'karooz-backup-' + (tag ? tag + '-' : '') + new Date().toISOString().slice(0,10) + '.json';
     a.click();
     URL.revokeObjectURL(url);
-  });
+  }
+  document.getElementById('exportBtn').addEventListener('click', () => downloadBackup());
 
   document.getElementById('importBtn').addEventListener('click', () => {
     document.getElementById('importFile').click();
@@ -5117,6 +5170,117 @@
     e.target.value = '';
   });
 
+  /* ---------------- Update check (بررسی نسخه‌ی جدید از GitHub) ---------------- */
+  const APP_VERSION = '1.23.0';                 // با هر انتشار جدید، همین عدد را هم‌نام با تگ ریپو کن
+  const UPDATE_REPO = 'abol0fazl/Karooz';
+  const UPDATE_KEY = 'karooz.update.v1';        // وضعیت چک (فقط روی همین دستگاه؛ داخل پشتیبان نمی‌رود)
+  const UPDATE_EVERY = 6 * 60 * 60 * 1000;      // حداکثر هر ۶ ساعت یک بار چک خودکار
+  let updateState = load(UPDATE_KEY, {});
+  if(!updateState || typeof updateState !== 'object' || Array.isArray(updateState)) updateState = {};
+  let updateInfo = null;                        // { version, notes, pageUrl, assetUrl } فقط وقتی نسخه‌ی جدیدتر هست
+
+  function parseVer(v){
+    const m = String(v || '').trim().replace(/^v/i, '').match(/^(\d+)\.(\d+)\.(\d+)/);
+    return m ? [+m[1], +m[2], +m[3]] : null;
+  }
+  function isNewerVersion(a, b){
+    const x = parseVer(a), y = parseVer(b);
+    if(!x || !y) return false;
+    for(let i = 0; i < 3; i++){ if(x[i] !== y[i]) return x[i] > y[i]; }
+    return false;
+  }
+  function repoUrlOnly(u){
+    return (typeof u === 'string' && u.indexOf('https://github.com/' + UPDATE_REPO + '/') === 0) ? u : '';
+  }
+  function saveUpdateState(){ save(UPDATE_KEY, updateState); }
+
+  function renderUpdateBanner(){
+    const banner = document.getElementById('updateBanner');
+    const show = !!updateInfo && updateState.dismissed !== updateInfo.version;
+    banner.style.display = show ? 'flex' : 'none';
+    if(show) document.getElementById('updateBannerText').textContent = '🔔 نسخه‌ی جدید کاروز (' + updateInfo.version + ') آماده است';
+  }
+  function openUpdateModal(){
+    if(!updateInfo) return;
+    document.getElementById('updateVersions').textContent = 'نسخه‌ی فعلی ' + APP_VERSION + '  ←  نسخه‌ی جدید ' + updateInfo.version;
+    document.getElementById('updateNotes').textContent = updateInfo.notes || 'توضیحی برای این نسخه ثبت نشده است.';
+    document.getElementById('updateDownloadBtn').textContent = 'پشتیبان‌گیری و دانلود نسخه‌ی جدید';
+    document.getElementById('updateModalOverlay').classList.add('open');
+  }
+  function closeUpdateModal(){ document.getElementById('updateModalOverlay').classList.remove('open'); }
+
+  async function checkForUpdate(manual){
+    const status = document.getElementById('updateStatus');
+    if(manual) status.textContent = 'در حال بررسی…';
+    try{
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      const res = await fetch('https://api.github.com/repos/' + UPDATE_REPO + '/releases/latest', { signal: ctrl.signal, cache: 'no-store' });
+      clearTimeout(timer);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const rel = await res.json();
+      const version = String(rel.tag_name || '').replace(/^v/i, '');
+      if(!parseVer(version)) throw new Error('bad tag');
+      updateState.lastCheck = Date.now();
+      if(isNewerVersion(version, APP_VERSION)){
+        const asset = (rel.assets || []).find(a => /\.html?$/i.test(a.name || '') && repoUrlOnly(a.browser_download_url));
+        updateInfo = {
+          version,
+          notes: String(rel.body || '').slice(0, 4000),
+          pageUrl: repoUrlOnly(rel.html_url),
+          assetUrl: asset ? asset.browser_download_url : ''
+        };
+        updateState.latest = updateInfo;
+      }else{
+        updateInfo = null;
+        delete updateState.latest;
+      }
+      saveUpdateState();
+      renderUpdateBanner();
+      if(manual){
+        if(updateInfo){ status.textContent = 'نسخه‌ی جدید ' + updateInfo.version + ' موجود است.'; openUpdateModal(); }
+        else status.textContent = 'نسخه‌ی شما به‌روز است ✓';
+      }
+    }catch(e){
+      if(manual) status.textContent = 'بررسی انجام نشد؛ اتصال اینترنت را چک کن و دوباره امتحان کن.';
+    }
+  }
+  function maybeCheckForUpdate(){
+    if(!navigator.onLine) return;
+    if(updateState.lastCheck && Date.now() - updateState.lastCheck < UPDATE_EVERY) return;
+    checkForUpdate(false);
+  }
+  function initUpdateCheck(){
+    document.getElementById('appVersionLabel').textContent = 'v' + APP_VERSION;
+    const known = updateState.latest;
+    if(known && isNewerVersion(known.version, APP_VERSION)) updateInfo = known;
+    else if(known){ delete updateState.latest; saveUpdateState(); }
+    renderUpdateBanner();
+    maybeCheckForUpdate();
+    window.addEventListener('online', maybeCheckForUpdate);
+  }
+  document.getElementById('updateBannerOpen').addEventListener('click', openUpdateModal);
+  document.getElementById('updateBannerClose').addEventListener('click', () => {
+    if(updateInfo){ updateState.dismissed = updateInfo.version; saveUpdateState(); }
+    renderUpdateBanner();
+  });
+  document.getElementById('updateModalClose').addEventListener('click', closeUpdateModal);
+  document.getElementById('updateLaterBtn').addEventListener('click', closeUpdateModal);
+  document.getElementById('updateModalOverlay').addEventListener('click', (e) => { if(e.target.id === 'updateModalOverlay') closeUpdateModal(); });
+  document.getElementById('checkUpdateBtn').addEventListener('click', () => checkForUpdate(true));
+  document.getElementById('updateDownloadBtn').addEventListener('click', () => {
+    if(!updateInfo) return;
+    downloadBackup('before-update');
+    const url = updateInfo.assetUrl || updateInfo.pageUrl || ('https://github.com/' + UPDATE_REPO + '/releases/latest');
+    const direct = !!updateInfo.assetUrl;
+    document.getElementById('updateDownloadBtn').textContent = 'پشتیبان دانلود شد؛ در حال دانلود نسخه‌ی جدید…';
+    setTimeout(() => {
+      const a = document.createElement('a');
+      a.href = url; a.rel = 'noopener'; a.target = direct ? '_self' : '_blank';
+      document.body.appendChild(a); a.click(); a.remove();
+    }, 700);
+  });
+
   /* ---------------- Init ---------------- */
   reportView = getJalaliYMD(new Date());
   exportReportView = getJalaliYMD(new Date());
@@ -5131,6 +5295,7 @@
 
   renderClPaletteEditor();
   renderAll();
+  initUpdateCheck();
 
   // Keep the header stamp fresh, and auto-refresh the daily view at midnight (only while parked on "today")
   setInterval(() => {
