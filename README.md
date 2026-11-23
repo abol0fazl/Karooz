@@ -12,11 +12,14 @@
 
 ## معرفی
 
-کاروز (کار + روز) یک اپ سبک برای ثبت و مدیریت کارهای روزانه است. کارها را به پروژه و چند دسته‌بندی هم‌زمان وصل می‌کنی، در پایان روز گزارش می‌گیری و در پایان ماه یک خروجی رسمی و قابل‌ارائه داری. همه‌چیز داخل مرورگر اجرا می‌شود و اطلاعاتت از دستگاهت بیرون نمی‌رود.
+کاروز (کار + روز) یک اپ سبک برای ثبت و مدیریت کارهای روزانه است. کارها را به پروژه و چند دسته‌بندی هم‌زمان وصل می‌کنی، فعالیت‌های شخصی‌ات را جدا دنبال می‌کنی، در پایان روز گزارش می‌گیری و در پایان ماه یک خروجی رسمی و قابل‌ارائه داری. همه‌چیز داخل مرورگر اجرا می‌شود و اطلاعاتت از دستگاهت بیرون نمی‌رود.
 
 ## امکانات
 
 - **کارهای روزانه** با سه وضعیت (برای انجام، در حال انجام، انجام شد)، توضیح، پروژه و چند دسته‌بندی رنگی، جستجو و فیلتر، و جابه‌جایی با کشیدن و رها کردن
+- **دو نوع کار: «فعالیت» و «پروژه»:** هنگام ثبت کار جدید نوعش را انتخاب کن (پیش‌فرض فعالیت است)
+- **فعالیت‌های من:** بخشی جدا برای عادت‌ها و فعالیت‌های شخصی، با کارت اختصاصی که آخرین تاریخ انجام، میانگین امتیاز و تعداد روزهای انجام‌شده را نشان می‌دهد
+- **تقویم ماهانه برای هر فعالیت:** روزهای انجام‌شده و انجام‌نشده یک نگاه دیده می‌شوند و روزهای آینده کم‌رنگ‌اند؛ سوابق ثبت‌شده هر فعالیت هم با تاریخ و وضعیت در یک لیست جمع‌وجور و اسکرول‌دار قابل مشاهده است
 - **کارهای تکرارشونده:** روی هر کار کلیک کن و تکرارش را روی «هر روز»، «روزهای فرد»، «روزهای زوج» یا روزهای دلخواه هفته بگذار
 - **امتیاز و یادداشت تکمیل** هنگام انجام هر کار، به‌عنوان پایه‌ی گزارش روزانه
 - **اتاق کار** برای کارهایی که هنوز روز مشخصی ندارند، **چک‌لیست‌ها** و **ایده‌های آینده**
@@ -24,9 +27,10 @@
 - **گزارش پایان روز** و **متن آماده‌ی گزارش روزانه** برای کپی
 - **گزارش ماهانه** و **خروجی رسمی ماهانه** با نمودار، قابل ذخیره به‌صورت تصویر یا چاپ/PDF
 - ثبت **مرخصی، غیبت و اضافه‌کاری**
+- **تنظیمات ساعت کاری و شرایط کاری:** ثبت مرخصی، غیبت و اضافه‌کاری را جداگانه فعال یا غیرفعال کن، سهمیه‌ی مجاز ماهانه‌ی مرخصی و غیبت را تعیین کن و ساعت شروع و پایان کار و مدت اضافه‌کاری را مطابق شرایط خودت تنظیم کن
 - **نمودارهای تعاملی** (دایره‌ای، ساعتی و روند ماهانه)
 - **شخصی‌سازی ظاهر:** حالت روشن/تیره، رنگ‌ها، میزان بلور شیشه‌ای و تصویر پس‌زمینه
-- **پشتیبان‌گیری و بازیابی** با فایل JSON
+- **پشتیبان‌گیری و بازیابی** با فایل JSON (شامل تنظیمات کاری و اطلاعات فعالیت‌ها)
 - **اعلان بروزرسانی** وقتی نسخه‌ی جدید منتشر شود
 
 ## اجرا
@@ -48,7 +52,7 @@
 
 ## بروزرسانی
 
-وقتی اینترنت وصل باشد، اپ خودش آخرین نسخه‌ی این ریپو را چک می‌کند و در صورت وجود نسخه‌ی جدید یک اعلان نشان می‌دهد. با زدن دکمه‌ی بروزرسانی اول یک فایل پشتیبان از اطلاعاتت دانلود می‌شود و بعد فایل نسخه‌ی جدید. فایل جدید را جای فایل قبلی (همان پوشه و همان نام) بگذار و اپ را دوباره باز کن؛ اطلاعاتت سر جایش است. چک دستی هم از **تنظیمات ← بروزرسانی** ممکن است.
+وقتی اینترنت وصل باشد، اپ خودش آخرین نسخه‌ی این ریپو را چک می‌کند و در صورت وجود نسخه‌ی جدید یک اعلان نشان می‌دهد. با زدن دکمه‌ی بروزرسانی اول یک فایل پشتیبان از اطلاعاتت دانلود می‌شود و بعد فایل نسخه‌ی جدید. فایل جدید را جای فایل قبلی (همان پوشه و همان نام) بگذار و اپ را دوباره باز کن؛ اطلاعاتت سر جایش است و پروژه‌های قدیمی هم به‌طور خودکار با نوع «پروژه» حفظ می‌شوند. چک دستی هم از **تنظیمات ← بروزرسانی** ممکن است.
 
 ## مشارکت
 
@@ -74,11 +78,14 @@ A single-file HTML application · No server · No installation · Your data stay
 
 ## Overview
 
-Karooz (a combination of the Persian words *Kar* — work — and *Rooz* — day) is a lightweight application for recording and managing daily tasks. Tasks can be connected to projects and multiple categories. You can review your work at the end of each day and create a formal, shareable report at the end of each month. Everything runs in your browser, and your information stays on your device.
+Karooz (a combination of the Persian words *Kar* — work — and *Rooz* — day) is a lightweight application for recording and managing daily tasks. Tasks can be connected to projects and multiple categories, personal activities are tracked separately, you can review your work at the end of each day, and create a formal, shareable report at the end of each month. Everything runs in your browser, and your information stays on your device.
 
 ## Features
 
 - **Daily tasks** with three statuses (To Do, In Progress, Done), descriptions, projects, multiple color-coded categories, search, filters, and drag-and-drop ordering
+- **Two task types: "Activity" and "Project":** choose the type when creating a new task (Activity is the default)
+- **My Activities:** a dedicated section for habits and personal activities, with custom cards showing the last completion date, average score, and number of days completed
+- **Monthly calendar per activity:** completed and missed days are visible at a glance, future days are dimmed, and each activity's records are listed with date and status in a compact, scrollable list
 - **Recurring tasks:** set a task to repeat every day, on odd days, on even days, or on selected weekdays
 - **Completion scores and notes** when marking tasks as done, used as the basis for daily reports
 - **Workspace** for tasks without a scheduled date, **checklists**, and **future ideas**
@@ -86,9 +93,10 @@ Karooz (a combination of the Persian words *Kar* — work — and *Rooz* — day
 - **End-of-day reports** and copy-ready daily report text
 - **Monthly reports** and formal monthly reports with charts, exportable as images or printable to PDF
 - Tracking for **leave, absences, and overtime**
+- **Work hours and conditions settings:** enable or disable leave, absence, and overtime tracking individually, set monthly leave and absence allowances, and configure work start and end times and overtime duration to match your own schedule
 - **Interactive charts** (pie, hourly, and monthly trends)
 - **Appearance customization:** light/dark mode, colors, glass blur, and background images
-- **Backup and restore** using JSON files
+- **Backup and restore** using JSON files (including work settings and activity data)
 - **Update notifications** when a new version is released
 
 ## Getting Started
@@ -110,7 +118,7 @@ All information is stored in your browser's `localStorage`. This means the app i
 
 ## Updates
 
-When an internet connection is available, the app checks this repository for the latest version and displays a notification if an update is available. When you choose to update, the app first downloads a backup of your data and then the new version. Replace the old file with the downloaded file (using the same folder and filename), then reopen the app. Your data will remain available. You can also check manually from **Settings → Updates**.
+When an internet connection is available, the app checks this repository for the latest version and displays a notification if an update is available. When you choose to update, the app first downloads a backup of your data and then the new version. Replace the old file with the downloaded file (using the same folder and filename), then reopen the app. Your data will remain available, and existing projects are automatically preserved with the "Project" type. You can also check manually from **Settings → Updates**.
 
 ## Contributing
 
