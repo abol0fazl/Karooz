@@ -732,6 +732,25 @@
   }
   .settings-drawer .backup-actions button:hover{ border-color: var(--red); color: var(--text); }
 
+
+  .settings-group-card{background:var(--bg-card-glass);border:1px solid var(--border-soft);border-radius:13px;padding:13px 14px;margin:10px 0;}
+  .settings-group-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .settings-group-title{font-size:13px;font-weight:700;color:var(--text);}
+  .settings-group-desc{font-size:11px;line-height:1.8;color:var(--text-dim);margin-top:4px;}
+  .settings-switch{position:relative;width:44px;height:24px;flex:0 0 auto;display:inline-block;}
+  .settings-switch input{opacity:0;width:0;height:0;}
+  .settings-switch span{position:absolute;inset:0;border-radius:999px;background:var(--border);cursor:pointer;transition:.2s;}
+  .settings-switch span:before{content:"";position:absolute;width:18px;height:18px;right:3px;top:3px;border-radius:50%;background:#fff;transition:.2s;}
+  .settings-switch input:checked + span{background:var(--green);}
+  .settings-switch input:checked + span:before{transform:translateX(-20px);}
+  .settings-extra{display:none;border-top:1px solid var(--border-soft);margin-top:12px;padding-top:12px;}
+  .settings-extra.open{display:block;}
+  .settings-field{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;font-size:12px;color:var(--text-dim);}
+  .settings-field input,.settings-field select{width:110px;max-width:48%;direction:ltr;text-align:center;}
+  .settings-section-note{font-size:11px;line-height:1.9;color:var(--text-faint);margin-top:8px;}
+  .settings-drawer{width:min(470px,94vw);padding:22px 18px 42px;}
+  .settings-drawer-section{padding-bottom:4px;border-bottom:1px solid var(--border-soft);}
+  .settings-drawer-section:last-child{border-bottom:0;}
   /* ---------- Dark/Light mode toggle ---------- */
   .mode-toggle-wrap{ display:flex; justify-content:center; }
   .mode-toggle{
@@ -1690,6 +1709,40 @@
     </div>
 
     <div class="settings-drawer-section">
+      <div class="settings-drawer-section-title">🗓️ تنظیمات روز و قوانین کاری</div>
+      <div class="settings-group-card">
+        <div class="settings-group-title">روز من</div>
+        <div class="settings-group-desc">بازه زمانی روز در نمودارها و بخش‌های زمانی اپلیکیشن</div>
+        <div class="settings-field"><label for="dayStartHour">شروع روز</label><select id="dayStartHour"></select></div>
+        <div class="settings-field"><label for="dayEndHour">پایان روز</label><select id="dayEndHour"></select></div>
+        <div class="settings-section-note">محدوده پیش‌فرض از ساعت ۷ صبح تا ۱۲ شب است.</div>
+      </div>
+      <div class="settings-group-card">
+        <div class="settings-group-title">📅 سهمیه ماهانه با حقوق</div>
+        <div class="settings-field"><label for="monthlyAllowance">تعداد روزهای مجاز در ماه</label><input type="number" id="monthlyAllowance" min="0" max="31" step="1"></div>
+        <div class="settings-section-note">این سهمیه به‌صورت مشترک برای مرخصی و محاسبه روزهای بدون حقوق غیبت استفاده می‌شود.</div>
+      </div>
+      <div class="settings-group-card">
+        <div class="settings-group-head"><div><div class="settings-group-title">🏖️ مرخصی</div><div class="settings-group-desc">فعال‌سازی ثبت مرخصی با سقف ماهانه</div></div><label class="settings-switch"><input type="checkbox" id="leaveFeatureEnabled"><span></span></label></div>
+        <div class="settings-extra" id="leaveFeatureExtra"><div class="settings-section-note">تعداد مجاز ماهانه از تنظیم مشترک سهمیه روزهای مجاز با حقوق استفاده می‌کند.</div></div>
+      </div>
+      <div class="settings-group-card">
+        <div class="settings-group-head"><div><div class="settings-group-title">🚫 غیبت</div><div class="settings-group-desc">فعال‌سازی ثبت غیبت و نمایش سهمیه در توضیحات</div></div><label class="settings-switch"><input type="checkbox" id="absenceFeatureEnabled"><span></span></label></div>
+        <div class="settings-extra" id="absenceFeatureExtra">
+          <div class="settings-section-note">تعداد روزهای مجاز با حقوق از سهمیه مشترک ماهانه محاسبه می‌شود.</div>
+        </div>
+      </div>
+      <div class="settings-group-card">
+        <div class="settings-group-head"><div><div class="settings-group-title">⏱️ اضافه‌کاری</div><div class="settings-group-desc">ثبت اضافه‌کاری بر اساس ساعت پایان روز کاری شما</div></div><label class="settings-switch"><input type="checkbox" id="overtimeFeatureEnabled"><span></span></label></div>
+        <div class="settings-extra" id="overtimeFeatureExtra">
+          <div class="settings-field"><label for="workStartHour">شروع ساعت کاری</label><select id="workStartHour"></select></div>
+          <div class="settings-field"><label for="workEndHour">پایان ساعت کاری</label><select id="workEndHour"></select></div>
+          <div class="settings-section-note">ساعت‌های قابل ثبت اضافه‌کاری از پایان ساعت کاری تا انتهای روز خواهند بود.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-drawer-section">
       <div class="settings-drawer-section-title">حالت نمایش</div>
       <div class="mode-toggle-wrap">
         <button class="mode-toggle" id="modeToggleBtn" type="button" title="تغییر حالت روز/شب">
@@ -1979,7 +2032,8 @@
     checklists: 'karooz.checklists.v1',
     clPalette: 'karooz.clPalette.v1',
     ideas: 'karooz.ideas.v1',
-    recurring: 'karooz.recurring.v1'
+    recurring: 'karooz.recurring.v1',
+    workSettings: 'karooz.workSettings.v1'
   };
   const OLD_TASKS_KEY = 'karooz.tasks.v2';
 
@@ -2569,9 +2623,29 @@
     if(!Array.isArray(r.generated)) r.generated = [];
     if(!Array.isArray(r.categories)) r.categories = [];
   });
-  let overtime = load(KEYS.overtime, {});   // { 'y-m-d': endHour (17..21) } — overtime applies to that single day only
-  const OT_BASE = 16;
-  function otLabel(end){ return `اضافه‌کاری تا ساعت ${toFa(end)} (${toFa(end - OT_BASE)} ساعت)`; }
+  let overtime = load(KEYS.overtime, {});
+  let workSettings = Object.assign({
+    leaveEnabled:false, absenceEnabled:false, overtimeEnabled:false,
+    monthlyAllowance:1, dayStart:7, dayEnd:24, workStart:9, workEnd:17
+  }, load(KEYS.workSettings, {}));
+  function clampHour(v, fallback){ v=Number(v); return Number.isFinite(v)?Math.max(0,Math.min(24,Math.round(v))):fallback; }
+  workSettings.dayStart=clampHour(workSettings.dayStart,7);
+  workSettings.dayEnd=clampHour(workSettings.dayEnd,24);
+  workSettings.workStart=clampHour(workSettings.workStart,8);
+  workSettings.workEnd=clampHour(workSettings.workEnd,16);
+  workSettings.monthlyAllowance=Math.max(0,Math.min(31,parseInt(workSettings.monthlyAllowance,10)||0));
+  if(workSettings.dayEnd<=workSettings.dayStart) workSettings.dayEnd=Math.min(24,workSettings.dayStart+1);
+  if(workSettings.workEnd<=workSettings.workStart) workSettings.workEnd=Math.min(24,workSettings.workStart+1);
+  let OT_BASE=workSettings.overtimeEnabled ? workSettings.workEnd : 16;
+  function saveWorkSettings(){ save(KEYS.workSettings,workSettings); }
+  function monthLeaveDays(y,m){
+    const raw=leaves[y+'-'+m];
+    if(!raw) return [];
+    return Array.isArray(raw)?raw:[raw];
+  }
+  function isLeaveDay(y,m,key){ return monthLeaveDays(y,m).includes(key); }   // { 'y-m-d': endHour (17..21) } — overtime applies to that single day only
+
+  function otLabel(end){ return `اضافه‌کاری تا ساعت ${toFa(end)} (${toFa(Math.max(0,end-OT_BASE))} ساعت)`; }
   function monthOvertime(y, m){
     let hours = 0, days = 0;
     Object.keys(overtime).forEach(k => {
@@ -2723,12 +2797,13 @@
   }
 
   /* ---------------- Rendering: day navigation bar ---------------- */
+  function isLeaveDayForView(y,m,key){ return isLeaveDay(y,m,key); }
   function renderDayNav(){
     const parts = jalaliPartsFor(viewedDate());
     const isToday = dayOffset === 0;
     document.getElementById('dayNavTitle').textContent = isToday ? 'امروز' : parts.weekday;
     const vy = viewedYMD();
-    const isLeaveDay = leaves[vy.y + '-' + vy.m] === viewedDayKey();
+    const isLeaveDay = isLeaveDayForView(vy.y, vy.m, viewedDayKey());
     document.getElementById('dayNavSub').textContent = `${toFa(parts.day)} ${parts.month} ${toFa(parts.year)}` + (isLeaveDay ? ' · 🏖️ مرخصی' : '') + (absences[viewedDayKey()] ? ' · 🚫 غیبت' : '') + (overtime[viewedDayKey()] ? ' · اضافه‌کاری تا ' + toFa(overtime[viewedDayKey()]) : '');
     document.getElementById('jumpTodayBtn').style.display = isToday ? 'none' : 'inline-block';
   }
@@ -2985,7 +3060,8 @@
   function buildHourlyChartSVG(doneTasks, widthPx, heightPx, endHour){
     widthPx = widthPx || 540; heightPx = heightPx || 170;
     const hours = [];
-    for(let h = 8; h <= Math.max(16, endHour || 16); h++) hours.push(h);
+    const chartEnd=Math.max(workSettings.dayEnd,endHour||0);
+    for(let h=workSettings.dayStart;h<=chartEnd;h++) hours.push(h);
     const counts = hours.map(() => 0);
     const byHour = hours.map(() => []);
     doneTasks.slice().sort((a,b) => (a.completedAt||0) - (b.completedAt||0)).forEach(t => {
@@ -3571,19 +3647,20 @@
     });
     return out.sort((a,b) => a-b);
   }
-  // Office rule: one leave day per month is paid; every off day beyond that is unpaid and may reduce salary.
+  // Monthly paid-day allowance is configurable and shared by leave and absence records.
   function sumBox(cls, icon, value, unit, label){
     return `<div class="sum-box ${cls}"><div class="sicon">${icon}</div><div><div class="sval">${value}${unit ? `<small>${unit}</small>` : ''}</div><div class="slabel">${label}</div></div></div>`;
   }
   function monthSummaryHtml(totalCompleted, totalOpen){
     const y = reportView.y, m = reportView.m;
-    const leaveKey = leaves[y + '-' + m] || null;
+    const leaveKeys = monthLeaveDays(y,m);
+    const leaveCount = leaveKeys.length;
     const abs = monthAbsenceDays(y, m).length;
     const ot = monthOvertime(y, m);
-    const unpaid = Math.max(0, abs + (leaveKey ? 1 : 0) - 1);
+    const unpaid = Math.max(0, abs + leaveCount - workSettings.monthlyAllowance);
     let h = sumBox('done', '✅', toFa(totalCompleted), 'کار', 'تکمیل‌شده');
     h += sumBox('open', '📌', toFa(totalOpen), 'کار', 'باز (کل)');
-    if(leaveKey) h += sumBox('leave', '🏖️', 'روز ' + toFa(leaveKey.split('-')[2]), '', 'مرخصی');
+    if(leaveCount) h += sumBox('leave', '🏖️', toFa(leaveCount), 'روز', 'مرخصی');
     if(abs) h += sumBox('absent', '🚫', toFa(abs), 'روز', 'غیبت');
     if(unpaid) h += sumBox('unpaid', '⚠️', toFa(unpaid), 'روز', 'بدون حقوق');
     if(ot.days) h += sumBox('ot', '⏱️', toFa(ot.hours), 'ساعت', `اضافه‌کاری (${toFa(ot.days)} روز)`);
@@ -3628,8 +3705,8 @@
     const dateOfDay = (d) => { const dt = new Date(firstDate.getTime()); dt.setDate(dt.getDate() + d - 1); return dt; };
     const fridays = new Set();
     for(let d = 1; d <= daysInMonth; d++){ if(dateOfDay(d).getDay() === 5) fridays.add(d); }
-    const leaveKey = leaves[reportView.y + '-' + reportView.m] || null;
-    const leaveDay = leaveKey ? parseInt(leaveKey.split('-')[2], 10) : null;
+    const leaveKeys = monthLeaveDays(reportView.y, reportView.m);
+    const leaveDays = new Set(leaveKeys.map(k => parseInt(k.split('-')[2], 10)));
 
     const monthOtByDay = {};
     Object.keys(overtime).forEach(k => {
@@ -3637,7 +3714,7 @@
       if(p[0] === reportView.y && p[1] === reportView.m && overtime[k] > OT_BASE) monthOtByDay[p[2]] = overtime[k];
     });
     const activeDays = new Set([...Object.keys(monthTasksByDay).map(Number), ...Object.keys(monthNotesByDay).map(Number), ...Object.keys(monthOtByDay).map(Number)]);
-    if(leaveDay) activeDays.add(leaveDay);
+    leaveDays.forEach(d => activeDays.add(d));
     const absentDays = new Set(monthAbsenceDays(reportView.y, reportView.m));
     absentDays.forEach(d => activeDays.add(d));
     // Every day of the month is shown; days not reached yet stay faded and inactive until their date arrives
@@ -3650,7 +3727,7 @@
     [...allDays].sort((a,b) => a-b).forEach(d => {
       const isFriday = fridays.has(d);
       const isFuture = isFutureDay(d);
-      const isLeave = !isFriday && leaveDay === d;
+      const isLeave = !isFriday && leaveDays.has(d);
       const isAbsent = !isFriday && absentDays.has(d);
       const dayTasks = monthTasksByDay[d] || [];
       const noteObj = monthNotesByDay[d] || null;
@@ -3798,7 +3875,7 @@
       body.appendChild(blk);
     }
 
-    if(leaves[reportView.y + '-' + reportView.m] === dayKeyOf(reportView.y, reportView.m, d)){
+    if(isLeaveDay(reportView.y, reportView.m, dayKeyOf(reportView.y, reportView.m, d))){
       const leaveBadge = document.createElement('div');
       leaveBadge.className = 'day-tag-chip selected';
       leaveBadge.style.cssText = 'display:inline-block; margin:0 0 14px 8px; cursor:default;';
@@ -4436,26 +4513,14 @@
   }
 
   function renderLeaveBtn(){
-    const btn = document.getElementById('leaveBtn');
-    if(!btn) return;
-    const ymd = viewedYMD();
-    const used = leaves[ymd.y + '-' + ymd.m] || null;
-    btn.classList.remove('on');
-    btn.disabled = false;
-    btn.title = 'ثبت مرخصی (فقط یک‌بار در ماه)';
-    btn.textContent = '🏖️ مرخصی';
-    if(used === viewedDayKey()){
-      btn.disabled = true; btn.classList.add('on');
-      btn.textContent = '🏖️ مرخصی ثبت شد';
-      btn.title = 'این روز مرخصی است';
-    }else if(used){
-      btn.disabled = true;
-      btn.textContent = '🏖️ مرخصی این ماه مصرف شده';
-      btn.title = 'مرخصی این ماه روز ' + toFa(used.split('-')[2]) + ' استفاده شده';
-    }else if(viewedDate().getDay() === 5){
-      btn.disabled = true;
-      btn.title = 'جمعه تعطیل است';
-    }
+    const btn=document.getElementById('leaveBtn'); if(!btn) return;
+    if(!workSettings.leaveEnabled){btn.style.display='none';return;}
+    btn.style.display='';
+    const ymd=viewedYMD(),key=viewedDayKey(),used=monthLeaveDays(ymd.y,ymd.m);
+    btn.classList.remove('on');btn.disabled=false;btn.title='ثبت مرخصی ('+toFa(workSettings.monthlyAllowance)+' روز در ماه)';btn.textContent='🏖️ مرخصی';
+    if(used.includes(key)){btn.disabled=true;btn.classList.add('on');btn.textContent='🏖️ مرخصی ثبت شد';}
+    else if(used.length>=workSettings.monthlyAllowance){btn.disabled=true;btn.textContent='🏖️ سهمیه مرخصی تکمیل شد';}
+    else if(viewedDate().getDay()===5){btn.disabled=true;btn.title='جمعه تعطیل است';}
   }
 
   function refreshDailyView(){
@@ -4608,7 +4673,7 @@
   let pendingOvertime = 0;
   function renderOvertimePicker(){
     const el = document.getElementById('overtimeHourPicker'); el.innerHTML = '';
-    [17,18,19,20,21].forEach(h => {
+    Array.from({length:Math.max(0,24-OT_BASE)},(_,i)=>OT_BASE+i+1).forEach(h => {
       const chip = document.createElement('div');
       chip.className = 'day-tag-chip' + (pendingOvertime === h ? ' selected' : '');
       chip.textContent = 'تا ساعت ' + toFa(h);
@@ -4619,6 +4684,7 @@
     document.getElementById('overtimeSaveBtn').disabled = !pendingOvertime;
   }
   function openOvertimeModal(){
+    if(!workSettings.overtimeEnabled) return;
     const key = viewedDayKey();
     pendingOvertime = overtime[key] || 0;
     const parts = jalaliPartsFor(viewedDate());
@@ -4838,32 +4904,28 @@
     return `${pj.weekday} ${toFa(p[2])} ${PERSIAN_MONTHS[p[1] - 1]}`;
   }
   function openAbsenceModal(key){
+    if(!workSettings.absenceEnabled) return;
     absenceEditDay = key;
     const ex = absences[key] || null;
     document.getElementById('absenceReasonInput').value = ex && ex.reason ? ex.reason : '';
     document.getElementById('absenceModalTitle').textContent = (ex ? '✏️ ویرایش غیبت — ' : '🚫 ثبت غیبت — ') + absenceDayLabel(key);
     document.getElementById('absenceSaveBtn').textContent = ex ? 'ذخیره تغییرات' : 'ثبت غیبت';
     document.getElementById('absenceDeleteBtn').style.display = ex ? 'block' : 'none';
-    document.getElementById('absenceHint').textContent = 'طبق قوانین دفتر، یک روز مرخصی در ماه با حقوق است و روزهای بیشتر بدون حقوق و مشمول کسر خواهند بود.';
+    document.getElementById('absenceHint').textContent = 'سهمیه روزهای مجاز با حقوق: ' + toFa(workSettings.monthlyAllowance) + ' روز در ماه. روزهای بیشتر بدون حقوق و مشمول کسر خواهند بود.';
     document.getElementById('absenceModalOverlay').classList.add('open');
     setTimeout(() => document.getElementById('absenceReasonInput').focus(), 50);
   }
   function closeAbsenceModal(){ document.getElementById('absenceModalOverlay').classList.remove('open'); }
   function refreshAfterAbsence(){ closeAbsenceModal(); renderAll(); renderMonthlyReport(); }
   function renderAbsenceBtn(){
-    const btn = document.getElementById('absenceBtn');
-    if(!btn) return;
-    const ymd = viewedYMD(), key = viewedDayKey();
-    btn.classList.remove('on'); btn.disabled = false;
-    btn.textContent = '🚫 غیبت'; btn.title = 'ثبت غیبت برای این روز';
-    if(absences[key]){
-      btn.classList.add('on'); btn.textContent = '🚫 غیبت ثبت شد';
-      btn.title = 'برای ویرایش دلیل یا حذف غیبت کلیک کن';
-    }else if(leaves[ymd.y + '-' + ymd.m] === key){
-      btn.disabled = true; btn.title = 'این روز مرخصی است';
-    }else if(viewedDate().getDay() === 5){
-      btn.disabled = true; btn.title = 'جمعه تعطیل است';
-    }
+    const btn=document.getElementById('absenceBtn');if(!btn)return;
+    if(!workSettings.absenceEnabled){btn.style.display='none';return;}
+    btn.style.display='';
+    const ymd=viewedYMD(),key=viewedDayKey();
+    btn.classList.remove('on');btn.disabled=false;btn.textContent='🚫 غیبت';btn.title='ثبت غیبت برای این روز';
+    if(absences[key]){btn.classList.add('on');btn.textContent='🚫 غیبت ثبت شد';btn.title='برای ویرایش دلیل یا حذف غیبت کلیک کن';}
+    else if(isLeaveDay(ymd.y,ymd.m,key)){btn.disabled=true;btn.title='این روز مرخصی است';}
+    else if(viewedDate().getDay()===5){btn.disabled=true;btn.title='جمعه تعطیل است';}
   }
   document.getElementById('absenceBtn').addEventListener('click', () => openAbsenceModal(viewedDayKey()));
   document.getElementById('absenceModalClose').addEventListener('click', closeAbsenceModal);
@@ -4883,17 +4945,13 @@
     refreshAfterAbsence();
   });
 
-  document.getElementById('leaveBtn').addEventListener('click', () => {
-    const ymd = viewedYMD();
-    const mk = ymd.y + '-' + ymd.m;
-    if(leaves[mk]) return;
-    if(viewedDate().getDay() === 5) return;
-    if(absences[viewedDayKey()]){ alert('برای این روز غیبت ثبت شده است. اول غیبت را از گزارش ماهیانه حذف کن.'); return; }
-    if(!confirm('مرخصی این ماه روی ' + toFa(viewedJalaliDisplay()) + ' ثبت شود؟\nفقط یک‌بار در ماه قابل استفاده است و بعد از ثبت قابل تغییر نیست.')) return;
-    leaves[mk] = viewedDayKey();
-    save(KEYS.leaves, leaves);
-    renderDayNav();
-    renderLeaveBtn();
+  document.getElementById('leaveBtn').addEventListener('click',()=>{
+    if(!workSettings.leaveEnabled)return;
+    const ymd=viewedYMD(),mk=ymd.y+'-'+ymd.m,key=viewedDayKey(),used=monthLeaveDays(ymd.y,ymd.m);
+    if(used.includes(key)||used.length>=workSettings.monthlyAllowance||viewedDate().getDay()===5)return;
+    if(absences[key]){alert('برای این روز غیبت ثبت شده است. اول غیبت را حذف کن.');return;}
+    if(!confirm('مرخصی این ماه روی '+toFa(viewedJalaliDisplay())+' ثبت شود؟'))return;
+    used.push(key);leaves[mk]=used;save(KEYS.leaves,leaves);renderAll();renderMonthlyReport();
   });
 
   document.getElementById('prevMonthBtn').addEventListener('click', () => {
@@ -5087,7 +5145,7 @@
   });
 
   function downloadBackup(tag){
-    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, checklists, ideas, clPalette, monthSummaries, recurring, exportedAt: new Date().toISOString() };
+    const backup = { tasks, projects, categories, categoryColors, projectMeta, theme, notes, overtime, leaves, absences, workSettings, checklists, ideas, clPalette, monthSummaries, recurring, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -5117,6 +5175,7 @@
         if(data.overtime && typeof data.overtime === 'object') overtime = data.overtime;
         if(data.leaves && typeof data.leaves === 'object') leaves = data.leaves;
         if(data.absences && typeof data.absences === 'object') absences = data.absences;
+        if(data.workSettings && typeof data.workSettings === 'object') workSettings = Object.assign({}, workSettings, data.workSettings);
         if(Array.isArray(data.checklists)) checklists = data.checklists;
         if(Array.isArray(data.ideas)) ideas = data.ideas;
         if(Array.isArray(data.recurring)) recurring = data.recurring;
@@ -5151,6 +5210,9 @@
         save(KEYS.overtime, overtime);
         save(KEYS.leaves, leaves);
         save(KEYS.absences, absences);
+        OT_BASE=workSettings.overtimeEnabled?workSettings.workEnd:16;
+        save(KEYS.workSettings, workSettings);
+        syncWorkSettingsUI();
         save(KEYS.checklists, checklists);
         save(KEYS.ideas, ideas);
         save(KEYS.recurring, recurring);
@@ -5170,8 +5232,48 @@
     e.target.value = '';
   });
 
+  /* ---------------- Work settings ---------------- */
+  function fillHourOptions(el,selected){
+    if(!el)return;el.innerHTML='';
+    for(let h=0;h<=24;h++){const op=document.createElement('option');op.value=String(h);op.textContent=h===24?'۲۴:۰۰ (پایان روز)':toFa(String(h).padStart(2,'0')+':۰۰');el.appendChild(op);}
+    el.value=String(selected);
+  }
+  function syncWorkSettingsUI(){
+    fillHourOptions(document.getElementById('dayStartHour'),workSettings.dayStart);
+    fillHourOptions(document.getElementById('dayEndHour'),workSettings.dayEnd);
+    fillHourOptions(document.getElementById('workStartHour'),workSettings.workStart);
+    fillHourOptions(document.getElementById('workEndHour'),workSettings.workEnd);
+    ['leave','absence','overtime'].forEach(name=>{
+      const enabled=!!workSettings[name+'Enabled'],toggle=document.getElementById(name+'FeatureEnabled'),extra=document.getElementById(name+'FeatureExtra');
+      if(toggle)toggle.checked=enabled;if(extra)extra.classList.toggle('open',enabled);
+    });
+    const allowance=document.getElementById('monthlyAllowance');if(allowance)allowance.value=workSettings.monthlyAllowance;
+    const otBtn=document.getElementById('overtimeBtn');if(otBtn)otBtn.style.display=workSettings.overtimeEnabled?'':'none';
+  }
+  function commitWorkSettings(){
+    const num=id=>parseInt(document.getElementById(id).value,10);
+    const next={
+      dayStart:clampHour(num('dayStartHour'),7),dayEnd:clampHour(num('dayEndHour'),24),
+      workStart:clampHour(num('workStartHour'),9),workEnd:clampHour(num('workEndHour'),17)
+    };
+    if(next.dayEnd<=next.dayStart){alert('پایان روز باید بعد از شروع روز باشد.');syncWorkSettingsUI();return;}
+    if(next.workEnd<=next.workStart){alert('پایان ساعت کاری باید بعد از شروع ساعت کاری باشد.');syncWorkSettingsUI();return;}
+    Object.assign(workSettings,next);
+    OT_BASE=workSettings.overtimeEnabled?workSettings.workEnd:16;
+    saveWorkSettings();syncWorkSettingsUI();refreshDailyView();renderAll();renderMonthlyReport();
+  }
+  ['leave','absence','overtime'].forEach(name=>document.getElementById(name+'FeatureEnabled').addEventListener('change',e=>{
+    workSettings[name+'Enabled']=e.target.checked;if(name==='overtime')OT_BASE=workSettings.overtimeEnabled?workSettings.workEnd:16;saveWorkSettings();syncWorkSettingsUI();refreshDailyView();
+  }));
+  ['dayStartHour','dayEndHour','workStartHour','workEndHour'].forEach(id=>document.getElementById(id).addEventListener('change',commitWorkSettings));
+  document.getElementById('monthlyAllowance').addEventListener('change',e=>{
+    workSettings.monthlyAllowance=Math.max(0,Math.min(31,parseInt(e.target.value,10)||0));
+    saveWorkSettings();syncWorkSettingsUI();renderLeaveBtn();renderAbsenceBtn();renderMonthlyReport();
+  });
+  syncWorkSettingsUI();
+
   /* ---------------- Update check (بررسی نسخه‌ی جدید از GitHub) ---------------- */
-  const APP_VERSION = '1.23.0';                 // با هر انتشار جدید، همین عدد را هم‌نام با تگ ریپو کن
+  const APP_VERSION = '1.24.0';                 // با هر انتشار جدید، همین عدد را هم‌نام با تگ ریپو کن
   const UPDATE_REPO = 'abol0fazl/Karooz';
   const UPDATE_KEY = 'karooz.update.v1';        // وضعیت چک (فقط روی همین دستگاه؛ داخل پشتیبان نمی‌رود)
   const UPDATE_EVERY = 6 * 60 * 60 * 1000;      // حداکثر هر ۶ ساعت یک بار چک خودکار
